@@ -64,6 +64,34 @@ public final class Vector extends Point {
                 _xyz._d3() * other._xyz._d3();
     }
 
+    /**
+     * Cross product between two vectors
+     * @param other other vector
+     * @return new orthogonal vector
+     */
+    public Vector crossProduct(Vector other) {
+        double x = _xyz._d2() * other._xyz._d3() - _xyz._d3() * other._xyz._d2();
+        double y = _xyz._d3() * other._xyz._d1() - _xyz._d1() * other._xyz._d3();
+        double z = _xyz._d1() * other._xyz._d2() - _xyz._d2() * other._xyz._d1();
+
+        return new Vector(x, y, z);
+    }
+
+    public double lengthSquared() {
+        return dotProduct(this);
+    }
+
+    public double length() {
+        return Math.sqrt(lengthSquared());
+    }
+
+    /**
+     * Normalizes the vector
+     * @return new normalized vector
+     */
+    public Vector normalize() {
+        return scale(1 / length());
+    }
 
 }
 
