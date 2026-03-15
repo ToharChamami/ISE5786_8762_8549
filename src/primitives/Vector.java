@@ -6,12 +6,15 @@ package primitives;
 
 public final class Vector extends Point {
 
+    public static final Vector AXIS_X = new Vector(1, 0, 0);
+    public static final Vector AXIS_Y = new Vector(0, 1, 0);
+    public static final Vector AXIS_Z = new Vector(0, 0, 1);
+
     /**
      * Constructor to initialize Vector with three number values
      *
      * @throws IllegalArgumentException in case of zero vector
      */
-
     public Vector(double x, double y, double z) {
 
         super(x, y, z);
@@ -33,9 +36,33 @@ public final class Vector extends Point {
 
     }
 
+
+    /**
+     * Returns a string representation of the object.
+     * The returned string consists of an arrow prefix ({@code ->})
+     * followed by the string representation of the superclass.
+     * * @return A string representing this object.
+     */
     @Override
     public String toString() {
-        return "Vector: " + super.toString();
+        return "->" + super.toString();
+    }
+
+
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     * This implementation checks for identity, nullity, and class compatibility,
+     * then delegates the equality logic to the superclass implementation.
+     * * @param obj The reference object with which to compare.
+     *
+     * @return {@code true} if this object is the same as the obj argument
+     * based on the superclass logic; {@code false} otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return super.equals(obj);
     }
 
     public Vector add(Vector other) {

@@ -1,5 +1,8 @@
 package geometries.impl;
-import primitives.*;
+
+import primitives.Point;
+import primitives.Ray;
+import primitives.Vector;
 
 /**
  * Tube class represents a semi-infinite cylinder in 3D space,
@@ -7,15 +10,17 @@ import primitives.*;
  */
 public class Tube extends RadialGeometry {
 
-    protected final Ray axis;
+    protected final Ray _axis;
+
     /**
      * Constructor to initialize a tube with an axis ray and a radius. [cite: 126, 653]
-     * @param _axis   the axis ray of the tube [cite: 634]
+     *
+     * @param axis    the axis ray of the tube [cite: 634]
      * @param _radius the radius of the tube [cite: 634]
      */
-    public Tube(Ray _axis, double _radius) {
+    public Tube(double _radius, Ray axis) {
         super(_radius);
-        axis = _axis;
+        _axis = axis;
     }
 
 

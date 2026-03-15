@@ -41,7 +41,7 @@ public class Point {
      *
      * @return A new {@code Vector} representing the direction and distance from the other point to this one.
      */
-    public Vector substruct(Point other) {
+    public final Vector subtract(Point other) {
         return new Vector(_xyz.subtract(other._xyz));
     }
 
@@ -62,7 +62,7 @@ public class Point {
      * * @param other the other point
      * * @return square distance
      */
-    public double distanceSquared(Point other) {
+    public final double distanceSquared(Point other) {
         Double3 diff = _xyz.subtract(other._xyz);
         return diff._d1() * diff._d1() + diff._d2() * diff._d2() + diff._d3() * diff._d3();
     }
@@ -73,8 +73,48 @@ public class Point {
      * @param other the other point
      * @return distance
      */
-    public double distance(Point other) {
+    public final double distance(Point other) {
         return Math.sqrt(distanceSquared(other));
+    }
+
+    /**
+     * Returns a string representation of the point.
+     * * @return A string representing the _xyz value.
+     */
+    @Override
+    public String toString() {
+        return "" + _xyz;
+    }
+
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     * The objects are considered equal if they are of the same class
+     * and their _xyz fields are identical.
+     * * @param obj The reference object with which to compare.
+     *
+     * @return {@code true} if this object is the same as the obj
+     * argument; {@code false} otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        return _xyz.equals(((Point) obj)._xyz);
+    }
+
+
+    /**
+     * Returns a hash code value for the point.
+     * This method is supported for the benefit of hash tables.
+     * * @return A hash code value for this object.
+     */
+    @Override
+    public int hashCode() {
+        return _xyz.hashCode();
     }
 
 }
