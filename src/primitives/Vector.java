@@ -32,6 +32,7 @@ public final class Vector extends Point {
         }
 
     }
+
     @Override
     public String toString() {
         return "Vector: " + super.toString();
@@ -59,13 +60,14 @@ public final class Vector extends Point {
      */
 
     public double dotProduct(Vector other) {
-        return _xyz._d1() * other._xyz._d2() +
+        return _xyz._d1() * other._xyz._d1() +
                 _xyz._d2() * other._xyz._d2() +
                 _xyz._d3() * other._xyz._d3();
     }
 
     /**
      * Cross product between two vectors
+     *
      * @param other other vector
      * @return new orthogonal vector
      */
@@ -87,6 +89,7 @@ public final class Vector extends Point {
 
     /**
      * Normalizes the vector
+     *
      * @return new normalized vector
      */
     public Vector normalize() {
