@@ -6,7 +6,7 @@ import geometries.api.Geometry;
  * The RadialGeometry class is an abstract base class for all geometric shapes
  * that are defined by a radius.
  */
-public abstract class RadianGeometry extends Geometry {
+public abstract class RadialGeometry extends Geometry {
 
     /**
      * The radius of the geometric shape.
@@ -27,12 +27,12 @@ public abstract class RadianGeometry extends Geometry {
      *
      * @throws IllegalArgumentException If the radius is less than or equal to zero.
      */
-    public RadianGeometry(double _radius) {
+    public RadialGeometry(double _radius) {
         if (_radius < 0 || _radius == 0) {
             throw new IllegalArgumentException("radius must be positive");
 
         }
-        radius = _radius;
-        radiusSquared = _radius * _radius;
+         this.radius = _radius;
+         this.radiusSquared = _radius * _radius;
     }
 }
