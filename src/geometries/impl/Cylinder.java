@@ -1,8 +1,6 @@
 package geometries.impl;
 
-import primitives.Point;
 import primitives.Ray;
-import primitives.Vector;
 
 /**
  * Cylinder class represents a finite cylinder in 3D space.
@@ -24,8 +22,4 @@ public final class Cylinder extends Tube {
         _height = height;
     }
 
-    @Override
-    public Vector getNormal(Point point) {
-        return null;
-    }
 }

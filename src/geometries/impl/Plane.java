@@ -12,7 +12,6 @@ public final class Plane extends Geometry {
     private final Point _point;
     private final Vector _normal;
 
-
     /**
      * Constructor to initialize a plane from three points.
      *

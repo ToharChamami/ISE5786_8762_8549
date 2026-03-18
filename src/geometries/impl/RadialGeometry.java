@@ -21,7 +21,6 @@ public abstract class RadialGeometry extends Geometry {
      */
     protected double radiusSquared;
 
-
     /**
      * Constructs a new RadialGeometry with the specified radius.
      * Automatically calculates and stores the squared radius.

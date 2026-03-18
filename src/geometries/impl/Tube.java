@@ -23,7 +23,6 @@ public class Tube extends RadialGeometry {
         _axis = axis;
     }
 
-
     @Override
     public Vector getNormal(Point point) {
         return null;

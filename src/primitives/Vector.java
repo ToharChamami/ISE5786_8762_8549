@@ -16,11 +16,7 @@ public final class Vector extends Point {
      * @throws IllegalArgumentException in case of zero vector
      */
     public Vector(double x, double y, double z) {
-
-        super(x, y, z);
-        if (_xyz.equals(Double3.ZERO)) {
-            throw new IllegalArgumentException("Vector(0,0,0) is not allowed");
-        }
+        this(new Double3(x, y, z));
     }
 
     /**
@@ -29,13 +25,11 @@ public final class Vector extends Point {
      * @throws IllegalArgumentException in case of zero vector
      */
     public Vector(Double3 xyz) {
-        super(xyz);
-        if (_xyz.equals(Double3.ZERO)) {
+        if (xyz.equals(Double3.ZERO)) {
             throw new IllegalArgumentException("Vector(0,0,0) is not allowed");
         }
-
+        super(xyz);
     }
-
 
     /**
      * Returns a string representation of the object.
@@ -47,7 +41,6 @@ public final class Vector extends Point {
     public String toString() {
         return "->" + super.toString();
     }
-
 
     /**
      * Indicates whether some other object is "equal to" this one.
@@ -106,7 +99,6 @@ public final class Vector extends Point {
         return new Vector(x, y, z);
     }
 
-    
     public double lengthSquared() {
         return dotProduct(this);
     }
