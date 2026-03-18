@@ -18,8 +18,8 @@ public class Point {
 
     /**
      * Constructs a new point based on three individual coordinate values.
-     * * @param x The value on the x-axis.
      *
+     * @param x The value on the x-axis.
      * @param y The value on the y-axis.
      * @param z The value on the z-axis.
      */
@@ -29,7 +29,8 @@ public class Point {
 
     /**
      * Constructs a new point using an existing Double3 object.
-     * * @param xyz An object containing the three coordinate values.
+     *
+     * @param xyz An object containing the three coordinate values.
      */
     public Point(Double3 xyz) {
         _xyz = xyz;
@@ -37,19 +38,18 @@ public class Point {
 
     /**
      * Subtracts a point from the current point to create a new vector.
-     * * @param other The point to subtract from this point.
      *
+     * @param other The point to subtract from this point.
      * @return A new {@code Vector} representing the direction and distance from the other point to this one.
      */
     public final Vector subtract(Point other) {
         return new Vector(_xyz.subtract(other._xyz));
     }
 
-
     /**
      * Adds a vector to the current point to create a new point.
-     * * @param vector The vector to add to this point.
      *
+     * @param vector The vector to add to this point.
      * @return A new {@code Point} resulting from the translation of this point by the given vector.
      */
     public Point add(Vector vector) {
@@ -57,10 +57,10 @@ public class Point {
     }
 
     /**
-     * * Calculates the square distance between two points
-     * *
-     * * @param other the other point
-     * * @return square distance
+     * Calculates the square distance between two points
+     *
+     * @param other the other point
+     * @return square distance
      */
     public final double distanceSquared(Point other) {
         Double3 diff = _xyz.subtract(other._xyz);
@@ -105,7 +105,6 @@ public class Point {
         }
         return _xyz.equals(((Point) obj)._xyz);
     }
-
 
     /**
      * Returns a hash code value for the point.

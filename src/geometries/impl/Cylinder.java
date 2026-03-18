@@ -4,14 +4,13 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
-
 /**
  * Cylinder class represents a finite cylinder in 3D space.
  * It inherits from Tube and adds a height property.
  */
 public final class Cylinder extends Tube {
 
-    protected final double _height;
+    private final double _height;
 
     /**
      * Constructor to initialize a cylinder with its dimensions and axis.

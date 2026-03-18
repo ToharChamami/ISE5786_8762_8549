@@ -3,7 +3,6 @@ package geometries.api;
 import primitives.Point;
 import primitives.Vector;
 
-
 /**
  * The Geometry interface serves as a base for all geometric shapes
  * in a 3D Cartesian coordinate system.
@@ -12,6 +11,10 @@ import primitives.Vector;
  * to provide fundamental geometric calculations.
  */
 public abstract class Geometry {
+    /**
+     * Basic default constructor for documentation tools
+     */
+    public Geometry() { /* Basic default constructor for documentation tools */ }
 
     /**
      * Calculates the normal vector to the geometric body at a specific point on its surface.

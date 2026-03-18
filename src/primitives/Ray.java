@@ -25,8 +25,8 @@ public final class Ray {
     /**
      * Constructs a new Ray with a given origin and direction.
      * The direction vector is automatically normalized during initialization.
-     * * @param _origin    The starting point of the ray.
      *
+     * @param origin    The starting point of the ray.
      * @param direction The direction vector of the ray (will be normalized).
      */
     public Ray(Point origin, Vector direction) {
@@ -36,7 +36,8 @@ public final class Ray {
 
     /**
      * Getter for the origin point of the ray.
-     * * @return The origin point.
+     *
+     * @return The origin point.
      */
     public Point origin() {
         return _origin;
@@ -44,30 +45,18 @@ public final class Ray {
 
     /**
      * Getter for the direction vector of the ray.
-     * * @return The normalized direction vector.
+     *
+     * @return The normalized direction vector.
      */
     public Vector direction() {
         return _direction;
     }
 
-
-    /**
-     * Returns a string representation of the ray.
-     * * @return A string containing the origin and direction values.
-     */
     @Override
     public String toString() {
         return "Ray:" + _origin + _direction;
     }
 
-
-    /**
-     * Indicates whether some other object is "equal to" this one.
-     * Two rays are considered equal if they have the same origin and direction.
-     * * @param obj The reference object with which to compare.
-     *
-     * @return {@code true} if this object is the same as the obj argument; {@code false} otherwise.
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -76,11 +65,6 @@ public final class Ray {
         return _origin.equals(other._origin) && _direction.equals(other._direction);
     }
 
-
-    /**
-     * Returns a hash code value for the ray.
-     * * @return A hash code value based on the origin and direction.
-     */
     @Override
     public int hashCode() {
         return Objects.hash(_origin, _direction);
