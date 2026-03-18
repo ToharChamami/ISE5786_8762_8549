@@ -106,6 +106,7 @@ public final class Vector extends Point {
         return new Vector(x, y, z);
     }
 
+    
     public double lengthSquared() {
         return dotProduct(this);
     }
