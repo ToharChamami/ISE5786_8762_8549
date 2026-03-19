@@ -7,6 +7,9 @@ import primitives.Vector;
  * The Sphere class represents a sphere in 3D Cartesian coordinate system.
  */
 public final class Sphere extends RadialGeometry {
+    /**
+     * Center point of the sphere
+     */
     private final Point _center;
 
     /**

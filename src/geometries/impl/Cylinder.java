@@ -7,7 +7,9 @@ import primitives.Ray;
  * It inherits from Tube and adds a height property.
  */
 public final class Cylinder extends Tube {
-
+    /**
+     * The height of the cylinder
+     */
     private final double _height;
 
     /**

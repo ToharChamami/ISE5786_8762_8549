@@ -8,8 +8,13 @@ import primitives.Vector;
  * Class Plane represents a plane in a 3D system.
  */
 public final class Plane extends Geometry {
-
+    /**
+     * Point on the plane
+     */
     private final Point _point;
+    /**
+     * Normal vector to the plane
+     */
     private final Vector _normal;
 
     /**

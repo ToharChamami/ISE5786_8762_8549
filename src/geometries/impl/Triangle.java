@@ -2,6 +2,10 @@ package geometries.impl;
 
 import primitives.Point;
 
+/**
+ * Triangle class represents a triangle in 3D space.
+ * Inherits from Polygon.
+ */
 public final class Triangle extends Polygon {
 
     /**

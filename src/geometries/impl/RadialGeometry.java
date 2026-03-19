@@ -24,8 +24,8 @@ public abstract class RadialGeometry extends Geometry {
     /**
      * Constructs a new RadialGeometry with the specified radius.
      * Automatically calculates and stores the squared radius.
-     * * @param _radius The radius of the shape. Must be a positive value.
      *
+     * @param radius The radius of the shape. Must be a positive value.
      * @throws IllegalArgumentException If the radius is less than or equal to zero.
      */
     public RadialGeometry(double radius) {

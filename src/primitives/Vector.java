@@ -5,24 +5,36 @@ package primitives;
  */
 
 public final class Vector extends Point {
-
+    /**
+     * Unit vector on the X axis
+     */
     public static final Vector AXIS_X = new Vector(1, 0, 0);
+    /**
+     * Unit vector on the Y axis
+     */
     public static final Vector AXIS_Y = new Vector(0, 1, 0);
+    /**
+     * Unit vector on the Z axis
+     */
     public static final Vector AXIS_Z = new Vector(0, 0, 1);
 
     /**
-     * Constructor to initialize Vector with three number values
+     * Constructor to initialize a vector from three coordinates.
      *
-     * @throws IllegalArgumentException in case of zero vector
+     * @param x coordinate
+     * @param y coordinate
+     * @param z coordinate
+     * @throws IllegalArgumentException if it's a zero vector
      */
     public Vector(double x, double y, double z) {
         this(new Double3(x, y, z));
     }
 
     /**
-     * Constructor to initialize Vector with a Double3 object
+     * Constructor to initialize a vector from a Double3 object.
      *
-     * @throws IllegalArgumentException in case of zero vector
+     * @param xyz coordinates
+     * @throws IllegalArgumentException if it's a zero vector
      */
     public Vector(Double3 xyz) {
         if (xyz.equals(Double3.ZERO)) {
@@ -31,26 +43,11 @@ public final class Vector extends Point {
         super(xyz);
     }
 
-    /**
-     * Returns a string representation of the object.
-     * The returned string consists of an arrow prefix ({@code ->})
-     * followed by the string representation of the superclass.
-     * * @return A string representing this object.
-     */
     @Override
     public String toString() {
         return "->" + super.toString();
     }
 
-    /**
-     * Indicates whether some other object is "equal to" this one.
-     * This implementation checks for identity, nullity, and class compatibility,
-     * then delegates the equality logic to the superclass implementation.
-     * * @param obj The reference object with which to compare.
-     *
-     * @return {@code true} if this object is the same as the obj argument
-     * based on the superclass logic; {@code false} otherwise.
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -58,27 +55,32 @@ public final class Vector extends Point {
         return super.equals(obj);
     }
 
+    /**
+     * Adds two vectors.
+     *
+     * @param other the other vector
+     * @return a new vector
+     */
     public Vector add(Vector other) {
         return new Vector(_xyz.add(other._xyz));
     }
 
     /**
-     * Scalar multiplication
+     * Scales a vector by a scalar.
      *
-     * @param scalar multiplication factor
-     * @return new scaled vector
+     * @param scalar the scalar value
+     * @return a new vector
      */
     public Vector scale(double scalar) {
         return new Vector(_xyz.scale(scalar));
     }
 
     /**
-     * Dot product between two vectors
+     * Dot product between two vectors.
      *
-     * @param other other vector
-     * @return scalar result
+     * @param other the other vector
+     * @return the scalar product
      */
-
     public double dotProduct(Vector other) {
         return _xyz._d1() * other._xyz._d1() +
                 _xyz._d2() * other._xyz._d2() +
@@ -86,10 +88,10 @@ public final class Vector extends Point {
     }
 
     /**
-     * Cross product between two vectors
+     * Cross product between two vectors.
      *
-     * @param other other vector
-     * @return new orthogonal vector
+     * @param other the other vector
+     * @return a new vector orthogonal to both
      */
     public Vector crossProduct(Vector other) {
         double x = _xyz._d2() * other._xyz._d3() - _xyz._d3() * other._xyz._d2();
@@ -99,10 +101,20 @@ public final class Vector extends Point {
         return new Vector(x, y, z);
     }
 
+    /**
+     * Squared length of the vector.
+     *
+     * @return length squared
+     */
     public double lengthSquared() {
         return dotProduct(this);
     }
 
+    /**
+     * Length of the vector.
+     *
+     * @return length
+     */
     public double length() {
         return Math.sqrt(lengthSquared());
     }

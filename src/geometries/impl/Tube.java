@@ -9,7 +9,9 @@ import primitives.Vector;
  * defined by an axis ray and a radius. [cite: 154, 653]
  */
 public class Tube extends RadialGeometry {
-
+    /**
+     * The axis ray of the tube
+     */
     protected final Ray _axis;
 
     /**
