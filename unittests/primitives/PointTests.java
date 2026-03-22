@@ -5,8 +5,19 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Unit tests for class {@link primitives.Point}.
+ */
 public class PointTests {
+    /**
+     * Default constructor
+     */
+    public PointTests() {
+    }
 
+    /**
+     * Delta value for accuracy when comparing double values
+     */
     private static final double DELTA = 1e-6;
 
     /**
@@ -27,7 +38,9 @@ public class PointTests {
                 "ERROR: Point subtract(itself) does not throw an exception");
     }
 
-    //* Test method for {@link primitives.Point#add(primitives.Point)}.
+    /**
+     * Test method for {@link primitives.Point#add(primitives.Vector)}.
+     */
 
     @Test
     void testAdd() {
@@ -43,7 +56,9 @@ public class PointTests {
 
     }
 
-    // * Test method for {@link primitives.Point#distanceSquared(primitives.Point)}.
+    /**
+     * Test method for {@link primitives.Point#distanceSquared(primitives.Point)}.
+     */
     @Test
     void testDistanceSquared() {
 // EP01: Simple distanceSquared of a point and a point
@@ -56,9 +71,11 @@ public class PointTests {
 
     }
 
-    // * Test method for {@link primitives.Point#dintance(primitives.Point)}.
+    /**
+     * Test method for {@link primitives.Point#distance(primitives.Point)}.
+     */
     @Test
-    void testdistance() {
+    void testDistance() {
         // EP01: Simple distanceSquared of a point and a point
         Point p1 = new Point(4, 6, 8);
         Point p2 = new Point(2, 2, 2);

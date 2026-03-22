@@ -10,10 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for class {@link geometries.impl.Plane}.
- *
- * @author Elinor
  */
 class PlaneTests {
+
+    /**
+     * Default constructor
+     */
+    PlaneTests() {
+    }
+
     /**
      * Delta value for accuracy when comparing double values
      */

@@ -7,8 +7,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for class {@link primitives.Vector}.
+ */
 public class VectorTests {
 
+    /**
+     * Default constructor
+     */
+    public VectorTests() {
+    }
+
+    /**
+     * Delta value for accuracy when comparing double values
+     */
     private static final double DELTA = 1e-6;
 
     /**
@@ -16,10 +28,9 @@ public class VectorTests {
      */
     @Test
     void testSubtract() {
-        Point p1 = new Point(1, 2, 3);
-
         // Equivalence Partitions Tests
         // EP01: Simple subtraction of two points
+        Point p1 = new Point(1, 2, 3);
         Point p2 = new Point(2, 4, 6);
         assertEquals(new Vector(1, 2, 3), p2.subtract(p1), "ERROR: Point subtract(Point) result is wrong");
 
@@ -29,10 +40,13 @@ public class VectorTests {
                 "ERROR: Point subtract(itself) does not throw an exception");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#Vector(double, double, double)}.
+     */
     void testVector() {
 
         // EP01: Simple constractor of a vector
-        assertDoesNotThrow(() -> new Vector(1, 2, 3), "ERROR:Vector ctor doesnt build right vector");
+        assertDoesNotThrow(() -> new Vector(1, 2, 3), "ERROR:Failed constructing a valid vector");
 
         //BV01:
         assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR:constctor zero has been build ");
@@ -40,18 +54,25 @@ public class VectorTests {
         assertThrows(IllegalArgumentException.class, () -> new Vector(Double3.ZERO), "Constructed a zero vector from Double3.ZERO");
     }
 
+    /**
+     * Test method for {@link primitives.Vector#add(primitives.Vector)}.
+     */
     @Test
     void testAdd() {
         Point p1 = new Point(1, 2, 3);
         Vector v1 = new Vector(1, 2, 3);
         //EP01
-        assertEquals(new Vector(2, 4, 6), p1.add(v1), "ERROR:Point add(Vector) to origin result is wrong");
+        assertEquals(new Vector(2, 4, 6), p1.add(v1), "ERROR:Vector add() result is wrong");
         //BV01
+        // We use subtract and add logic; if v1 + v2 = 0, it should throw exception in Vector
         Vector v2 = new Vector(-1, -2, -3);
         assertThrows(IllegalArgumentException.class, () -> p1.add(v2), "ERROR: VECTOR Add() result doesnt throw exception");
 
     }
 
+    /**
+     * Test method for {@link primitives.Vector#scale(double)}.
+     */
     @Test
     void testScale() {
         Vector v1 = new Vector(1, 2, 3);
@@ -70,11 +91,9 @@ public class VectorTests {
         Vector v2 = new Vector(0, 3, -2); // Orthogonal to v1 if it was (1,2,3)? No, let's pick better values.
         Vector vOrthogonal = new Vector(0, 3, -2); // 1*0 + 2*3 + 3*(-2) = 0
 
-        // ============ Equivalence Partitions Tests ==============
         // EP01: Simple dot product calculation
         assertEquals(14, v1.dotProduct(v1), DELTA, "dotProduct() wrong value");
 
-        // =============== Boundary Values Tests ==================
         // BV01: Dot product of orthogonal vectors (should be zero)
         assertEquals(0, v1.dotProduct(vOrthogonal), DELTA, "dotProduct() for orthogonal vectors is not zero");
     }
@@ -99,6 +118,25 @@ public class VectorTests {
         // BV01: Cross product of parallel vectors (should throw exception for zero vector)
         assertThrows(IllegalArgumentException.class, () -> v1.crossProduct(v1.scale(2)),
                 "crossProduct() for parallel vectors does not throw exception");
+    }
+
+    /**
+     * Test method for {@link primitives.Vector#length()}.
+     */
+    @Test
+    void testLength() {
+
+        // EP01: Simple length calculation using Pythagoras triple
+        assertEquals(5, new Vector(0, 3, 4).length(), DELTA, "ERROR: length() wrong value");
+    }
+
+    /**
+     * Test method for {@link primitives.Vector#lengthSquared()}.
+     */
+    @Test
+    void testLengthSquared() {
+        // EP01: Simple squared length calculation
+        assertEquals(25, new Vector(0, 3, 4).lengthSquared(), DELTA, "ERROR: lengthSquared() wrong value");
     }
 
     /**
