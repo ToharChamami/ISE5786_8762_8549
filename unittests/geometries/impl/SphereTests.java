@@ -7,9 +7,18 @@ import primitives.Vector;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for class {@link geometries.impl.Sphere}.
+ */
 public class SphereTests {
+    /**
+     * Delta value for accuracy when comparing double values
+     */
     private static final double DELTA = 1e-6;
 
+    /**
+     * Test method for {@link geometries.impl.Sphere#getNormal(primitives.Point)}.
+     */
     @Test
     void testGetNormal() {
 

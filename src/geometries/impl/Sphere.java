@@ -25,7 +25,9 @@ public final class Sphere extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        return null;
+        // TDD Fix: Subtract center from the point to get the direction vector
+        // and normalize it to ensure length is 1.0.
+        return point.subtract(_center).normalize();
 
     }
 }

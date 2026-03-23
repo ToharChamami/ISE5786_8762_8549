@@ -78,8 +78,8 @@ public class PointTests {
     void testDistance() {
         // EP01: Simple distanceSquared of a point and a point
         Point p1 = new Point(4, 6, 8);
-        Point p2 = new Point(2, 2, 2);
-        assertEquals(6, p1.distance(p2), DELTA, "ERROR: Point distance(Point) to origin result is wrong");
+        Point p2 = new Point(4, 6, 4);
+        assertEquals(4, p1.distance(p2), DELTA, "ERROR: Point distance(Point) to origin result is wrong");
 
         // BV01: distance of point with itself
         assertEquals(0, p1.distance(p1), DELTA, "ERROR: Point distance(itself) to origin result is wrong");

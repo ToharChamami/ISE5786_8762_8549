@@ -8,12 +8,18 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for class {@link geometries.impl.Triangle}.
+ */
 public class TriangleTests {
 
+    /**
+     * Delta value for accuracy when comparing double values
+     */
     private static final double DELTA = 1e-6;
 
     /**
-     * Test method for {@link Triangle#getNormal(Point)}.
+     * Test method for {@link geometries.impl.Triangle#getNormal(primitives.Point)}.
      */
     @Test
     void testGetNormal() {
