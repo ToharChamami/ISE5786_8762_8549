@@ -1,4 +1,4 @@
-package gometries.impl;
+package geometries.impl;
 
 public class CylinderTests {
 }
