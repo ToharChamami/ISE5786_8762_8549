@@ -22,7 +22,6 @@ public class SphereTests {
         assertDoesNotThrow(() -> sphere.getNormal(pointOnSurface), "getNormal() threw unexpected exception");
         //ep02
         assertEquals(1, result.length(), DELTA, "Sphere normal is not a unit vector");
-
         //EP03
         Vector expected = pointOnSurface.subtract(center);
         assertEquals(expected, result, "normal direction isn`t correct");

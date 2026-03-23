@@ -47,7 +47,6 @@ public class VectorTests {
 
         // EP01: Simple constractor of a vector
         assertDoesNotThrow(() -> new Vector(1, 2, 3), "ERROR:Failed constructing a valid vector");
-
         //BV01:
         assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR:constctor zero has been build ");
         //BV02
