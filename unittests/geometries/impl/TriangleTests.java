@@ -31,7 +31,7 @@ public class TriangleTests {
 
         Vector result = triangle.getNormal(pointInside);
 
-//EP02: checks the the result length is 1
+//EP02: checks the result length is 1
         assertEquals(1, result.length(), DELTA, "Triangle normal is not a unit vector");
 
 //EP03: checks if the normal is orthogonal
