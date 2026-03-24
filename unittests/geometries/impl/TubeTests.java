@@ -14,6 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TubeTests {
 
     /**
+     * Basic default constructor
+     */
+    public TubeTests() {
+    }
+
+    /**
      * Delta value for accuracy when comparing double values
      */
     private static final double DELTA = 1e-6;

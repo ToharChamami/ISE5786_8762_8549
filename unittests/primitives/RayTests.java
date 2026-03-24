@@ -11,6 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RayTests {
 
     /**
+     * Basic default constructor
+     */
+    public RayTests() {
+    }
+
+    /**
      * Delta value for accuracy when comparing double values
      */
     private static final double DELTA = 1e-6;

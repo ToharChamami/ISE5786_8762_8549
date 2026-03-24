@@ -11,6 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Unit tests for class {@link geometries.impl.Sphere}.
  */
 public class SphereTests {
+
+    /**
+     * Basic default constructor
+     */
+    public SphereTests() {
+    }
+
     /**
      * Delta value for accuracy when comparing double values
      */
