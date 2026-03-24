@@ -28,13 +28,13 @@ public class VectorTests {
      */
     @Test
     void testSubtract() {
-        // Equivalence Partitions Tests
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Simple subtraction of two points
         Point p1 = new Point(1, 2, 3);
         Point p2 = new Point(2, 4, 6);
         assertEquals(new Vector(1, 2, 3), p2.subtract(p1), "ERROR: Point subtract(Point) result is wrong");
 
-        // Boundary Values Tests
+        // =============== Boundary Values Tests ==================
         // BV01: Subtraction of a point from itself (should throw exception for zero vector)
         assertThrows(IllegalArgumentException.class, () -> p1.subtract(p1),
                 "ERROR: Point subtract(itself) does not throw an exception");
@@ -45,11 +45,14 @@ public class VectorTests {
      */
     void testVector() {
 
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Simple ctor of a vector
         assertDoesNotThrow(() -> new Vector(1, 2, 3), "ERROR:Failed constructing a valid vector");
-        //BV01:
-        assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR:constctor zero has been build ");
-        //BV02
+
+        // =============== Boundary Values Tests ==================
+        //BV01: ensure the ctor throw exception when its zero vector by zero values
+        assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR:ctor zero has been build ");
+        //BV02: ensure the ctor throw exception when its zero vector by double3 with zero values
         assertThrows(IllegalArgumentException.class, () -> new Vector(Double3.ZERO), "Constructed a zero vector from Double3.ZERO");
     }
 
@@ -60,8 +63,12 @@ public class VectorTests {
     void testAdd() {
         Vector p1 = new Vector(1, 2, 3);
         Vector v1 = new Vector(1, 2, 3);
+
+        // ============ Equivalence Partitions Tests ==============
         //EP01: ensure the result is correct
         assertEquals(new Vector(2, 4, 6), p1.add(v1), "ERROR:Vector add() result is wrong");
+
+        // =============== Boundary Values Tests ==================
         //BV01: ensure the throw exception when the result is zero vector
         Vector v2 = new Vector(-1, -2, -3);
         assertThrows(IllegalArgumentException.class, () -> p1.add(v2), "ERROR: VECTOR Add() result doesnt throw exception");
@@ -74,9 +81,13 @@ public class VectorTests {
     @Test
     void testScale() {
         Vector v1 = new Vector(1, 2, 3);
-        //ep01
+
+        // ============ Equivalence Partitions Tests ==============
+        //EP01: ensure the excepted vector built
         assertEquals(new Vector(2, 4, 6), v1.scale(2), "ERROR:The scale origin result is wrong");
-        //BV01
+
+        // =============== Boundary Values Tests ==================
+        //BV01: ensure the ctor does not building zero vector
         assertThrows(IllegalArgumentException.class, () -> v1.scale(0), "ERROR:Scale cannot be zero");
     }
 
@@ -89,9 +100,11 @@ public class VectorTests {
         Vector v2 = new Vector(0, 3, -2); // Orthogonal to v1 if it was (1,2,3)? No, let's pick better values.
         Vector vOrthogonal = new Vector(0, 3, -2); // 1*0 + 2*3 + 3*(-2) = 0
 
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Simple dot product calculation
         assertEquals(14, v1.dotProduct(v1), DELTA, "dotProduct() wrong value");
 
+        // =============== Boundary Values Tests ==================
         // BV01: Dot product of orthogonal vectors (should be zero)
         assertEquals(0, v1.dotProduct(vOrthogonal), DELTA, "dotProduct() for orthogonal vectors is not zero");
     }
@@ -105,6 +118,7 @@ public class VectorTests {
         Vector v1 = new Vector(1, 2, 3);
         Vector result = v1.crossProduct(v2);
 
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Check length of cross product result
         assertEquals(v1.length() * v2.length(), result.length(), DELTA,
                 "crossProduct() result length is wrong");
@@ -113,6 +127,7 @@ public class VectorTests {
         assertEquals(0, result.dotProduct(v1), DELTA, "crossProduct() result not orthogonal to v1");
         assertEquals(0, result.dotProduct(v2), DELTA, "crossProduct() result not orthogonal to v2");
 
+        // =============== Boundary Values Tests ==================
         // BV01: Cross product of parallel vectors (should throw exception for zero vector)
         assertThrows(IllegalArgumentException.class, () -> v1.crossProduct(v1.scale(2)),
                 "crossProduct() for parallel vectors does not throw exception");
@@ -124,6 +139,7 @@ public class VectorTests {
     @Test
     void testLength() {
 
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Simple length calculation using Pythagoras triple
         assertEquals(5, new Vector(0, 3, 4).length(), DELTA, "ERROR: length() wrong value");
     }
@@ -133,6 +149,8 @@ public class VectorTests {
      */
     @Test
     void testLengthSquared() {
+
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Simple squared length calculation
         assertEquals(25, new Vector(0, 3, 4).lengthSquared(), DELTA, "ERROR: lengthSquared() wrong value");
     }
@@ -144,6 +162,8 @@ public class VectorTests {
     void testNormalize() {
         Vector v = new Vector(0, 3, 4);
         Vector n = v.normalize();
+
+        // ============ Equivalence Partitions Tests ==============
 
         // EP01: Check if normalized vector length is 1
         assertEquals(1, n.length(), DELTA, "normalized vector length is not 1");

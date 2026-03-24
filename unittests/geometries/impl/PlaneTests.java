@@ -30,6 +30,7 @@ class PlaneTests {
     @Test
     void testConstructor() {
 
+        // =============== Boundary Values Tests ==================
         // BV01: Correct plane with three non-collinear points
         assertDoesNotThrow(() -> new Plane(new Point(0, 0, 1), new Point(1, 0, 0), new Point(0, 1, 0)),
                 "Failed constructing a correct plane");
@@ -55,6 +56,7 @@ class PlaneTests {
     @Test
     void testConstructorPointVector() {
 
+        // ============ Equivalence Partitions Tests ==============
         // EP01: Ensure the normal is normalized (unit vector)
         Point p = new Point(1, 2, 3);
         Vector v = new Vector(0, 0, 5);
