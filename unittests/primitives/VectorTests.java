@@ -45,7 +45,7 @@ public class VectorTests {
      */
     void testVector() {
 
-        // EP01: Simple constractor of a vector
+        // EP01: Simple ctor of a vector
         assertDoesNotThrow(() -> new Vector(1, 2, 3), "ERROR:Failed constructing a valid vector");
         //BV01:
         assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR:constctor zero has been build ");
@@ -58,12 +58,11 @@ public class VectorTests {
      */
     @Test
     void testAdd() {
-        Point p1 = new Point(1, 2, 3);
+        Vector p1 = new Vector(1, 2, 3);
         Vector v1 = new Vector(1, 2, 3);
-        //EP01
+        //EP01: ensure the result is correct
         assertEquals(new Vector(2, 4, 6), p1.add(v1), "ERROR:Vector add() result is wrong");
-        //BV01
-        // We use subtract and add logic; if v1 + v2 = 0, it should throw exception in Vector
+        //BV01: ensure the throw exception when the result is zero vector
         Vector v2 = new Vector(-1, -2, -3);
         assertThrows(IllegalArgumentException.class, () -> p1.add(v2), "ERROR: VECTOR Add() result doesnt throw exception");
 

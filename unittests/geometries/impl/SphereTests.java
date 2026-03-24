@@ -31,14 +31,15 @@ public class SphereTests {
 
         Point center = new Point(1, 1, 1);
         Sphere sphere = new Sphere(center, 1);
-
         Point pointOnSurface = new Point(1, 1, 2);
         Vector result = sphere.getNormal(pointOnSurface);
-        //EP01
+
+        // ============ Equivalence Partitions Tests ==============
+        //EP01 ensure the method does not throw exception
         assertDoesNotThrow(() -> sphere.getNormal(pointOnSurface), "getNormal() threw unexpected exception");
-        //ep02
+        //EP02 ensure the normal is a unit vector
         assertEquals(1, result.length(), DELTA, "Sphere normal is not a unit vector");
-        //EP03
+        //EP03 ensure the normal direction is correct
         Vector expected = pointOnSurface.subtract(center);
         assertEquals(expected, result, "normal direction isn`t correct");
 

@@ -38,19 +38,21 @@ public class TriangleTests {
         // A point clearly inside the triangle boundaries
         Point pointInside = new Point(0.2, 0.2, 0);
 
-//EP01: checks the method does not throw exception
+        // ============ Equivalence Partitions Tests ==============
+        //EP01: checks the method does not throw exception
         assertDoesNotThrow(() -> triangle.getNormal(pointInside), "getNormal() threw unexpected exception");
 
         Vector result = triangle.getNormal(pointInside);
 
-//EP02: checks the result length is 1
+        //EP02: checks the result length is 1
         assertEquals(1, result.length(), DELTA, "Triangle normal is not a unit vector");
 
-//EP03: checks if the normal is orthogonal
+        //EP03: checks if the normal is orthogonal
         Vector edge1 = p2.subtract(p1);
         Vector edge2 = p3.subtract(p2);
         assertEquals(0, result.dotProduct(edge1), DELTA, "Normal is not orthogonal to edge1");
         assertEquals(0, result.dotProduct(edge2), DELTA, "Normal is not orthogonal to edge2");
+
         //EP04: checks the normal direction is up or down
         assertTrue(result.equals(new Vector(0, 0, 1)) || result.equals(new Vector(0, 0, -1)),
                 "Normal direction is incorrect for a triangle on XY plane");

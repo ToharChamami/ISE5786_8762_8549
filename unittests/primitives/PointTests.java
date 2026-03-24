@@ -48,7 +48,7 @@ public class PointTests {
 
         Point p1 = new Point(1, 2, 3);
         Vector v1 = new Vector(2, 4, 6);
-        assertEquals(new Vector(3, 6, 9), p1.add(v1), "ERROR: Point add(Vector) result is wrong");
+        assertEquals(new Point(3, 6, 9), p1.add(v1), "ERROR: Point add(Vector) result is wrong");
 
         // BV01: Addition of opposite vector resulting in origin (Point.ZERO)
         Vector vOpposite = new Vector(-1, -2, -3);

@@ -36,7 +36,8 @@ public class TubeTests {
         Point pointBehindAxis = new Point(1, 0, -2);
         Point pointAtAxisHead = new Point(1, 0, 0);
 
-        //EP01: case the point is in front of the exis,on the surface
+        // ============ Equivalence Partitions Tests ==============
+        //EP01: case the point is in front of the axis,on the surface
         assertDoesNotThrow(() -> tube.getNormal(pointInFrontOfAxis), "ERROR:getNormal() threw unexpected exception");
         Vector result1 = tube.getNormal(pointInFrontOfAxis);
         assertEquals(1, result1.length(), DELTA, "ERROR: Tube normal is not a unit vector");
@@ -50,6 +51,7 @@ public class TubeTests {
         Vector expected2 = new Vector(1, 0, 0);
         assertEquals(expected2, result2, "normal direction isn`t correct");
 
+        // =============== Boundary Values Tests ==================
         //BVA:case the point is at Axis head, on the surface
         assertDoesNotThrow(() -> tube.getNormal(pointAtAxisHead), "ERROR:getNormal() threw unexpected exception");
         Vector result3 = tube.getNormal(pointAtAxisHead);
