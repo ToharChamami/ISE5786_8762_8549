@@ -23,10 +23,10 @@ public final class Plane extends Geometry {
      * @param p1 first point
      * @param p2 second point
      * @param p3 third point
+     * @throws IllegalArgumentException if the points are co-linear in any way
      */
     public Plane(Point p1, Point p2, Point p3) {
         _point = p1;
-        //change of the TDD
         //calculate two vector in the plane
         Vector v1 = p2.subtract(p1);
         Vector v2 = p3.subtract(p1);
@@ -40,7 +40,6 @@ public final class Plane extends Geometry {
      * @param normal the normal vector to the plane
      */
     public Plane(Point point, Vector normal) {
-
         _point = point;
         _normal = normal.normalize();
     }

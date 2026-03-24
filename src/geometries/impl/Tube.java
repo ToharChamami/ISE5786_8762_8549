@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.isZero;
+
 /**
  * Tube class represents a semi-infinite cylinder in 3D space,
  * defined by an axis ray and a radius. [cite: 154, 653]
@@ -34,12 +36,9 @@ public class Tube extends RadialGeometry {
         Vector v = _axis.direction();
         // t = v * (P - P0)
         double t = v.dotProduct(point.subtract(origin));
-        // If t is 0, the projection is exactly at the origin of the ray
-        if (t == 0) {
-            return point.subtract(origin).normalize();
-        }
         // O' = P0 + t * v
-        Point oTag = origin.add(v.scale(t));
+        // If t is 0, the projection is exactly at the origin of the ray
+        Point oTag = isZero(t) ? origin : origin.add(v.scale(t));
         // Normal = (P - O') normalized
         return point.subtract(oTag).normalize();
     }

@@ -52,7 +52,7 @@ public class TubeTests {
         assertEquals(expected2, result2, "normal direction isn`t correct");
 
         // =============== Boundary Values Tests ==================
-        //BVA:case the point is at Axis head, on the surface
+        //BV01: the point is at Axis head, on the surface
         assertDoesNotThrow(() -> tube.getNormal(pointAtAxisHead), "ERROR:getNormal() threw unexpected exception");
         Vector result3 = tube.getNormal(pointAtAxisHead);
         assertEquals(1, result3.length(), DELTA, "ERROR: Tube normal is not a unit vector");

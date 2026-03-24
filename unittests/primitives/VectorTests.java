@@ -43,6 +43,7 @@ public class VectorTests {
     /**
      * Test method for {@link primitives.Vector#Vector(double, double, double)}.
      */
+    @Test
     void testVector() {
 
         // ============ Equivalence Partitions Tests ==============
@@ -161,18 +162,17 @@ public class VectorTests {
     @Test
     void testNormalize() {
         Vector v = new Vector(0, 3, 4);
-        Vector n = v.normalize();
 
         // ============ Equivalence Partitions Tests ==============
 
-        // EP01: Check if normalized vector length is 1
+        // EP01: Basic case of a vector normalization
+        Vector n = v.normalize();
+        // Check if normalized vector length is 1
         assertEquals(1, n.length(), DELTA, "normalized vector length is not 1");
-
-        // EP02: Check if normalized vector is parallel to original
+        // Check if normalized vector is parallel to original
         assertThrows(IllegalArgumentException.class, () -> v.crossProduct(n),
                 "normalized vector is not parallel to original");
-
-        // EP03: Check if they are in the same direction
+        // Check if they are in the same direction
         assertTrue(v.dotProduct(n) > 0, "normalized vector has opposite direction");
     }
 }
