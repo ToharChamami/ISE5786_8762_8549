@@ -49,7 +49,7 @@ public class SphereTests {
 
     }
 
-    @test
+    @Test
     void testIntersect() {
         // ============ Equivalence Partitions Tests ==============
 
@@ -101,6 +101,33 @@ public class SphereTests {
         assertEquals(1, result.size(), "wrong number of points");
 
         //BVA 2.5 Ray start at the sphere and goes outside (0 point)
-        assertNull(sphere.findIntersections(new Ray(new Point(1, 1, 0), new Vector(0, 1, 0))), "Ray should have instructions");
+        assertNull(sphere.findIntersections(
+                new Ray(new Point(1, 1, 0), new Vector(0, 1, 0))), "Ray should have instructions");
+
+        // BV26: Ray starts after sphere (0 points)
+        assertNull(sphere.findIntersections(
+                new Ray(new Point(1, 2, 0), new Vector(0, 1, 0))));
+
+        // **** Group 3: Ray's line is tangent to the sphere (all 0 points)
+        // BV31: Ray starts before the tangent point
+        assertNull(sphere.findIntersections(
+                new Ray(new Point(0, 1, 0), new Vector(1, 0, 0))), "Ray should have instructions");
+        // BV32: Ray starts at the tangent point
+        assertNull(sphere.findIntersections(
+                new Ray(new Point(1, 1, 0), new Vector(1, 0, 0))), "Ray should have instructions");
+        // BV33: Ray starts after the tangent point
+        assertNull(sphere.findIntersections(
+                new Ray(new Point(2, 1, 0), new Vector(1, 0, 0))), "Ray should have instructions");
+
+        // **** Group 4: Special cases
+        // BV41: Ray's line is outside sphere, ray is orthogonal to ray start to sphere's center line
+        assertNull(sphere.findIntersections(
+                new Ray(new Point(1, 2, 0), new Vector(1, 0, 0))), "Ray should have instructions");
+
+        // BV42: Ray starts inside, ray is orthogonal to ray start to sphere's center line (1 point)
+        result = sphere.findIntersections(new Ray(new Point(1, 0.5, 0), new Vector(1, 0, 0)));
+        assertNotNull(result, "Ray should have instructions");
+        assertEquals(1, result.size(), "wrong number of points");
+
     }
 }
