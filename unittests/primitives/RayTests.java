@@ -33,7 +33,7 @@ public class RayTests {
         //EP01: ensure the ctor is building the ray
         assertDoesNotThrow(() -> new Ray(point, vector), "ERROR:Failed constructing a valid vector");
 
-        //EP02:ensure the normal length is 1.0
+        //EP02: ensure the normal length is 1.0
         Ray result = new Ray(point, vector);
         assertEquals(1, result.direction().length(), DELTA, "ERROR:Ray ctor must normolize the direction vector");
     }

@@ -11,7 +11,7 @@ import primitives.Vector;
  * to provide fundamental geometric calculations.
  * </p>
  */
-public abstract class Geometry {
+public abstract class Geometry extends Intersectable {
     /**
      * Basic default constructor for documentation tools
      */

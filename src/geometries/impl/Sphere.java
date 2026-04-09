@@ -1,6 +1,8 @@
 package geometries.impl;
 
+import java.util.List;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
 
 /**
@@ -28,5 +30,10 @@ public final class Sphere extends RadialGeometry {
         // TDD Fix: Subtract center from the point to get the direction vector and normalize it to ensure length is 1.0.
         return point.subtract(_center).normalize();
 
+    }
+
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        return null;
     }
 }
