@@ -77,6 +77,6 @@ public final class Ray {
      * @return The point P = P0 + t * v.
      */
     public Point getPoint(double t) {
-        return head.add(direction.scale(t));
+        return _origin.add(_direction.scale(t));
     }
 }
