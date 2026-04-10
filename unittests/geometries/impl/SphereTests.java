@@ -49,6 +49,9 @@ public class SphereTests {
 
     }
 
+    /**
+     * Test method for {@link geometries.impl.Sphere#findIntersections(Ray)}.
+     */
     @test
     void testIntersect() {
         // ============ Equivalence Partitions Tests ==============
