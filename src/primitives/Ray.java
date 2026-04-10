@@ -69,4 +69,14 @@ public final class Ray {
     public int hashCode() {
         return Objects.hash(_origin, _direction);
     }
+
+    /**
+     * Calculates a point on the ray at a given distance t from the head.
+     *
+     * @param t The distance from the head of the ray.
+     * @return The point P = P0 + t * v.
+     */
+    public Point getPoint(double t) {
+        return head.add(direction.scale(t));
+    }
 }

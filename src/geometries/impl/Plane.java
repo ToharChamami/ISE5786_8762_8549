@@ -6,6 +6,9 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
+
 /**
  * Class Plane represents a plane in a 3D system.
  */
@@ -53,6 +56,28 @@ public final class Plane extends Geometry {
 
     @Override
     public List<Point> findIntersections(Ray ray) {
-        return null;
+        Point head = ray.origin();
+        Vector direction = ray.direction();
+        Vector normal = _normal;
+        Point point = _point;
+
+        double denominatornv = normal.dotProduct(direction);
+
+        if (isZero(denominatornv)) {
+            return null;
+        }
+
+        Vector headToPoint;
+        try {
+            headToPoint = point.subtract(head);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+
+        double PointMinusHead = normal.dotProduct(headToPoint);
+
+        double t = alignZero(PointMinusHead / denominatornv);
+
+        return (t > 0) ? List.of(ray.getPoint(t)) : null;
     }
 }

@@ -6,6 +6,7 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
 /**
@@ -90,6 +91,31 @@ public class Polygon extends Geometry {
 
     @Override
     public List<Point> findIntersections(Ray ray) {
-        return null;
+        var planeIntersections = _plane.findIntersections(ray);
+
+        // בדיקת ביצועים: אם אין חיתוך עם המישור, אין טעם להמשיך בחישובים המורכבים
+        if (planeIntersections == null) return null;
+
+        Point rayHead = ray.origin();
+        Vector rayDirection = ray.direction();
+
+        Vector v1 = _vertices.get(_vertices.size() - 1).subtract(rayHead);
+        double globalSign = 0;
+
+        for (Point vertex : _vertices) {
+            Vector v2 = vertex.subtract(rayHead);
+            Vector edgeNormal = v1.crossProduct(v2).normalize();
+            double currentSign = alignZero(rayDirection.dotProduct(edgeNormal));
+
+            if (currentSign == 0) return null;
+
+            if (globalSign == 0) {
+                globalSign = currentSign;
+            } else if (globalSign * currentSign < 0) {
+                return null;
+            }
+            v1 = v2;
+        }
+        return (planeIntersections != null) ? List.of(planeIntersections.get(0)) : null;
     }
 }

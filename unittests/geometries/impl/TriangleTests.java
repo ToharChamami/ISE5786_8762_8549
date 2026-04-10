@@ -1,6 +1,5 @@
 package geometries.impl;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Ray;
@@ -64,8 +63,7 @@ public class TriangleTests {
     }
 
     /**
-     * geometries.impl.Triangle#getNormal(primitives.Point)
-     * Test method for {@link geometries.impl.Triangle#findIntersections(primitives.Ray)}.
+     * Test method for {@link geometries.impl.Triangle#findIntersections(Ray)}.
      */
     @Test
     void testFindIntersections() {
@@ -73,42 +71,59 @@ public class TriangleTests {
                 new Point(1, 0, 0),
                 new Point(0, 1, 0),
                 new Point(0, 0, 1));
+
         // ============ Equivalence Partitions Tests ==============
 
+        //  The ray intersects the plane (Based on Plane EP)
+
         // EP01: Inside triangle (1 point)
-        Ray ray1 = new Ray(new Point(0.5, 0.5, 0.5), new Vector(-1, -1, -1));
-        List<Point> result1 = triangle.findIntersections(ray1);
+        var result1 = triangle.findIntersections(new Ray(new Point(0.1, 0.1, 0.1), new Vector(1, 1, 1)));
         assertNotNull(result1, "Ray should intersect inside the triangle");
         assertEquals(1, result1.size(), "Should be 1 intersection point");
 
         // EP02: Outside against edge (0 points)
-        Ray ray2 = new Ray(new Point(1, 1, 1), new Vector(0, 0, -1));
-        assertNull(triangle.findIntersections(ray2), "Ray should be outside against edge");
+        assertNull(triangle.findIntersections(new Ray(new Point(1, 1, 1), new Vector(0, 0, -1))), "Ray should be outside against edge");
 
         // EP03: Outside against vertex (0 points)
-        Ray ray3 = new Ray(new Point(2, 2, 2), new Vector(-1, -1, -1));
-        assertNull(triangle.findIntersections(ray3), "Ray should be outside against vertex");
+        assertNull(triangle.findIntersections(new Ray(new Point(2, 2, 2), new Vector(-1, -1, -1))), "Ray should be outside against vertex");
+
+        //Group: The ray does NOT intersect the plane (Based on Plane EP)
+
+        // EP04: Ray points away from the plane
+        assertNull(triangle.findIntersections(new Ray(new Point(2, 2, 2), new Vector(1, 1, 1))),
+                "Ray points away from the plane");
 
         // =============== Boundary Values Tests ==================
 
-        // BV01: On edge (0 points)
-        Ray ray4 = new Ray(new Point(0.5, 0.5, 0), new Vector(0, 0, 1));
-        assertNull(triangle.findIntersections(ray4), "Ray on edge should return null");
+        //  Group: Specific Triangle boundary cases (Based on Triangle BVA)
 
-        // BV02: In vertex (0 points)
-        Ray ray5 = new Ray(new Point(1, 0, 0), new Vector(0, 1, 0));
-        assertNull(triangle.findIntersections(ray5), "Ray in vertex should return null");
+        // BV01: Point on edge (0 points)
+        assertNull(triangle.findIntersections(new Ray(new Point(0.5, 0.5, 0.5), new Vector(1, 1, 0))),
+                "Intersection point is on edge");
 
-        // BV03: On edge continuation (0 points)
-        Ray ray6 = new Ray(new Point(2, 0, 0), new Vector(0, 0, 1));
-        assertNull(triangle.findIntersections(ray6), "Ray on edge continuation should return null");
+        // BV02: Point in vertex (0 points)
+        assertNull(triangle.findIntersections(new Ray(new Point(1, 0, 0), new Vector(0, 1, 1))),
+                "Intersection point is in vertex");
+
+        // BV03: Point on edge continuation (0 points)
+        assertNull(triangle.findIntersections(new Ray(new Point(2, 0, 0), new Vector(-1, 0, 1))),
+                "Intersection point is on edge continuation");
+
+        //  Group: Plane boundary cases (Based on Plane BVA)
+
+        // BV11: Ray is parallel to the plane (included in plane)
+        assertNull(triangle.findIntersections(new Ray(new Point(0.5, 0.5, 0), new Vector(1, -1, 0))),
+                "Ray is included in the plane");
+
+        // BV12: Ray is parallel to the plane (outside the plane)
+        assertNull(triangle.findIntersections(new Ray(new Point(0, 0, 0), new Vector(1, -1, 0))),
+                "Ray is parallel and outside the plane");
+
+        // BV13: Ray is orthogonal to the plane and starts in the plane
+        assertNull(triangle.findIntersections(new Ray(new Point(0.5, 0.5, 0), new Vector(0, 0, 1))),
+                "Ray is orthogonal and starts in the plane");
     }
-
 }
-
-
-
-
 
 
 
