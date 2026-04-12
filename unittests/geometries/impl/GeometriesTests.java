@@ -8,8 +8,20 @@ import primitives.Vector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Unit tests for the Geometries class. [cite: 73]
+ */
 class GeometriesTests {
 
+    /**
+     * Basic default constructor for documentation tools
+     */
+    public GeometriesTests() {
+    }
+
+    /**
+     * Test method for findIntersections in Geometries (Composite). [cite: 73, 75]
+     */
     @Test
     void testFindIntersections() {
         Geometries geometries = new Geometries(

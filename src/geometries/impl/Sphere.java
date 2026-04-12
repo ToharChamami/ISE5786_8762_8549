@@ -5,6 +5,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.alignZero;
+
 /**
  * The Sphere class represents a sphere in 3D Cartesian coordinate system.
  */
@@ -29,7 +31,6 @@ public final class Sphere extends RadialGeometry {
     public Vector getNormal(Point point) {
         // TDD Fix: Subtract center from the point to get the direction vector and normalize it to ensure length is 1.0.
         return point.subtract(_center).normalize();
-
     }
 
     @Override
@@ -56,8 +57,8 @@ public final class Sphere extends RadialGeometry {
 
         double th = Math.sqrt(rSquared - dSquared);
 
-        double t1 = tm - th;
-        double t2 = tm + th;
+        double t1 = alignZero(tm - th);
+        double t2 = alignZero(tm + th);
 
         if (t1 > 0 && t2 > 0) {
             return List.of(ray.getPoint(t1), ray.getPoint(t2));

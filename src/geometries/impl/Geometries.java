@@ -11,7 +11,9 @@ import primitives.Ray;
  * Composite class for a collection of geometric objects.
  */
 public class Geometries extends Intersectable {
-    // javav doc needed
+    /**
+     * List of intersectable geometric objects
+     */
     private final List<Intersectable> geometries = new ArrayList<>();
 
     /**
