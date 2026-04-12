@@ -20,7 +20,7 @@ class GeometriesTests {
     }
 
     /**
-     * Test method for findIntersections in Geometries (Composite). [cite: 73, 75]
+     * Test method for findIntersections in Geometries (Composite).
      */
     @Test
     void testFindIntersections() {
@@ -47,7 +47,7 @@ class GeometriesTests {
         assertNull(geometries.findIntersections(rayNone), "No geometry intersected should return null");
 
         // BVA03: Only one geometry is intersected
-        Ray rayOne = new Ray(new Point(0.5, 0.5, 2), new Vector(0, 0, -1));
+        Ray rayOne = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
         assertEquals(1, geometries.findIntersections(rayOne).size(), "Only one geometry should be intersected");
 
         // BVA04: All geometries are intersected

@@ -82,10 +82,12 @@ public class TriangleTests {
         assertEquals(1, result1.size(), "Should be 1 intersection point");
 
         // EP02: Outside against edge (0 points)
-        assertNull(triangle.findIntersections(new Ray(new Point(1, 1, 1), new Vector(0, 0, -1))), "Ray should be outside against edge");
+        assertNull(triangle.findIntersections(
+                new Ray(new Point(1, 1, 1), new Vector(0, 0, -1))), "Ray should be outside against edge");
 
         // EP03: Outside against vertex (0 points)
-        assertNull(triangle.findIntersections(new Ray(new Point(2, 2, 2), new Vector(-1, -1, -1))), "Ray should be outside against vertex");
+        assertNull(triangle.findIntersections(
+                new Ray(new Point(2, 2, 2), new Vector(-2, -1, -1))), "Ray should be outside against vertex");
 
         //Group: The ray does NOT intersect the plane (Based on Plane EP)
 

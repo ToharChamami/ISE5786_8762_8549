@@ -23,7 +23,7 @@ public class Geometries extends Intersectable {
     }
 
     /**
-     * Constructor with variable number of geometries [cite: 68]
+     * Constructor with variable number of geometries
      *
      * @param geometries objects to add
      */

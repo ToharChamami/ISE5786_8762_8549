@@ -37,4 +37,25 @@ public class RayTests {
         Ray result = new Ray(point, vector);
         assertEquals(1, result.direction().length(), DELTA, "ERROR:Ray ctor must normolize the direction vector");
     }
+
+    /**
+     * Test method for {@link primitives.Ray#getPoint(double)}.
+     */
+    @Test
+    void testGetPoint() {
+        Ray ray = new Ray(new Point(1, 2, 3), new Vector(1, 0, 0));
+
+        // ============ EP Tests ==============
+
+        // EP01: t > 0
+        assertEquals(new Point(3, 2, 3), ray.getPoint(2), "Wrong point for t > 0");
+
+        // EP02: t < 0
+        assertEquals(new Point(0, 2, 3), ray.getPoint(-1), "Wrong point for t < 0");
+
+        // =============== BV Tests ==================
+
+        // BV01: t = 0
+        assertEquals(new Point(1, 2, 3), ray.getPoint(0), "t=0 should return p0");
+    }
 }

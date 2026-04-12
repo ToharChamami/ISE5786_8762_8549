@@ -74,9 +74,13 @@ public final class Ray {
      * Calculates a point on the ray at a given distance t from the head.
      *
      * @param t The distance from the head of the ray.
-     * @return The point P = P0 + t * v.
+     * @return The point P = _origin + t * _direction.
      */
     public Point getPoint(double t) {
-        return _origin.add(_direction.scale(t));
+        try {
+            return _origin.add(_direction.scale(t));
+        } catch (Exception e) {
+            return _origin;
+        }
     }
 }

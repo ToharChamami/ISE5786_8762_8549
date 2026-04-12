@@ -1,6 +1,12 @@
 package geometries.impl;
 
+import java.util.List;
 import primitives.Point;
+import primitives.Ray;
+import primitives.Vector;
+
+import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 /**
  * Triangle class represents a triangle in 3D space.
@@ -20,4 +26,28 @@ public final class Triangle extends Polygon {
         super(p1, p2, p3);
     }
 
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        var planeIntersections = _plane.findIntersections(ray);
+        if (planeIntersections == null) return null;
+
+        Point p0 = ray.origin();
+        Vector v = ray.direction();
+
+        Vector v1 = _vertices.get(0).subtract(p0);
+        Vector v2 = _vertices.get(1).subtract(p0);
+        Vector v3 = _vertices.get(2).subtract(p0);
+
+        Vector n1 = v1.crossProduct(v2).normalize();
+        Vector n2 = v2.crossProduct(v3).normalize();
+        Vector n3 = v3.crossProduct(v1).normalize();
+
+        double s1 = alignZero(v.dotProduct(n1));
+        double s2 = alignZero(v.dotProduct(n2));
+        double s3 = alignZero(v.dotProduct(n3));
+
+        if (isZero(s1) || isZero(s2) || isZero(s3)) return null;
+
+        return ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) ? planeIntersections : null;
+    }
 }
