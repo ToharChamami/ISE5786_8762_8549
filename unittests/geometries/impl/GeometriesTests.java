@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Unit tests for the Geometries class. [cite: 73]
+ * Unit tests for the Geometries class.
  */
 class GeometriesTests {
 

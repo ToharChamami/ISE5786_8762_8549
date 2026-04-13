@@ -5,7 +5,7 @@ import primitives.Point;
 import primitives.Ray;
 
 /**
- * Abstract class representing objects that can be intersected by a ray. [cite: 17, 18]
+ * Abstract class representing objects that can be intersected by a ray.
  */
 public abstract class Intersectable {
     /**
@@ -15,10 +15,10 @@ public abstract class Intersectable {
     }
 
     /**
-     * Finds the intersection points between a given ray and the geometry. [cite: 18, 22]
+     * Finds the intersection points between a given ray and the geometry.
      *
-     * @param ray The ray to check for intersections [cite: 18]
-     * @return A list of intersection points, or null if there are no intersections [cite: 27]
+     * @param ray The ray to check for intersections
+     * @return A list of intersection points, or null if there are no intersections
      */
     public abstract List<Point> findIntersections(Ray ray);
 }
