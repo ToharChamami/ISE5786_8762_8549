@@ -79,7 +79,7 @@ public final class Ray {
     public Point getPoint(double t) {
         try {
             return _origin.add(_direction.scale(t));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException _) {
             return _origin;
         }
     }

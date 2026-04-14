@@ -48,10 +48,10 @@ public class Geometries extends Intersectable {
             var itemIntersections = item.findIntersections(ray);
             if (itemIntersections != null) {
 
-                if (result == null) {
-                    result = new ArrayList<>();
-                }
-                result.addAll(itemIntersections);
+                if (result == null)
+                    result = new ArrayList<>(itemIntersections);
+                else
+                    result.addAll(itemIntersections);
             }
         }
 

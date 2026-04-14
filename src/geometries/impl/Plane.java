@@ -58,10 +58,8 @@ public final class Plane extends Geometry {
     public List<Point> findIntersections(Ray ray) {
         Point head = ray.origin();
         Vector direction = ray.direction();
-        Vector normal = _normal;
-        Point point = _point;
 
-        double denominatornv = normal.dotProduct(direction);
+        double denominatornv = _normal.dotProduct(direction);
 
         if (isZero(denominatornv)) {
             return null;
@@ -69,12 +67,12 @@ public final class Plane extends Geometry {
 
         Vector headToPoint;
         try {
-            headToPoint = point.subtract(head);
-        } catch (IllegalArgumentException e) {
+            headToPoint = _point.subtract(head);
+        } catch (IllegalArgumentException _) {
             return null;
         }
 
-        double PointMinusHead = normal.dotProduct(headToPoint);
+        double PointMinusHead = _normal.dotProduct(headToPoint);
 
         double t = alignZero(PointMinusHead / denominatornv);
 

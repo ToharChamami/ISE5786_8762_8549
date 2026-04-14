@@ -6,7 +6,6 @@ import primitives.Ray;
 import primitives.Vector;
 
 import static primitives.Util.alignZero;
-import static primitives.Util.isZero;
 
 /**
  * Triangle class represents a triangle in 3D space.
@@ -36,18 +35,19 @@ public final class Triangle extends Polygon {
 
         Vector v1 = _vertices.get(0).subtract(p0);
         Vector v2 = _vertices.get(1).subtract(p0);
-        Vector v3 = _vertices.get(2).subtract(p0);
-
         Vector n1 = v1.crossProduct(v2).normalize();
-        Vector n2 = v2.crossProduct(v3).normalize();
-        Vector n3 = v3.crossProduct(v1).normalize();
-
         double s1 = alignZero(v.dotProduct(n1));
+        if (s1 == 0) return null;
+
+        Vector v3 = _vertices.get(2).subtract(p0);
+        Vector n2 = v2.crossProduct(v3).normalize();
         double s2 = alignZero(v.dotProduct(n2));
+        if (s1 * s2 <= 0) return null;
+
+        Vector n3 = v3.crossProduct(v1).normalize();
         double s3 = alignZero(v.dotProduct(n3));
+        if (s1 * s3 <= 0) return null;
 
-        if (isZero(s1) || isZero(s2) || isZero(s3)) return null;
-
-        return ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) ? planeIntersections : null;
+        return planeIntersections;
     }
 }

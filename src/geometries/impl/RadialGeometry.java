@@ -19,7 +19,7 @@ public abstract class RadialGeometry extends Geometry {
      * The square of the radius (radius * radius).
      * Pre-calculated to improve performance in geometric calculations.
      */
-    protected double radiusSquared;
+    protected double _radiusSquared;
 
     /**
      * Constructs a new RadialGeometry with the specified radius.
@@ -34,6 +34,6 @@ public abstract class RadialGeometry extends Geometry {
 
         }
         _radius = radius;
-        radiusSquared = radius * radius;
+        _radiusSquared = radius * radius;
     }
 }
