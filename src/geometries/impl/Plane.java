@@ -59,9 +59,9 @@ public final class Plane extends Geometry {
         Point head = ray.origin();
         Vector direction = ray.direction();
 
-        double denominatornv = _normal.dotProduct(direction);
+        double denominatorNV = _normal.dotProduct(direction);
 
-        if (isZero(denominatornv)) {
+        if (isZero(denominatorNV)) {
             return null;
         }
 
@@ -72,9 +72,9 @@ public final class Plane extends Geometry {
             return null;
         }
 
-        double PointMinusHead = _normal.dotProduct(headToPoint);
+        double pointMinusHead = _normal.dotProduct(headToPoint);
 
-        double t = alignZero(PointMinusHead / denominatornv);
+        double t = alignZero(pointMinusHead / denominatorNV);
 
         return (t > 0) ? List.of(ray.getPoint(t)) : null;
     }
