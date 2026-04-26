@@ -85,6 +85,46 @@ public class Camera implements Cloneable {
                 return null;
             }
         }
+
+        private void checkResolution() {
+            if (_camera._nX <= 0 || _camera._nY <= 0) {
+                throw new IllegalArgumentException("Resolution (nX, nY) must be positive");
+            }
+        }
+
+        private void checkLocationAndDirection() {
+            if (_camera._p0 == null) {
+                throw new java.util.MissingResourceException("Missing camera location (p0)", "Camera", "p0");
+            }
+            if (_camera._vTo == null) {
+                throw new java.util.MissingResourceException("Missing camera direction vector (vTo)", "Camera", "vTo");
+            }
+            if (_camera._vUp == null) {
+                throw new java.util.MissingResourceException("Missing camera 'up' vector (vUp)", "Camera", "vUp");
+            }
+
+            _camera._vTo = _camera._vTo.normalize();
+
+            try {
+                _camera._vRight = _camera._vTo.crossProduct(_camera._vUp).normalize();
+                _camera._vUp = _camera._vRight.crossProduct(_camera._vTo).normalize();
+            } catch (IllegalArgumentException _) {
+                throw new IllegalArgumentException("Direction vector (vTo) and Up vector (vUp) cannot be parallel");
+            }
+        }
+
+        private void checkViewPlane() {
+            if (_camera._width <= 0 || _camera._height <= 0) {
+                throw new IllegalArgumentException("View Plane width and height must be positive");
+            }
+            if (_camera._distance <= 0) {
+                throw new IllegalArgumentException("View Plane distance must be positive");
+            }
+
+            _camera._pixelWidth = _camera._width / _camera._nX;
+            _camera._pixelHeight = _camera._height / _camera._nY;
+            _camera._vpCenter = _camera._p0.add(_camera._vTo.scale(_camera._distance));
+        }
     }
 
     public static Builder getBuilder() {
@@ -101,7 +141,20 @@ public class Camera implements Cloneable {
      * @return null for now
      */
     public Ray constructRay(int nX, int nY, int j, int i) {
-        return null;
+
+        Point pIJ = _vpCenter;
+
+        double xJ = (j - (nX - 1) / 2.0) * _pixelWidth;
+        double yI = -(i - (nY - 1) / 2.0) * _pixelHeight;
+
+        if (xJ != 0) {
+            pIJ = pIJ.add(_vRight.scale(xJ));
+        }
+        if (yI != 0) {
+            pIJ = pIJ.add(_vUp.scale(yI));
+        }
+
+        return new Ray(_p0, pIJ.subtract(_p0));
     }
 
     // Temporary helper for CameraTests (optional if constructRay matches)
