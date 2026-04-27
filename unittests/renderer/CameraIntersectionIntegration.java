@@ -16,11 +16,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Integration tests for Camera ray construction and geometric intersections.
  */
 class CameraIntersectionIntegration {
+
+    /**
+     * Default constructor for the integration tests class.
+     */
+    CameraIntersectionIntegration() {
+    }
+
+    /**
+     * Resolution X for integration tests
+     */
     private static final int NX = 3;
+
+    /**
+     * Resolution Y for integration tests
+     */
     private static final int NY = 3;
 
     /**
      * Private helper method to perform Act and Assert phases.
+     *
+     * @param camera   The camera to construct rays from
+     * @param body     The geometric body to intersect
+     * @param expected Expected total number of intersections
+     * @param testName Name of the test for error reporting
      */
     private void assertIntersectionsCount(Camera camera, Intersectable body, int expected, String testName) {
         int count = 0;
@@ -34,6 +53,9 @@ class CameraIntersectionIntegration {
         assertEquals(expected, count, "Wrong total number of intersections for " + testName);
     }
 
+    /**
+     * Integration tests for Camera and Sphere.
+     */
     @Test
     void testCameraRaySphereIntegration() {
         Camera camera1 = Camera.getBuilder()
@@ -63,6 +85,9 @@ class CameraIntersectionIntegration {
         assertIntersectionsCount(camera1, new Sphere(new Point(0, 0, 1), 0.5), 0, "Sphere BV02");
     }
 
+    /**
+     * Integration tests for Camera and Plane.
+     */
     @Test
     void testCameraRayPlaneIntegration() {
         Camera camera = Camera.getBuilder()
@@ -82,6 +107,9 @@ class CameraIntersectionIntegration {
         assertIntersectionsCount(camera, new Plane(new Point(0, 0, -5), new Vector(0, 5, 1)), 6, "Plane BV01");
     }
 
+    /**
+     * Integration tests for Camera and Triangle.
+     */
     @Test
     void testCameraRayTriangleIntegration() {
         Camera camera = Camera.getBuilder()
