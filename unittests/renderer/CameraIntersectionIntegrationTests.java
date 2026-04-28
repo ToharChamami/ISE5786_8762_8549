@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Integration tests for Camera ray construction and geometric intersections.
  */
-class CameraIntersectionIntegration {
+class CameraIntersectionIntegrationTests {
 
     /**
      * Default constructor for the integration tests class.
      */
-    CameraIntersectionIntegration() {
+    CameraIntersectionIntegrationTests() {
     }
 
     /**
@@ -45,7 +45,7 @@ class CameraIntersectionIntegration {
         int count = 0;
         for (int i = 0; i < NY; ++i) {
             for (int j = 0; j < NX; ++j) {
-                Ray ray = camera.constructRay(NX, NY, j, i);
+                Ray ray = camera.constructRay(j, i);
                 List<Point> intersections = body.findIntersections(ray);
                 if (intersections != null) count += intersections.size();
             }
