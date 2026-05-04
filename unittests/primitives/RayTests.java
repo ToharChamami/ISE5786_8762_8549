@@ -1,9 +1,11 @@
 package primitives;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for class {@link primitives.Ray}.
@@ -57,5 +59,36 @@ public class RayTests {
 
         // BV01: t = 0
         assertEquals(new Point(1, 2, 3), ray.getPoint(0), "t=0 should return p0");
+
     }
+
+    /**
+     * Tests the findClosestPoint method.
+     */
+    @Test
+    void testFindClosestPoint() {
+        Ray ray = new Ray(new Point(0, 0, 10), new Vector(1, 10, -100));
+
+        Point p1 = new Point(1, 1, -100);
+        Point p2 = new Point(-1, 1, -99);
+        Point p3 = new Point(0, 2, -10); // זו הנקודה הקרובה ביותר (מרחק ריבועי קטן)
+
+        // ============ Equivalence Partitions Tests ==============
+        // EP01 the midlle point is the closest
+        assertEquals(p3, ray.findClosestPoint(List.of(p1, p3, p2)),
+                "Closest point should be the middle one");
+
+        // =============== Boundary Values Tests ==================
+        // BV01
+        assertNull(ray.findClosestPoint(null), "Null list should return null");
+
+        // BV02
+        assertEquals(p3, ray.findClosestPoint(List.of(p3, p1, p2)),
+                "Closest point should be the first one");
+
+        // BV03
+        assertEquals(p3, ray.findClosestPoint(List.of(p1, p2, p3)),
+                "Closest point should be the last one");
+    }
+
 }

@@ -7,11 +7,31 @@ import primitives.Color;
  * Unit tests for the ImageWriter class.
  */
 public class ImageWriterTests {
+    /**
+     * Default constructor for ImageWriterTests
+     */
+    public ImageWriterTests() {
+    }
 
+    /**
+     * Image width in pixels
+     */
     private static final int WIDTH = 800;
+    /**
+     * Image height in pixels
+     */
     private static final int HEIGHT = 500;
+    /**
+     * Grid interval size in pixels
+     */
     private static final int STEP = 50;
+    /**
+     * Background color of the image
+     */
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 255);
+    /**
+     * Color of the grid lines
+     */
     private static final Color GRID_COLOR = new Color(255, 0, 0);
 
     /**

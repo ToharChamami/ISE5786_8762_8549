@@ -9,14 +9,27 @@ import primitives.Color;
  * This class is a Plain Data Structure (PDS).
  */
 public class Scene {
+    /**
+     * The name of the scene
+     */
     public final String name;
+    /**
+     * The background color of the scene
+     */
     public Color background = Color.BLACK;
+    /**
+     * The ambient light of the scene
+     */
     public AmbientLight ambientLight = AmbientLight.NONE;
+    /**
+     * The geometries in the scene
+     */
     public Geometries geometries = new Geometries();
 
     /**
      * Constructor that accepts only the scene name.
-     * * @param name the name of the scene
+     *
+     * @param name the name of the scene
      */
     public Scene(String name) {
         this.name = name;
@@ -24,8 +37,8 @@ public class Scene {
 
     /**
      * Sets the background color of the scene.
-     * * @param background the background color
      *
+     * @param background the background color
      * @return the current Scene object (this) for method chaining
      */
     public Scene setBackground(Color background) {
@@ -35,8 +48,8 @@ public class Scene {
 
     /**
      * Sets the ambient light of the scene.
-     * * @param ambientLight the ambient light
      *
+     * @param ambientLight the ambient light
      * @return the current Scene object (this) for method chaining
      */
     public Scene setAmbientLight(AmbientLight ambientLight) {
@@ -46,8 +59,8 @@ public class Scene {
 
     /**
      * Sets the geometries in the scene.
-     * * @param geometries the geometries collection
      *
+     * @param geometries the geometries collection
      * @return the current Scene object (this) for method chaining
      */
     public Scene setGeometries(Geometries geometries) {
