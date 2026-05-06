@@ -40,7 +40,7 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Calculates the color at a specific intersection point.
-     * Currently returns only the ambient light intensity.
+     * Currently, returns only the ambient light intensity.
      *
      * @param point the intersection point
      * @return the calculated color

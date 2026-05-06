@@ -28,7 +28,7 @@ public class ImageWriterTests {
     /**
      * Background color of the image
      */
-    private static final Color BACKGROUND_COLOR = new Color(0, 0, 255);
+    private static final Color BACKGROUND_COLOR = new Color(191, 191, 255);
     /**
      * Color of the grid lines
      */

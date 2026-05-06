@@ -63,7 +63,6 @@ public class Point {
      * @return square distance
      */
     public final double distanceSquared(Point other) {
-
         double dx = _xyz._d1() - other._xyz._d1();
         double dy = _xyz._d2() - other._xyz._d2();
         double dz = _xyz._d3() - other._xyz._d3();
