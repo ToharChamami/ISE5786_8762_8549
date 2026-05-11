@@ -5,7 +5,7 @@ package renderer;
  * <p>
  * Used to select which ray tracer implementation the renderer should use.
  */
-public enum RayTracerType {
+public enum git RayTracerType {
    /**
     * A basic ray tracer.
     */

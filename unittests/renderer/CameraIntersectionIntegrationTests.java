@@ -46,7 +46,7 @@ class CameraIntersectionIntegrationTests {
         for (int i = 0; i < NY; ++i) {
             for (int j = 0; j < NX; ++j) {
                 Ray ray = camera.constructRay(j, i);
-                List<Point> intersections = body.findIntersections(ray);
+                List<Point> intersections = body.calcIntersections(ray);
                 if (intersections != null) count += intersections.size();
             }
         }

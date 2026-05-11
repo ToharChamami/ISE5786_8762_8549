@@ -10,6 +10,7 @@ import static primitives.Util.alignZero;
 /**
  * Triangle class represents a triangle in 3D space.
  * Inherits from Polygon.
+ * * @author Tohar Chamami
  */
 public final class Triangle extends Polygon {
 
@@ -20,13 +21,12 @@ public final class Triangle extends Polygon {
      * @param p2 second point
      * @param p3 third point
      */
-
     public Triangle(Point p1, Point p2, Point p3) {
         super(p1, p2, p3);
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         var planeIntersections = _plane.findIntersections(ray);
         if (planeIntersections == null) return null;
 
@@ -48,6 +48,6 @@ public final class Triangle extends Polygon {
         double s3 = alignZero(v.dotProduct(n3));
         if (s1 * s3 <= 0) return null;
 
-        return planeIntersections;
+        return List.of(new Intersection(this, planeIntersections.get(0).point));
     }
 }

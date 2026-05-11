@@ -1,5 +1,7 @@
 package geometries.api;
 
+import geometries.Intersectable;
+import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 
@@ -16,6 +18,31 @@ public abstract class Geometry extends Intersectable {
      * Basic default constructor for documentation tools
      */
     public Geometry() { /* Basic default constructor for documentation tools */ }
+
+    /**
+     * The emission color of the geometry
+     */
+    private Color _emission = Color.BLACK;
+
+    /**
+     * Returns the emission color of the geometry
+     *
+     * @return The color
+     */
+    public Color getEmission() {
+        return _emission;
+    }
+
+    /**
+     * Sets the emission color (Builder Pattern)
+     *
+     * @param emission The new emission color
+     * @return This geometry object
+     */
+    public Geometry setEmission(Color emission) {
+        this._emission = emission;
+        return this;
+    }
 
     /**
      * Calculates the normal vector to the geometric body at a specific point on its surface.

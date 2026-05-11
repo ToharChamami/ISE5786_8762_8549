@@ -29,22 +29,21 @@ public final class Sphere extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        // TDD Fix: Subtract center from the point to get the direction vector and normalize it to ensure length is 1.0.
         return point.subtract(_center).normalize();
     }
 
-    @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         Vector l;
         try {
             l = _center.subtract(ray.origin());
         } catch (IllegalArgumentException e) {
-            return List.of(ray.getPoint(_radius));
+            return List.of(new Intersection(this, ray.getPoint(_radius)));
         }
 
         double tm = ray.direction().dotProduct(l);
         double dSquared = l.lengthSquared() - tm * tm;
         double thSquared = alignZero(_radiusSquared - dSquared);
+
         if (thSquared <= 0)
             return null;
 
@@ -53,8 +52,9 @@ public final class Sphere extends RadialGeometry {
         if (t2 <= 0) return null;
 
         double t1 = alignZero(tm - th);
+
         return t1 <= 0
-                ? List.of(ray.getPoint(t2))
-                : List.of(ray.getPoint(t1), ray.getPoint(t2));
+                ? List.of(new Intersection(this, ray.getPoint(t2)))
+                : List.of(new Intersection(this, ray.getPoint(t1)), new Intersection(this, ray.getPoint(t2)));
     }
 }

@@ -24,7 +24,7 @@ class SimpleRayTracer extends RayTracerBase {
     @Override
     public Color traceRay(Ray ray) {
         // Find all intersection points between the ray and the scene's geometries
-        List<Point> intersections = _scene.geometries.findIntersections(ray);
+        List<Point> intersections = _scene.geometries.calcIntersections(ray);
 
         // If no intersections exist, return the background color
         if (intersections == null) {

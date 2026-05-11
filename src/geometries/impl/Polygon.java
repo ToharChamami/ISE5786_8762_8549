@@ -89,11 +89,9 @@ public class Polygon extends Geometry {
         return _plane.getNormal(point);
     }
 
-    @Override
-    public List<Point> findIntersections(Ray ray) {
+    public List<Intersection> calcIntersectionsHelper(Ray ray) {
         var planeIntersections = _plane.findIntersections(ray);
 
-        // בדיקת ביצועים: אם אין חיתוך עם המישור, אין טעם להמשיך בחישובים המורכבים
         if (planeIntersections == null) return null;
 
         Point rayHead = ray.origin();
@@ -116,6 +114,6 @@ public class Polygon extends Geometry {
             }
             v1 = v2;
         }
-        return (planeIntersections != null) ? List.of(planeIntersections.get(0)) : null;
+        return planeIntersections == null ? null : List.of(new Intersection(this, planeIntersections.get(0).point));
     }
 }

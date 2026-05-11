@@ -54,8 +54,7 @@ public final class Plane extends Geometry {
         return _normal;
     }
 
-    @Override
-    public List<Point> findIntersections(Ray ray) {
+    public List<Intersection> calcIntersectionsHelper(Ray ray) {
         double denominatorNV = _normal.dotProduct(ray.direction());
         if (isZero(denominatorNV)) {
             return null;
@@ -70,6 +69,6 @@ public final class Plane extends Geometry {
 
         double pointMinusHead = _normal.dotProduct(headToPoint);
         double t = alignZero(pointMinusHead / denominatorNV);
-        return (t > 0) ? List.of(ray.getPoint(t)) : null;
+        return (t > 0) ? List.of(new Intersection(this, ray.getPoint(t))) : null;
     }
 }
