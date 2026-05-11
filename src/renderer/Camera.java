@@ -1,5 +1,6 @@
 package renderer;
 
+import java.util.MissingResourceException;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
@@ -316,22 +317,27 @@ public class Camera implements Cloneable {
          * Checks location and direction, and computes orthogonal vectors.
          */
         private void checkLocationAndDirection() {
-            if (_camera._p0 == null || _vUp == null || (_vTo == null && _target == null)) {
-                throw new java.util.MissingResourceException("Missing camera location or direction", "Camera", "Location/Direction");
+
+            if (_camera._p0 == null) {
+                throw new MissingResourceException("Missing camera location", "Camera", "Location");
             }
 
-            if (this._vTo == null) {
-                _camera._vTo = this._target.subtract(_camera._p0);
-            }
-            _camera._vTo = this._vTo.normalize();
-
-            try {
-                _camera._vRight = _camera._vTo.crossProduct(this._vUp).normalize();
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("vTo and vUp cannot be parallel");
+            if (_vTo == null && _target != null) {
+                _vTo = _target.subtract(_camera._p0);
             }
 
-            _camera._vUp = _camera._vRight.crossProduct(_camera._vTo).normalize();
+            if (_vTo == null || _vUp == null) {
+                throw new MissingResourceException("Missing camera direction", "Camera", "Direction");
+            }
+
+            _camera._vTo = _vTo.normalize();
+            _camera._vUp = _vUp.normalize();
+
+            if (!primitives.Util.isZero(_camera._vTo.dotProduct(_camera._vUp))) {
+                throw new IllegalArgumentException("vTo and vUp are not orthogonal");
+            }
+
+            _camera._vRight = _camera._vTo.crossProduct(_camera._vUp).normalize();
         }
 
         /**

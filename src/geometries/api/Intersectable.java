@@ -1,6 +1,7 @@
 package geometries.api;
 
 import java.util.List;
+import primitives.Material;
 import primitives.Point;
 import primitives.Ray;
 
@@ -10,6 +11,12 @@ import primitives.Ray;
  * * @author Tohar Chamami
  */
 public abstract class Intersectable {
+
+    /**
+     * Default constructor to satisfy JavaDoc.
+     */
+    public Intersectable() {
+    }
 
     /**
      * Passive Data Structure (PDS) to bundle a point and the geometry it belongs to.
@@ -24,6 +31,10 @@ public abstract class Intersectable {
          * The point on the geometry surface
          */
         public final Point point;
+        /**
+         * The material of the intersected geometry
+         */
+        public final Material material;
 
         /**
          * Constructor for Intersection
@@ -34,6 +45,7 @@ public abstract class Intersectable {
         public Intersection(Geometry geometry, Point point) {
             this.geometry = geometry;
             this.point = point;
+            this.material = geometry == null ? new Material() : geometry.getMaterial();
         }
 
         @Override
@@ -61,12 +73,18 @@ public abstract class Intersectable {
         return calcIntersectionsHelper(ray);
     }
 
+    /**
+     * Finds intersections between a ray and the geometry (backward compatibility).
+     *
+     * @param ray the ray to intersect with
+     * @return a list of intersection points, or null if there are none
+     */
     public final List<Point> findIntersections(Ray ray) {
         var intersections = calcIntersections(ray);
         return intersections == null ? null
                 : intersections.stream()
-                .map(intersection -> intersection.point)
-                .toList();
+                  .map(intersection -> intersection.point)
+                  .toList();
     }
 
     /**

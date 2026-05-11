@@ -4,7 +4,6 @@ import geometries.api.Intersectable;
 import geometries.impl.Plane;
 import geometries.impl.Sphere;
 import geometries.impl.Triangle;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Ray;
@@ -46,7 +45,7 @@ class CameraIntersectionIntegrationTests {
         for (int i = 0; i < NY; ++i) {
             for (int j = 0; j < NX; ++j) {
                 Ray ray = camera.constructRay(j, i);
-                List<Point> intersections = body.calcIntersections(ray);
+                var intersections = body.calcIntersections(ray);
                 if (intersections != null) count += intersections.size();
             }
         }

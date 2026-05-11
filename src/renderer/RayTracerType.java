@@ -5,14 +5,14 @@ package renderer;
  * <p>
  * Used to select which ray tracer implementation the renderer should use.
  */
-public enum git RayTracerType {
-   /**
-    * A basic ray tracer.
-    */
-   SIMPLE,
+public enum RayTracerType {
+    /**
+     * A basic ray tracer.
+     */
+    SIMPLE,
 
-   /**
-    * A ray tracer that uses a regular grid acceleration structure.
-    */
-   GRID
+    /**
+     * A ray tracer that uses a regular grid acceleration structure.
+     */
+    GRID
 }

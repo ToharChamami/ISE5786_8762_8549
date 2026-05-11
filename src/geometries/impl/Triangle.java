@@ -48,6 +48,6 @@ public final class Triangle extends Polygon {
         double s3 = alignZero(v.dotProduct(n3));
         if (s1 * s3 <= 0) return null;
 
-        return List.of(new Intersection(this, planeIntersections.get(0).point));
+        return List.of(new Intersection(this, planeIntersections.get(0)));
     }
 }
