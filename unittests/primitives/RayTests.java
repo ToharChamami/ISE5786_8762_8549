@@ -1,5 +1,8 @@
 package primitives;
 
+import geometries.api.Geometry;
+import geometries.api.Intersectable.Intersection;
+import geometries.impl.Sphere;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -71,10 +74,10 @@ public class RayTests {
 
         Point p1 = new Point(1, 1, -100);
         Point p2 = new Point(-1, 1, -99);
-        Point p3 = new Point(0, 2, -10); // זו הנקודה הקרובה ביותר (מרחק ריבועי קטן)
+        Point p3 = new Point(0, 2, -10);
 
         // ============ Equivalence Partitions Tests ==============
-        // EP01 the midlle point is the closest
+        // EP01 the middle point is the closest
         assertEquals(p3, ray.findClosestPoint(List.of(p1, p3, p2)),
                 "Closest point should be the middle one");
 
@@ -90,5 +93,37 @@ public class RayTests {
         assertEquals(p3, ray.findClosestPoint(List.of(p1, p2, p3)),
                 "Closest point should be the last one");
     }
+    /**
+     * Test method for {@link primitives.Ray#findClosestIntersection(java.util.List)}.
+     */
+    @Test
+    void testFindClosestIntersection() {
+        Ray ray = new Ray(new Point(0, 0, 10), new Vector(1, 10, -100));
 
+        Geometry geo = new Sphere(new Point(0, 0, 0), 1);
+
+        Intersection i1 = new Intersection(geo, new Point(1, 1, -100));
+        Intersection i2 = new Intersection(geo, new Point(-1, 1, -99));
+        Intersection i3 = new Intersection(geo, new Point(0, 2, -10));
+
+        // ============ Equivalence Partitions Tests ==============
+        // EP01: The middle intersection is the closest
+        assertEquals(i3, ray.findClosestIntersection(List.of(i1, i3, i2)),
+                "Closest intersection should be the middle one");
+
+        // =============== Boundary Values Tests ==================
+        // BV01: Null list
+        assertNull(ray.findClosestIntersection(null), "Null list should return null");
+
+        // BV02: Empty list
+        assertNull(ray.findClosestIntersection(List.of()), "Empty list should return null");
+
+        // BV03: The first intersection is the closest
+        assertEquals(i3, ray.findClosestIntersection(List.of(i3, i1, i2)),
+                "Closest intersection should be the first one");
+
+        // BV04: The last intersection is the closest
+        assertEquals(i3, ray.findClosestIntersection(List.of(i1, i2, i3)),
+                "Closest intersection should be the last one");
+    }
 }

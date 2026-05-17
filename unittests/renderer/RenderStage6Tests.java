@@ -173,7 +173,7 @@ class RenderStage6Tests {
     void testRenderAmbientColor() {
         Scene scene = new Scene("Ambient colors").setAmbientLight(new AmbientLight(new Color(WHITE)));
         scene.geometries //
-                .add(_sphere.setMaterial(new Material().setKA(0.4)), // grey spher
+                .add(_sphere.setMaterial(new Material().setKA(0.4)), // grey sphere
                         _triangleLeftTop.setMaterial(new Material().setKA(new Double3(0, 0.8, 0))), // green triangle
                         _triangleLeftBottom.setMaterial(new Material().setKA(new Double3(0.8, 0, 0))), // red triangle
                         _triangleRightBottom.setMaterial(new Material().setKA(new Double3(0, 0, 0.8))) // blue triangle

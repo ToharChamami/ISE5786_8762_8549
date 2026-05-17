@@ -88,28 +88,19 @@ public final class Ray {
     }
 
     /**
-     * Finds the point in the given list that is closest to the head of the ray.
+     * Finds the closest point to the ray origin.
+     * Maintains backward compatibility by delegating to findClosestIntersection.
      *
-     * @param points list of points to check
-     * @return the closest point, or null if the list is null or empty
+     * @param points list of points
+     * @return the closest point, or null if the list is empty
      */
     public Point findClosestPoint(List<Point> points) {
-        if (points == null || points.isEmpty()) {
-            return null;
-        }
-
-        Point closestPoint = null;
-        double minDistance = Double.POSITIVE_INFINITY;
-
-        for (Point p : points) {
-            double currentDistance = p.distanceSquared(_origin);
-            if (currentDistance < minDistance) {
-                minDistance = currentDistance;
-                closestPoint = p;
-            }
-        }
-
-        return closestPoint;
+        return points == null ? null
+                : findClosestIntersection(
+                points.stream()
+                .map(point -> new Intersection(null, point))
+                .toList()
+        ).point;
     }
 
     /**
@@ -119,14 +110,14 @@ public final class Ray {
      * @return the closest intersection, or null if the list is empty
      */
     public Intersection findClosestIntersection(List<Intersection> intersections) {
-        if (intersections == null || intersections.isEmpty())
+        if (intersections == null)
             return null;
 
         Intersection closest = null;
         double minDistance = Double.POSITIVE_INFINITY;
 
         for (var intersection : intersections) {
-            double distance = _origin.distance(intersection.point);
+            double distance = _origin.distanceSquared(intersection.point);
             if (distance < minDistance) {
                 minDistance = distance;
                 closest = intersection;
