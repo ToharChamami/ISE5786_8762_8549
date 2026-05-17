@@ -1,0 +1,47 @@
+[33mab2b896[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m HEAD@{0}: commit: impl: light sources with Phong attenuation factors and basic unit tests
+[33m85665e7[m HEAD@{1}: pull origin master: Fast-forward
+[33m96b7f63[m HEAD@{2}: commit: Refactor: implement NVI pattern and migrate all geometries to use Geo-Intersections
+[33m012adef[m HEAD@{3}: pull: Fast-forward
+[33md7bc8c8[m HEAD@{4}: commit: modulesn were added, implement scene and lighting, and ImageWriter tests added
+[33m4eb51ea[m HEAD@{5}: pull: Fast-forward
+[33mc6e26f7[m HEAD@{6}: commit: camera class finished
+[33m6501101[m HEAD@{7}: commit: camera class wrriten
+[33m4841ac6[m HEAD@{8}: pull origin master: Fast-forward
+[33m92167b1[m HEAD@{9}: commit: fix with the teacher
+[33m3c1f257[m HEAD@{10}: commit: add project level dictionary
+[33mbfdb071[m HEAD@{11}: pull origin master: Fast-forward
+[33m581c577[m[33m ([m[1;33mtag: [m[1;33mPR03[m[33m)[m HEAD@{12}: commit: test finished, javadock checked
+[33mb95c9fb[m HEAD@{13}: pull origin master: Fast-forward
+[33m1b021fd[m HEAD@{14}: reset: moving to master
+[33m1b021fd[m HEAD@{15}: commit: Geometries class added
+[33mb13294d[m HEAD@{16}: commit: findIntersections method added in polygon,plane and sphere class's
+[33m3f3e0b5[m HEAD@{17}: commit (merge): Merge branch 'plane-test-Intersections-method'
+[33m093ea08[m HEAD@{18}: merge origin/master: Fast-forward
+[33m658e9e0[m HEAD@{19}: checkout: moving from plane-test-Intersections-method to master
+[33m24a7f27[m[33m ([m[1;31morigin/plane-test-Intersections-method[m[33m)[m HEAD@{20}: commit: added plane intersection logic and tests
+[33m658e9e0[m HEAD@{21}: checkout: moving from master to plane-test-Intersections-method
+[33m658e9e0[m HEAD@{22}: pull origin master: Fast-forward
+[33m62200fa[m HEAD@{23}: commit: intersectable adde, findIntersections method added
+[33m410d488[m HEAD@{24}: pull origin master: Fast-forward
+[33m1a5e211[m[33m ([m[1;33mtag: [m[1;33mPR02[m[33m)[m HEAD@{25}: commit: notes were added
+[33m3364927[m HEAD@{26}: commit: fix tests by TDD
+[33m57c2eb3[m HEAD@{27}: reset: moving to origin/master
+[33m21e42ba[m HEAD@{28}: reset: moving to HEAD
+[33m21e42ba[m HEAD@{29}: commit: tests were tried
+[33m4004fb9[m HEAD@{30}: commit: tube&ray test were wrritan
+[33m125e3bd[m HEAD@{31}: pull origin master: Fast-forward
+[33m2a298aa[m HEAD@{32}: commit: tests for triangle class were wrriten
+[33m2403c77[m HEAD@{33}: pull origin master: Fast-forward
+[33mffcd345[m HEAD@{34}: commit: test were written for Point class
+[33ma1c46bf[m HEAD@{35}: reset: moving to origin/master
+[33mf29a423[m HEAD@{36}: commit: files added
+[33mb8e7fba[m HEAD@{37}: reset: moving to HEAD
+[33mb8e7fba[m HEAD@{38}: pull origin master: Fast-forward
+[33m06638e2[m HEAD@{39}: commit: Reformat all with single blank lines + some small fixes with Dan
+[33mea72e3e[m HEAD@{40}: commit: Fix some javadocs, ignore doc folder for git
+[33mbc09d64[m[33m ([m[1;33mtag: [m[1;33mPR01[m[33m)[m HEAD@{41}: commit: Fix project name, folder name.
+[33m50d15dd[m HEAD@{42}: commit: Tohar wrote this
+[33m549ba37[m HEAD@{43}: pull: Fast-forward
+[33md35cfa2[m HEAD@{44}: commit: Tohar wrote here
+[33m0fba1c3[m HEAD@{45}: pull origin master: Fast-forward
+[33m4b00c8f[m HEAD@{46}: commit (initial): Tohar wrote Point class
