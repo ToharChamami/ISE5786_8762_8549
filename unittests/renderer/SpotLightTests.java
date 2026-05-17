@@ -42,9 +42,9 @@ class SpotLightTests {
         double distance = Math.sqrt(8);
         double attenuation = (1 + 1 * distance + 1 * 8);
         double cosFactor = 1 / Math.sqrt(2); // cos(45 deg)
-        Color expectedColorAngle = lightColor.scale(cosFactor).reduce(attenuation);
+        Color expectedColorAngle = lightColor.scale(cosFactor).scale(1d / attenuation);
 
-        assertTrue(Math.abs(expectedColorAngle.getRGB().getRed() - light.getIntensity(pAngle).getRGB().getRed()) <= 2,
+        assertTrue(Math.abs(expectedColorAngle.getColor().getRed() - light.getIntensity(pAngle).getColor().getRed()) <= 2,
                 "SpotLight getIntensity() at an angle is wrong");
 
         // EP03: Test getL direction vector from light to point
