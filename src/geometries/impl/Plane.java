@@ -54,7 +54,7 @@ public final class Plane extends Geometry {
         return _normal;
     }
 
-    public List<Intersection> calcIntersectionsHelper(Ray ray) {
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         double denominatorNV = _normal.dotProduct(ray.direction());
         if (isZero(denominatorNV)) {
             return null;

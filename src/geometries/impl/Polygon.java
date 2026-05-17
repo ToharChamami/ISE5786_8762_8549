@@ -91,20 +91,19 @@ public class Polygon extends Geometry {
 
     protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         var planeIntersections = _plane.findIntersections(ray);
-
         if (planeIntersections == null) return null;
 
         Point rayHead = ray.origin();
         Vector rayDirection = ray.direction();
 
-        Vector v1 = _vertices.get(_vertices.size() - 1).subtract(rayHead);
+        Vector v1 = _vertices.getLast().subtract(rayHead);
         double globalSign = 0;
 
         for (Point vertex : _vertices) {
             Vector v2 = vertex.subtract(rayHead);
             Vector edgeNormal = v1.crossProduct(v2).normalize();
-            double currentSign = alignZero(rayDirection.dotProduct(edgeNormal));
 
+            double currentSign = alignZero(rayDirection.dotProduct(edgeNormal));
             if (currentSign == 0) return null;
 
             if (globalSign == 0) {
@@ -114,6 +113,6 @@ public class Polygon extends Geometry {
             }
             v1 = v2;
         }
-        return planeIntersections == null ? null : List.of(new Intersection(this, planeIntersections.get(0)));
+        return List.of(new Intersection(this, planeIntersections.getFirst()));
     }
 }

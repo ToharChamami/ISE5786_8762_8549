@@ -10,7 +10,7 @@ public final class AmbientLight {
     /**
      * The intensity of the ambient light
      */
-    private final Color intensity;
+    private final Color _intensity;
 
     /**
      * Constant representing no ambient light (Black color).
@@ -23,7 +23,7 @@ public final class AmbientLight {
      * @param intensity the background lighting intensity
      */
     public AmbientLight(Color intensity) {
-        this.intensity = intensity;
+        this._intensity = intensity;
     }
 
     /**
@@ -32,6 +32,6 @@ public final class AmbientLight {
      * @return the intensity color
      */
     public Color getIntensity() {
-        return intensity;
+        return _intensity;
     }
 }

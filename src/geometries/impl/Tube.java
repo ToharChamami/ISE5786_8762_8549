@@ -44,7 +44,7 @@ public class Tube extends RadialGeometry {
         return point.subtract(oTag).normalize();
     }
 
-    public List<Intersection> calcIntersectionsHelper(Ray ray) {
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         return null;
     }
 }

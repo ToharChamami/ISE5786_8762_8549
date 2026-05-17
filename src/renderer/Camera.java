@@ -7,6 +7,8 @@ import primitives.Ray;
 import primitives.Vector;
 import scene.Scene;
 
+import static primitives.Util.alignZero;
+
 /**
  * Camera class representing the observer's location and orientation.
  * Implements the Builder pattern.
@@ -344,10 +346,11 @@ public class Camera implements Cloneable {
          * Checks view plane data and calculates helper fields.
          */
         private void checkViewPlane() {
-            if (_camera._width <= 0 || _camera._height <= 0) {
+            
+            if (alignZero(_camera._width) <= 0 || alignZero(_camera._height) <= 0) {
                 throw new IllegalArgumentException("View Plane width and height must be positive");
             }
-            if (_camera._distance <= 0) {
+            if (alignZero(_camera._distance) <= 0) {
                 throw new IllegalArgumentException("View Plane distance must be positive");
             }
 
