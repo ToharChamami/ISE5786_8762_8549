@@ -70,7 +70,7 @@ public abstract class Intersectable {
      * @return List of Intersections, or null if no intersections found
      */
     public final List<Intersection> calcIntersections(Ray ray) {
-        return calcIntersectionsHelper(ray);
+        return calcIntersectionsHelgiper(ray);
     }
 
     /**
@@ -83,8 +83,8 @@ public abstract class Intersectable {
         var intersections = calcIntersections(ray);
         return intersections == null ? null
                 : intersections.stream()
-                  .map(intersection -> intersection.point)
-                  .toList();
+                .map(intersection -> intersection.point)
+                .toList();
     }
 
     /**
