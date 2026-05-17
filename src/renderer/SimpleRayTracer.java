@@ -28,8 +28,7 @@ class SimpleRayTracer extends RayTracerBase {
         if (intersections == null) {
             return _scene.background;
         }
-
-        // 5.א.2: החלפת findClosestPoint ב-findClosestIntersection
+        
         Intersection closestIntersection = ray.findClosestIntersection(intersections);
 
         return calcColor(closestIntersection);
