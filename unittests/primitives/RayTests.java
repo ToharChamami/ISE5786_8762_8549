@@ -93,7 +93,9 @@ public class RayTests {
         assertEquals(p3, ray.findClosestPoint(List.of(p1, p2, p3)),
                 "Closest point should be the last one");
     }
-
+    /**
+     * Test method for {@link primitives.Ray#findClosestIntersection(java.util.List)}.
+     */
     @Test
     void testFindClosestIntersection() {
         Ray ray = new Ray(new Point(0, 0, 10), new Vector(1, 10, -100));
@@ -113,7 +115,7 @@ public class RayTests {
         // BV01: Null list
         assertNull(ray.findClosestIntersection(null), "Null list should return null");
 
-        // BV02: Empty list 
+        // BV02: Empty list
         assertNull(ray.findClosestIntersection(List.of()), "Empty list should return null");
 
         // BV03: The first intersection is the closest
