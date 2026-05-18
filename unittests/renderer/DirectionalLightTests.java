@@ -16,6 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DirectionalLightTests {
 
     /**
+     * Default constructor for the test class
+     */
+    public DirectionalLightTests() {
+    }
+
+    /**
      * Test method for {@link lighting.DirectionalLight} functional capabilities
      */
     @Test

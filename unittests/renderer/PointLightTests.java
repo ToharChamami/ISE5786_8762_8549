@@ -16,6 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PointLightTests {
 
     /**
+     * Default constructor for the test class
+     */
+    public PointLightTests() {
+    }
+
+    /**
      * Test method for {@link lighting.PointLight} functional capabilities
      */
     @Test

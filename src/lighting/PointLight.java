@@ -8,16 +8,31 @@ import primitives.Vector;
  * Representation of a point light source in the scene (such as a light bulb).
  */
 public class PointLight extends Light implements LightSource {
+    /**
+     * The position of the point light
+     */
     private final Point position;
+
+    /**
+     * Constant attenuation factor
+     */
     private double kC = 1d;
+
+    /**
+     * Linear attenuation factor
+     */
     private double kL = 0d;
+
+    /**
+     * Quadratic attenuation factor
+     */
     private double kQ = 0d;
 
     /**
      * Constructs a point light source with a given intensity and position.
-     * * @param intensity the color intensity of the light source
      *
-     * @param position the position point of the light source in the scene
+     * @param intensity the color intensity of the light source
+     * @param position  the position point of the light source in the scene
      */
     public PointLight(Color intensity, Point position) {
         super(intensity);
@@ -26,8 +41,8 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the constant attenuation factor and returns the object itself.
-     * * @param kC the constant attenuation factor
      *
+     * @param kC the constant attenuation factor
      * @return the PointLight object itself for chaining
      */
     public PointLight setKc(double kC) {
@@ -37,8 +52,8 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the linear attenuation factor and returns the object itself.
-     * * @param kL the linear attenuation factor
      *
+     * @param kL the linear attenuation factor
      * @return the PointLight object itself for chaining
      */
     public PointLight setKl(double kL) {
@@ -48,8 +63,8 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the quadratic attenuation factor and returns the object itself.
-     * * @param kQ the quadratic attenuation factor
      *
+     * @param kQ the quadratic attenuation factor
      * @return the PointLight object itself for chaining
      */
     public PointLight setKq(double kQ) {

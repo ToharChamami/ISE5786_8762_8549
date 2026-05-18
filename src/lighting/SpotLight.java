@@ -8,13 +8,20 @@ import primitives.Vector;
  * Representation of a spotlight source in the scene (such as a flashlight).
  */
 public class SpotLight extends PointLight {
+    /**
+     * The direction of the spotlight
+     */
     private final Vector direction;
+
+    /**
+     * The narrow beam factor
+     */
     private double narrowBeam = 1d;
 
     /**
      * Constructs a spotlight source with a given intensity, position, and direction.
-     * * @param intensity the color intensity of the light source
      *
+     * @param intensity the color intensity of the light source
      * @param position  the position point of the light source
      * @param direction the direction vector of the light beam
      */
@@ -25,8 +32,8 @@ public class SpotLight extends PointLight {
 
     /**
      * Sets the concentration beam factor and returns the object itself.
-     * * @param narrowBeam concentration factor exponent
      *
+     * @param narrowBeam concentration factor exponent
      * @return the SpotLight object itself for chaining
      */
     public SpotLight setNarrowBeam(double narrowBeam) {

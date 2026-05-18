@@ -15,9 +15,10 @@ public class DirectionalLight extends Light implements LightSource {
 
     /**
      * Constructor to initialize directional light.
-     * * @param intensity the intensity color of the light
      *
-     * @param direction the direction vector of the light
+     * @param intensity the intensity of the light
+     * @param direction the direction of the light
+     *
      */
     public DirectionalLight(Color intensity, Vector direction) {
         super(intensity);

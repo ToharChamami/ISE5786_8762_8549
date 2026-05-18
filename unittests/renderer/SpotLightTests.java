@@ -17,6 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SpotLightTests {
 
     /**
+     * Default constructor for the test class
+     */
+    public SpotLightTests() {
+    }
+
+    /**
      * Test method for {@link lighting.SpotLight} functional capabilities
      */
     @Test

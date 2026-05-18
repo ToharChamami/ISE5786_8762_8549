@@ -17,8 +17,8 @@ public class AmbientLight extends Light {
     /**
      * Constructs an ambient light source with an initial color intensity
      * and a Double3 attenuation factor.
-     * * @param ia the original illumination color intensity
      *
+     * @param ia the original illumination color intensity
      * @param ka the attenuation factor as a Double3 vector
      */
     public AmbientLight(Color ia, Double3 ka) {
@@ -28,8 +28,8 @@ public class AmbientLight extends Light {
     /**
      * Constructs an ambient light source with an initial color intensity
      * and a scalar double attenuation factor.
-     * * @param ia the original illumination color intensity
      *
+     * @param ia the original illumination color intensity
      * @param ka the attenuation factor as a double scalar
      */
     public AmbientLight(Color ia, double ka) {
@@ -38,7 +38,8 @@ public class AmbientLight extends Light {
 
     /**
      * Constructs an ambient light source directly with a given intensity.
-     * * @param intensity the background lighting intensity color
+     *
+     * @param intensity the background lighting intensity color
      */
     public AmbientLight(Color intensity) {
         super(intensity);
