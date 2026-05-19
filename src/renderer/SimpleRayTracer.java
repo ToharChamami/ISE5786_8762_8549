@@ -45,14 +45,9 @@ class SimpleRayTracer extends RayTracerBase {
      * @return the final calculated color
      */
     private Color calcColor(Intersection intersection, Ray ray) {
-
         Color color = _scene.ambientLight.getIntensity().scale(intersection.material.kA);
-
-        if (preprocessIntersection(intersection, ray.direction())) {
-            color = color.add(calcLocalEffects(intersection));
-        }
-
-        return color;
+        if (!preprocessIntersection(intersection, ray.direction())) return color;
+        return color.add(calcLocalEffects(intersection));
     }
 
     /**
@@ -97,11 +92,8 @@ class SimpleRayTracer extends RayTracerBase {
         Vector r = intersection.l.subtract(intersection.normal.scale(2 * intersection.lNormal)).normalize();
 
         double minusVR = alignZero(-intersection.v.dotProduct(r));
-        if (minusVR <= 0) {
-            return Double3.ZERO;
-        }
-
-        // kS * (-v * r)^nShininess
-        return intersection.material.kS.scale(Math.pow(minusVR, intersection.material.nShininess));
+        return minusVR <= 0 ? Double3.ZERO
+                // kS * (-v * r)^nShininess
+                : intersection.material.kS.scale(Math.pow(minusVR, intersection.material.nShininess));
     }
 }

@@ -47,8 +47,7 @@ public class SpotLight extends PointLight {
      */
     @Override
     public SpotLight setKc(double kC) {
-        super.setKc(kC);
-        return this;
+        return (SpotLight) super.setKc(kC);
     }
 
     /**
@@ -57,8 +56,7 @@ public class SpotLight extends PointLight {
      */
     @Override
     public SpotLight setKl(double kL) {
-        super.setKl(kL);
-        return this;
+        return (SpotLight) super.setKl(kL);
     }
 
     /**
