@@ -24,6 +24,21 @@ class SimpleRayTracer extends RayTracerBase {
     private static final double DELTA = 0.1;
 
     /**
+     * Maximum recursion level for transparency/reflection
+     */
+    private static final int MAX_CALC_COLOR_LEVEL = 10;
+
+    /**
+     * Minimum attenuation coefficient for recursion stopping
+     */
+    private static final double MIN_CALC_COLOR_K = 0.001;
+
+    /**
+     * Initial attenuation coefficient for recursion
+     */
+    private static final Double3 INITIAL_K = Double3.ONE;
+
+    /**
      * Constructor
      *
      * @param scene the scene to be rendered
@@ -44,17 +59,30 @@ class SimpleRayTracer extends RayTracerBase {
     }
 
     /**
-     * Calculates the total color of an intersection point by combining ambient light
-     * and local effects (emission, diffuse, specular) according to the Phong model.
+     * Calculates the total color of an intersection point.
+     * Acts as the entry point for the recursive calculation.
      *
      * @param intersection the intersection point data
      * @param ray          the ray that caused the intersection
      * @return the final calculated color
      */
     private Color calcColor(Intersection intersection, Ray ray) {
-        Color color = _scene.ambientLight.getIntensity().scale(intersection.material.kA);
-        if (!preprocessIntersection(intersection, ray.direction())) return color;
-        return color.add(calcLocalEffects(intersection, ray));
+        return calcColor(intersection, ray, MAX_CALC_COLOR_LEVEL, INITIAL_K);
+    }
+
+    /**
+     * Recursive function to calculate color at an intersection point,
+     * combining local effects and global effects (reflection/refraction).
+     *
+     * @param intersection the intersection point data
+     * @param ray          the ray that caused the intersection
+     * @param level        the current recursion level
+     * @param k            the current attenuation factor
+     * @return the calculated color at the intersection point
+     */
+    private Color calcColor(Intersection intersection, Ray ray, int level, Double3 k) {
+        Color color = calcLocalEffects(intersection, ray);
+        return color;
     }
 
     /**
@@ -143,10 +171,41 @@ class SimpleRayTracer extends RayTracerBase {
 
         for (Point p : intersections) {
             if (p.distance(intersection.point) < lightDistance) {
-                return false; // קיים גוף חוסם בדרך לאור
+                return false;
             }
         }
-
         return true;
+    }
+
+    /**
+     * Constructs the reflected ray from an intersection point.
+     * The starting point is offset along the normal to prevent self-intersection.
+     * * @param p the intersection point
+     *
+     * @param vector the incoming ray direction
+     * @param normal the surface normal
+     * @return the reflected ray
+     */
+    private Ray constructReflectedRay(Point p, Vector vector, Vector normal) {
+        Vector r = vector.subtract(normal.scale(2 * vector.dotProduct(normal)));
+        double delta = vector.dotProduct(normal) > 0 ? 0.1 : -0.1;
+        Point pOffset = p.add(normal.scale(delta));
+
+        return new Ray(pOffset, r);
+    }
+
+    /**
+     * Constructs the refracted (transparent) ray from an intersection point.
+     * The starting point is offset along the normal to prevent self-intersection.
+     * * @param p the intersection point
+     *
+     * @param vector the incoming ray direction
+     * @param normal the surface normal
+     * @return the refracted ray
+     */
+    private Ray constructRefractedRay(Point p, Vector vector, Vector normal) {
+        double delta = vector.dotProduct(normal) > 0 ? 0.1 : -0.1;
+        Point pOffset = p.add(normal.scale(-delta));
+        return new Ray(pOffset, vector);
     }
 }
