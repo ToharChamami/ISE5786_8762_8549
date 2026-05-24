@@ -85,4 +85,9 @@ public class SpotLight extends PointLight {
         double factor = narrowBeam == 1d ? cosAlpha : Math.pow(cosAlpha, narrowBeam);
         return super.getIntensity(p).scale(factor);
     }
+
+    @Override
+    public double getDistance(Point point) {
+        return this.getPosition().distance(point);
+    }
 }

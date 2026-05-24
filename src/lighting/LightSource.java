@@ -11,6 +11,14 @@ import primitives.Vector;
 public interface LightSource {
 
     /**
+     * Calculates the distance from the light source to a given point.
+     * * @param point the point in space to measure the distance to
+     *
+     * @return the distance between the light source and the point
+     */
+    double getDistance(Point point);
+
+    /**
      * Calculates the intensity of the light reaching a given point.
      * Takes attenuation factors into account based on the implementation.
      *

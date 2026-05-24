@@ -65,4 +65,5 @@ class SpotLightTests {
         assertEquals(Color.BLACK, light.getIntensity(pBehind),
                 "SpotLight getIntensity() should be Black for points behind the light source");
     }
+
 }

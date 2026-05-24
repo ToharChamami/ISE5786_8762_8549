@@ -28,7 +28,7 @@ public class Scene {
      * The geometries in the scene
      */
     public Geometries geometries = new Geometries();
-    
+
     /**
      * The external light sources in the scene
      */
@@ -75,4 +75,5 @@ public class Scene {
         this.geometries = geometries;
         return this;
     }
+
 }
