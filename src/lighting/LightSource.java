@@ -12,8 +12,8 @@ public interface LightSource {
 
     /**
      * Calculates the distance from the light source to a given point.
-     * * @param point the point in space to measure the distance to
      *
+     * @param point the point in space to measure the distance to
      * @return the distance between the light source and the point
      */
     double getDistance(Point point);

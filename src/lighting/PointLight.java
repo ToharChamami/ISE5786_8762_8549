@@ -11,7 +11,7 @@ public class PointLight extends Light implements LightSource {
     /**
      * The position of the point light
      */
-    private final Point position;
+    private final Point _position;
 
     /**
      * Constant attenuation factor
@@ -36,7 +36,7 @@ public class PointLight extends Light implements LightSource {
      */
     public PointLight(Color intensity, Point position) {
         super(intensity);
-        this.position = position;
+        this._position = position;
     }
 
     /**
@@ -78,7 +78,7 @@ public class PointLight extends Light implements LightSource {
      */
     @Override
     public Color getIntensity(Point p) {
-        double d = position.distance(p);
+        double d = _position.distance(p);
         double attenuation = kC + kL * d + kQ * d * d;
         return _intensity.scale(1d / attenuation);
     }
@@ -89,18 +89,20 @@ public class PointLight extends Light implements LightSource {
      */
     @Override
     public Vector getL(Point p) {
-        return p.subtract(position).normalize();
+        return p.subtract(_position).normalize();
     }
 
     /**
+     * Gets the position of the light source.
+     *
      * @return the position of the point light
      */
-    public Point getPosition() {
-        return this.position;
+    public Point get_position() {
+        return this._position;
     }
 
     @Override
     public double getDistance(Point point) {
-        return this.position.distance(point);
+        return this._position.distance(point);
     }
 }

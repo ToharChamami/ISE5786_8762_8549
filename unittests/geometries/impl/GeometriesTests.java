@@ -23,7 +23,7 @@ class GeometriesTests {
      * Test method for findIntersections in Geometries (Composite).
      */
     @Test
-    void testFindIntersections() {
+    void testCalcIntersections() {
         Geometries geometries = new Geometries(
                 new Sphere(new Point(1, 0, 0), 1d),
                 new Plane(new Point(0, 0, 1), new Vector(0, 0, 1)),

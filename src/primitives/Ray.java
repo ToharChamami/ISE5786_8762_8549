@@ -25,6 +25,11 @@ public final class Ray {
     public final Vector _direction;
 
     /**
+     * Small offset to prevent self-intersection
+     */
+    private static final double DELTA = 0.1;
+
+    /**
      * Constructs a new Ray with a given origin and direction.
      * The direction vector is automatically normalized during initialization.
      *
@@ -34,6 +39,19 @@ public final class Ray {
     public Ray(Point origin, Vector direction) {
         _origin = origin;
         _direction = direction.normalize();
+    }
+
+    /**
+     * Constructor for a ray with a slight offset along the normal.
+     *
+     * @param head      the original starting point
+     * @param direction the direction of the ray
+     * @param normal    the normal vector at the intersection
+     */
+    public Ray(Point head, Vector direction, Vector normal) {
+        Vector delta = normal.scale(normal.dotProduct(direction) > 0 ? DELTA : -DELTA);
+        this._origin = head.add(delta);
+        this._direction = direction.normalize();
     }
 
     /**

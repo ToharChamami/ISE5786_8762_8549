@@ -11,7 +11,7 @@ public class SpotLight extends PointLight {
     /**
      * The direction of the spotlight
      */
-    private final Vector direction;
+    private final Vector _direction;
 
     /**
      * The narrow beam factor
@@ -27,7 +27,7 @@ public class SpotLight extends PointLight {
      */
     public SpotLight(Color intensity, Point position, Vector direction) {
         super(intensity, position);
-        this.direction = direction.normalize();
+        this._direction = direction.normalize();
     }
 
     /**
@@ -76,7 +76,7 @@ public class SpotLight extends PointLight {
     @Override
     public Color getIntensity(Point p) {
         Vector l = getL(p);
-        double cosAlpha = direction.dotProduct(l);
+        double cosAlpha = _direction.dotProduct(l);
 
         if (cosAlpha <= 0) {
             return Color.BLACK;
@@ -88,6 +88,6 @@ public class SpotLight extends PointLight {
 
     @Override
     public double getDistance(Point point) {
-        return this.getPosition().distance(point);
+        return this.get_position().distance(point);
     }
 }
