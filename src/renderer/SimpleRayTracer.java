@@ -1,14 +1,22 @@
 package renderer;
 
+import java.util.ArrayList;
+import java.util.List;
 import lighting.LightSource;
+import lighting.PointLight;
 import primitives.Color;
 import primitives.Double3;
+import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import renderer.sampling.Offset2D;
+import renderer.sampling.Sampler;
+import renderer.sampling.TargetShape;
 import scene.Scene;
 
 import static geometries.api.Intersectable.Intersection;
 import static primitives.Util.alignZero;
+import static primitives.Vector.AXIS_X;
 
 /**
  * A simple implementation of RayTracerBase.
@@ -57,7 +65,7 @@ class SimpleRayTracer extends RayTracerBase {
     private Color calcColor(Intersection intersection, Ray ray) {
         return preprocessIntersection(intersection, ray.direction()) ?
                 _scene.ambientLight.getIntensity().scale(intersection.material.kA)
-                .add(calcColor(intersection, MAX_CALC_COLOR_LEVEL, INITIAL_K))
+                        .add(calcColor(intersection, MAX_CALC_COLOR_LEVEL, INITIAL_K))
                 : Color.BLACK;
     }
 
@@ -125,37 +133,89 @@ class SimpleRayTracer extends RayTracerBase {
     }
 
     /**
-     * Checks if the intersection point is unshaded by other geometries.
-     * Temporary fix: partially transparent geometries do not cast full shadows.
-     * Only opaque geometries (kT is less MIN_CALC_COLOR_K) will cast a shadow.
+     * Calculates the shadow attenuation factor (shading coefficient) for an intersection point.
+     * Supports both infinitesimal point lights (returns 0.0 or 1.0) and area lights with a
+     * dimensional radius to produce soft shadows (returns a fraction between 0.0 and 1.0).
      *
-     * @param intersection The intersection point to check.
-     * @return true if the point is unshaded, false otherwise.
+     * @param intersection The intersection point data structure containing geometric and light data.
+     * @return The shadow attenuation factor coefficient from 0.0 (full shadow) to 1.0 (fully lit).
      */
     @SuppressWarnings("unused")
-    private boolean unshaded(Intersection intersection) {
+    private double unshaded(Intersection intersection) {
+        if (intersection.light instanceof PointLight pointLight && pointLight.getRadius() > 0) {
+            return calcSoftShadowFactor(intersection, pointLight);
+        }
         Vector lightDirection = intersection.l.scale(-1);
-
-        // Create a shadow ray, offset by DELTA to avoid self-intersection
         Ray lightRay = new Ray(intersection.point, lightDirection, intersection.normal);
-
         var intersections = _scene.geometries.calcIntersections(lightRay);
         if (intersections == null) {
-            return true;
+            return 1.0;
         }
-
         double lightDistance = intersection.light.getDistance(intersection.point);
-
         for (Intersection geo : intersections) {
-            // Check if the intersecting geometry is closer than the light source
             if (alignZero(geo.point.distance(intersection.point) - lightDistance) <= 0) {
-                // If the geometry is opaque (kT is smaller than the minimum threshold) -> light is blocked
                 if (geo.material.kT.isLowerThan(MIN_CALC_COLOR_K)) {
-                    return false;
+                    return 0.0;
                 }
             }
         }
-        return true;
+        return 1.0;
+    }
+
+    /**
+     * Helper method to calculate the soft shadow illumination coefficient using a distributed beam of rays.
+     * Constructs a local orthonormal coordinate system grid on the light disk surface.
+     *
+     * @param intersection The core intersection data of the shaded geometry point.
+     * @param pointLight   The point light source object casted to access its dimensional radius.
+     * @return The fraction of unblocked rays reaching the light surface (between 0.0 and 1.0).
+     */
+    private double calcSoftShadowFactor(Intersection intersection, PointLight pointLight) {
+        renderer.sampling.Sampler sampler = new renderer.sampling.Sampler(9);
+
+        double radius = pointLight.getRadius();
+        Point lightPosition = pointLight._position();
+        Vector l = intersection.l.normalize();
+        Vector helperAxis = (Math.abs(l.dotProduct(AXIS_X)) > 0.9) ? new Vector(0, 1, 0) : new Vector(1, 0, 0);
+        Vector u = l.crossProduct(helperAxis).normalize();
+        Vector v = l.crossProduct(u).normalize();
+        List<Offset2D> offsets = sampler.getSamplePoints(renderer.sampling.TargetShape.CIRCLE);
+
+        int unshadedRaysCount = 0;
+        int totalRays = offsets.size();
+        for (renderer.sampling.Offset2D offset : offsets) {
+            double deltaX = offset.getX() * radius;
+            double deltaY = offset.getY() * radius;
+
+            Point samplePoint = lightPosition;
+            if (deltaX != 0) {
+                samplePoint = samplePoint.add(u.scale(deltaX));
+            }
+            if (deltaY != 0) {
+                samplePoint = samplePoint.add(v.scale(deltaY));
+            }
+            Vector shadowRayDir = samplePoint.subtract(intersection.point);
+            Ray shadowRay = new Ray(intersection.point, shadowRayDir, intersection.normal);
+            var intersections = _scene.geometries.calcIntersections(shadowRay);
+            if (intersections == null) {
+                unshadedRaysCount++;
+                continue;
+            }
+            double currentLightDistance = samplePoint.distance(intersection.point);
+            boolean isRayBlocked = false;
+            for (Intersection geo : intersections) {
+                if (alignZero(geo.point.distance(intersection.point) - currentLightDistance) <= 0) {
+                    if (geo.material.kT.isLowerThan(MIN_CALC_COLOR_K)) {
+                        isRayBlocked = true;
+                        break; // This individual ray is completely obstructed by an opaque object
+                    }
+                }
+            }
+            if (!isRayBlocked) {
+                unshadedRaysCount++;
+            }
+        }
+        return (double) unshadedRaysCount / totalRays;
     }
 
     /**
@@ -242,16 +302,11 @@ class SimpleRayTracer extends RayTracerBase {
      */
     private Color calcGlobalEffect(Ray ray, int level, Double3 k, Double3 kx) {
         Double3 kkr = kx.product(k);
-        // Check if the reflection effect is significant enough to continue
         if (kkr.isLowerThan(MIN_CALC_COLOR_K)) return Color.BLACK;
-
         Intersection closest = findClosestIntersection(ray);
-        // If there is no intersection, return the background color scaled by kx
         if (closest == null) {
             return _scene.background.scale(kx);
         }
-
-        // Recursively calculate the color of the intersection and scale it by kx
         return preprocessIntersection(closest, ray.direction())
                 ? calcColor(closest, level - 1, k).scale(kx) : Color.BLACK;
     }
@@ -273,4 +328,42 @@ class SimpleRayTracer extends RayTracerBase {
                 .add(calcGlobalEffect(refractedRay, level, k, intersection.material.kT));
     }
 
+    /**
+     * Generates a beam of shadow rays from the given intersection point toward
+     * the surface of a dimensional area light source (such as a PointLight with a radius).
+     * This method constructs a local coordinate system orthogonal to the main light direction vector.
+     *
+     * @param intersection The intersection point data structure containing geometric and light data.
+     * @param light        the light source being evaluated
+     * @param l            the main normalized direction vector from the light center to the point
+     * @param sampler      the Sampler system providing pre-calculated 2D offset points
+     * @return a list of generated shadow rays directed at the sampled points on the light source surface
+     */
+    private List<Ray> generateShadowBeam(Intersection intersection, PointLight light, Vector l, Sampler sampler) {
+        List<Ray> beamRays = new ArrayList<>();
+        double radius = light.getRadius();
+        Point lightPosition = light._position();
+        Vector xAxis = new Vector(1, 0, 0);
+        Vector helperAxis = (Math.abs(l.dotProduct(xAxis)) > 0.9) ? new Vector(0, 1, 0) : xAxis;
+
+        Vector u = l.crossProduct(helperAxis).normalize();
+        Vector v = l.crossProduct(u).normalize();
+
+        List<Offset2D> offsets = sampler.getSamplePoints(TargetShape.CIRCLE);
+        for (Offset2D offset : offsets) {
+            double deltaX = offset.getX() * radius;
+            double deltaY = offset.getY() * radius;
+
+            Point samplePoint = lightPosition;
+            if (deltaX != 0) {
+                samplePoint = samplePoint.add(u.scale(deltaX));
+            }
+            if (deltaY != 0) {
+                samplePoint = samplePoint.add(v.scale(deltaY));
+            }
+            Vector rayDirection = samplePoint.subtract(intersection.point);
+            beamRays.add(new Ray(intersection.point, rayDirection, intersection.normal));
+        }
+        return beamRays;
+    }
 }
