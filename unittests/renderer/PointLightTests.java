@@ -7,6 +7,7 @@ import primitives.Point;
 import primitives.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for PointLight class functional methods.
@@ -46,5 +47,14 @@ class PointLightTests {
         Vector expectedL = new Vector(0, 0, 1);
         assertEquals(expectedL, light.getL(p),
                 "PointLight getL() wrong direction vector");
+    }
+
+    @Test
+    public void testGetL() {
+        Point p = new Point(1, 2, 3);
+        //  BAV - Point is exactly at the light's position for PointLight
+        PointLight pl = new PointLight(new primitives.Color(255, 255, 255), p);
+        assertNull(pl.getL(p),
+                "PointLight getL() should return null when point equals light position");
     }
 }

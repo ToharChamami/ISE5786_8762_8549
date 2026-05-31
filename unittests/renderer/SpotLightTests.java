@@ -7,6 +7,7 @@ import primitives.Point;
 import primitives.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -64,6 +65,15 @@ class SpotLightTests {
         Point pBehind = new Point(0, 0, -2);
         assertEquals(Color.BLACK, light.getIntensity(pBehind),
                 "SpotLight getIntensity() should be Black for points behind the light source");
+    }
+
+    @Test
+    public void testGetL() {
+        Point p = new Point(1, 2, 3);
+        // BAV - Point is exactly at the light's position for SpotLight
+        SpotLight sl = new SpotLight(new primitives.Color(255, 255, 255), p, new Vector(0, 0, -1));
+        assertNull(sl.getL(p),
+                "SpotLight getL() should return null when point equals light position");
     }
 
 }
