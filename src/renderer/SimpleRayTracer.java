@@ -11,6 +11,7 @@ import primitives.Ray;
 import primitives.Vector;
 import renderer.sampling.Offset2D;
 import renderer.sampling.Sampler;
+import renderer.sampling.SamplingPattern;
 import renderer.sampling.TargetShape;
 import scene.Scene;
 
@@ -38,6 +39,17 @@ class SimpleRayTracer extends RayTracerBase {
      * Initial attenuation coefficient for recursion
      */
     private static final Double3 INITIAL_K = Double3.ONE;
+
+    // --- MINI-PROJECT 1 CONFIGURATION FIELDS ---
+    private boolean softShadows = false; // Toggle: false = hard shadows (default), true = soft shadows
+    private TargetShape shadowTargetShape = TargetShape.CIRCLE;
+    private Sampler shadowSampler = null;
+
+    /**
+     * The sampling pattern strategy used for generating shadow ray distributions.
+     * Defaults to {@link SamplingPattern#REGULAR_GRID}.
+     */
+    private SamplingPattern shadowPattern = SamplingPattern.REGULAR_GRID;
 
     /**
      * Constructor
@@ -142,7 +154,11 @@ class SimpleRayTracer extends RayTracerBase {
      */
     @SuppressWarnings("unused")
     private double unshaded(Intersection intersection) {
-        if (intersection.light instanceof PointLight pointLight && pointLight.getRadius() > 0) {
+        if (this.softShadows
+                && this.shadowSampler != null
+                && this.shadowSampler.getGridSize() > 1
+                && intersection.light instanceof PointLight pointLight
+                && pointLight.getRadius() > 0) {
             return calcSoftShadowFactor(intersection, pointLight);
         }
         Vector lightDirection = intersection.l.scale(-1);
@@ -174,12 +190,12 @@ class SimpleRayTracer extends RayTracerBase {
         renderer.sampling.Sampler sampler = new renderer.sampling.Sampler(9);
 
         double radius = pointLight.getRadius();
-        Point lightPosition = pointLight._position();
+        Point lightPosition = pointLight.getPosition();
         Vector l = intersection.l.normalize();
         Vector helperAxis = (Math.abs(l.dotProduct(AXIS_X)) > 0.9) ? new Vector(0, 1, 0) : new Vector(1, 0, 0);
         Vector u = l.crossProduct(helperAxis).normalize();
         Vector v = l.crossProduct(u).normalize();
-        List<Offset2D> offsets = sampler.getSamplePoints(renderer.sampling.TargetShape.CIRCLE);
+        List<Offset2D> offsets = this.shadowSampler.getSamplePoints(this.shadowTargetShape);
 
         int unshadedRaysCount = 0;
         int totalRays = offsets.size();
@@ -207,7 +223,7 @@ class SimpleRayTracer extends RayTracerBase {
                 if (alignZero(geo.point.distance(intersection.point) - currentLightDistance) <= 0) {
                     if (geo.material.kT.isLowerThan(MIN_CALC_COLOR_K)) {
                         isRayBlocked = true;
-                        break; // This individual ray is completely obstructed by an opaque object
+                        break;
                     }
                 }
             }
@@ -227,7 +243,6 @@ class SimpleRayTracer extends RayTracerBase {
      */
     private Ray constructReflectedRay(Intersection intersection) {
         Vector r = intersection.v.subtract(intersection.normal.scale(2 * intersection.vNormal));
-
         return new Ray(intersection.point, r, intersection.normal);
     }
 
@@ -251,27 +266,18 @@ class SimpleRayTracer extends RayTracerBase {
      */
     private Double3 transparency(Intersection intersection) {
         Vector lightDirection = intersection.l.scale(-1);
-
-        // Create a shadow ray, offset by DELTA to avoid self-intersection
         Ray lightRay = new Ray(intersection.point, lightDirection, intersection.normal);
 
         var intersections = _scene.geometries.calcIntersections(lightRay);
-
-        // If there are no intersections, the light is not blocked at all
         if (intersections == null) {
             return Double3.ONE;
         }
-
         Double3 ktr = Double3.ONE;
         double lightDistance = intersection.light.getDistance(intersection.point);
 
         for (Intersection geo : intersections) {
-            // Check if the intersecting geometry is closer than the light source
             if (alignZero(geo.point.distance(intersection.point) - lightDistance) <= 0) {
-                // Accumulate the transparency factor
                 ktr = ktr.product(geo.material.kT);
-
-                // If the transparency is negligible, stop calculating and return fully shaded
                 if (ktr.isLowerThan(MIN_CALC_COLOR_K)) {
                     return Double3.ZERO;
                 }
@@ -342,7 +348,7 @@ class SimpleRayTracer extends RayTracerBase {
     private List<Ray> generateShadowBeam(Intersection intersection, PointLight light, Vector l, Sampler sampler) {
         List<Ray> beamRays = new ArrayList<>();
         double radius = light.getRadius();
-        Point lightPosition = light._position();
+        Point lightPosition = light.getPosition();
         Vector xAxis = new Vector(1, 0, 0);
         Vector helperAxis = (Math.abs(l.dotProduct(xAxis)) > 0.9) ? new Vector(0, 1, 0) : xAxis;
 
@@ -366,4 +372,57 @@ class SimpleRayTracer extends RayTracerBase {
         }
         return beamRays;
     }
+
+    /**
+     * Toggles the soft shadows feature on or off.
+     *
+     * @param softShadows true to enable soft shadows, false for classic hard shadows
+     * @return the SimpleRayTracer object itself for builder pattern chaining
+     */
+    public SimpleRayTracer setSoftShadows(boolean softShadows) {
+        this.softShadows = softShadows;
+        // If enabled but no sampler was built yet, initialize with a default 9x9 grid
+        if (softShadows && this.shadowSampler == null) {
+            this.shadowSampler = new renderer.sampling.Sampler(9);
+        }
+        return this;
+    }
+
+    /**
+     * Sets the sampling grid density matrix size (e.g., 9 for a 9x9 grid).
+     * Automatically instantiates the sampling engine once to guarantee high performance.
+     *
+     * @param gridSize number of rows and columns for the sample matrix
+     * @return the SimpleRayTracer object itself for builder pattern chaining
+     */
+    public SimpleRayTracer setShadowGridSize(int gridSize) {
+        this.shadowSampler = new renderer.sampling.Sampler(gridSize);
+        return this;
+    }
+
+    /**
+     * Configures the geometric shape configuration of the area light boundary surface.
+     *
+     * @param shape the target boundary shape (e.g., CIRCLE, SQUARE)
+     * @return the SimpleRayTracer object itself for builder pattern chaining
+     */
+    public SimpleRayTracer setShadowTargetShape(TargetShape shape) {
+        this.shadowTargetShape = shape;
+        return this;
+    }
+
+    /**
+     * Configures the mathematical distribution pattern template for the shadow beam rays.
+     * This setting determines how sample points are scattered across the light source area
+     * (e.g., a uniform structured grid versus a randomized stratified jittered distribution)
+     * This method supports fluent builder pattern chaining.
+     *
+     * @param pattern the desired sampling distribution pattern strategy
+     * @return the SimpleRayTracer object itself for builder pattern chaining
+     */
+    public SimpleRayTracer setShadowSamplingPattern(SamplingPattern pattern) {
+        this.shadowPattern = pattern;
+        return this;
+    }
 }
+

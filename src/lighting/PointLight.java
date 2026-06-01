@@ -32,7 +32,7 @@ public class PointLight extends Light implements LightSource {
      * NEW FIELD FOR MINI-PROJECT 1
      * Default is 0 (infinitesimal point light)
      */
-    private double radius = 0;
+    private double _radius = 0;
 
     /**
      * Constructs a point light source with a given intensity and position.
@@ -110,15 +110,15 @@ public class PointLight extends Light implements LightSource {
      * Sets the physical radius of the light source to enable soft shadows.
      * Uses the builder pattern for method chaining.
      *
-     * @param radius the size/radius of the area light source
+     * @param _radius the size/radius of the area light source
      * @return the PointLight object itself for chaining
      * @throws IllegalArgumentException if the radius parameter is negative
      */
-    public PointLight setRadius(double radius) {
-        if (radius < 0) {
+    public PointLight setRadius(double _radius) {
+        if (_radius < 0) {
             throw new IllegalArgumentException("Light radius cannot be negative");
         }
-        this.radius = radius;
+        this._radius = _radius;
         return this;
     }
 
@@ -128,6 +128,16 @@ public class PointLight extends Light implements LightSource {
      * @return the radius of the light source
      */
     public double getRadius() {
-        return this.radius;
+        return this._radius;
     }
+
+    /**
+     * Gets the position of this light source.
+     *
+     * @return the position of the light source
+     */
+    public Point getPosition() {
+        return this._position;
+    }
+
 }
