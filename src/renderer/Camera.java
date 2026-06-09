@@ -293,7 +293,6 @@ public class Camera implements Cloneable {
             checkLocationAndDirection();
             checkViewPlane();
 
-            // בדיקת קיום rayTracer[cite: 11]
             if (_camera._rayTracer == null) {
                 setRayTracer(new Scene("test"), RayTracerType.SIMPLE);
             }
@@ -346,7 +345,7 @@ public class Camera implements Cloneable {
          * Checks view plane data and calculates helper fields.
          */
         private void checkViewPlane() {
-            
+
             if (alignZero(_camera._width) <= 0 || alignZero(_camera._height) <= 0) {
                 throw new IllegalArgumentException("View Plane width and height must be positive");
             }
