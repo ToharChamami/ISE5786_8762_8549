@@ -135,6 +135,32 @@ public class Camera implements Cloneable {
     }
 
     /**
+     * Returns the ray tracer used by the camera.
+     *
+     * @return the current ray tracer instance
+     */
+    public RayTracerBase getRayTracer() {
+        return this._rayTracer;
+    }
+
+    @Override
+    public Camera clone() {
+        try {
+            Camera cloned = (Camera) super.clone();
+            // מבטיח שהטרייסר שהגדרנו בבנייה יעבור בבטחה למצלמה המשוכפלת
+            if (this._rayTracer != null) {
+                cloned._rayTracer = this._rayTracer;
+            }
+            if (this._imageWriter != null) {
+                cloned._imageWriter = this._imageWriter;
+            }
+            return cloned;
+        } catch (Exception e) {
+            throw new AssertionError("Camera clone failed", e);
+        }
+    }
+
+    /**
      * Static method to get a new Builder object.
      *
      * @return a new Camera.Builder instance
@@ -299,7 +325,7 @@ public class Camera implements Cloneable {
 
             try {
                 return (Camera) _camera.clone();
-            } catch (CloneNotSupportedException _) {
+            } catch (Exception _) {
                 return null;
             }
         }
