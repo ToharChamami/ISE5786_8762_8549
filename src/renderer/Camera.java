@@ -147,7 +147,6 @@ public class Camera implements Cloneable {
     public Camera clone() {
         try {
             Camera cloned = (Camera) super.clone();
-            // מבטיח שהטרייסר שהגדרנו בבנייה יעבור בבטחה למצלמה המשוכפלת
             if (this._rayTracer != null) {
                 cloned._rayTracer = this._rayTracer;
             }

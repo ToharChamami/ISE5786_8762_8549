@@ -15,62 +15,110 @@ import renderer.sampling.TargetShape;
 import scene.Scene;
 
 /**
- * Test class for demonstrating Stage 5: Soft Shadows effects and rendering performance.
+ * Test class for demonstrating Stage 5: Soft Shadows effects.
+ * Scene is designed to clearly show the difference between hard and soft shadows.
  */
 public class SoftShadowsTest {
 
     @Test
     public void testRichSceneSoftShadows() {
-        // 1. יצירת הסצנה והגדרת תאורת רקע לבנה
-        Scene scene = new Scene("RichSceneSoftShadows")
-                .setAmbientLight(new AmbientLight(new Color(30, 30, 30), Double3.ONE))
-                .setBackground(new Color(255, 255, 255));
 
-        // 2. בניית הגיאומטריות - רצפה ו-9 כדורים (לפחות 10 גופים בסך הכל)
+        Scene scene = new Scene("RichSceneSoftShadows")
+                .setAmbientLight(new AmbientLight(new Color(25, 25, 25), Double3.ONE))
+                .setBackground(new Color(10, 10, 30));
+
+        Material floorMat = new Material().setKD(0.6).setKS(0.2).setShininess(20);
+        Material sphereMat = new Material().setKD(0.5).setKS(0.4).setShininess(60);
+
         scene.geometries.add(
                 new Plane(new Point(0, -50, 0), new Vector(0, 1, 0))
-                        .setEmission(new Color(40, 40, 40))
-                        .setMaterial(new Material().setKD(0.6).setKS(0.3).setShininess(30))
+                        .setEmission(new Color(30, 30, 30))
+                        .setMaterial(floorMat)
         );
 
-        Material sphereMaterial = new Material().setKD(0.5).setKS(0.4).setShininess(50);
-
+        // כדור מרכזי גדול - מטיל צל ברור על הרצפה
         scene.geometries.add(
-                new Sphere(new Point(-60, 0, -120), 20).setEmission(new Color(150, 0, 0)).setMaterial(sphereMaterial),
-                new Sphere(new Point(-30, -5, -100), 15).setEmission(new Color(0, 150, 0)).setMaterial(sphereMaterial),
-                new Sphere(new Point(0, -10, -80), 12).setEmission(new Color(0, 0, 150)).setMaterial(sphereMaterial),
-                new Sphere(new Point(30, -5, -100), 15).setEmission(new Color(150, 150, 0)).setMaterial(sphereMaterial),
-                new Sphere(new Point(60, 0, -120), 20).setEmission(new Color(0, 150, 150)).setMaterial(sphereMaterial),
-
-                new Sphere(new Point(-45, -20, -70), 8).setEmission(new Color(100, 50, 150)).setMaterial(sphereMaterial),
-                new Sphere(new Point(-15, -22, -60), 6).setEmission(new Color(150, 100, 50)).setMaterial(sphereMaterial),
-                new Sphere(new Point(15, -22, -60), 6).setEmission(new Color(50, 150, 100)).setMaterial(sphereMaterial),
-                new Sphere(new Point(45, -20, -70), 8).setEmission(new Color(200, 100, 100)).setMaterial(sphereMaterial)
+                new Sphere(new Point(0, -10, -80), 35)
+                        .setEmission(new Color(180, 30, 30))
+                        .setMaterial(sphereMat)
+        );
+        // כדור ירוק שמאל
+        scene.geometries.add(
+                new Sphere(new Point(-70, -25, -80), 22)
+                        .setEmission(new Color(30, 160, 30))
+                        .setMaterial(sphereMat)
+        );
+        // כדור כחול ימין
+        scene.geometries.add(
+                new Sphere(new Point(70, -25, -80), 22)
+                        .setEmission(new Color(30, 30, 180))
+                        .setMaterial(sphereMat)
+        );
+        // כדור צהוב קטן - שמאל קדימה
+        scene.geometries.add(
+                new Sphere(new Point(-40, -38, -30), 12)
+                        .setEmission(new Color(180, 180, 0))
+                        .setMaterial(sphereMat)
+        );
+        // כדור ציאן קטן - ימין קדימה
+        scene.geometries.add(
+                new Sphere(new Point(40, -38, -30), 12)
+                        .setEmission(new Color(0, 180, 180))
+                        .setMaterial(sphereMat)
+        );
+        // כדור סגול - שמאל רחוק
+        scene.geometries.add(
+                new Sphere(new Point(-90, -40, -40), 8)
+                        .setEmission(new Color(140, 0, 140))
+                        .setMaterial(sphereMat)
+        );
+        // כדור כתום - ימין רחוק
+        scene.geometries.add(
+                new Sphere(new Point(90, -40, -40), 8)
+                        .setEmission(new Color(200, 80, 0))
+                        .setMaterial(sphereMat)
+        );
+        // כדור אחורי רחוק
+        scene.geometries.add(
+                new Sphere(new Point(0, -38, -160), 12)
+                        .setEmission(new Color(60, 120, 60))
+                        .setMaterial(sphereMat)
+        );
+        // כדור מרחף באוויר
+        scene.geometries.add(
+                new Sphere(new Point(0, 40, -120), 18)
+                        .setEmission(new Color(100, 100, 100))
+                        .setMaterial(sphereMat)
         );
 
-        // 3. הגדרת 3 מקורות אור במיקומים שונים (לפי דרישות המיני-פרויקט) [cite: 58]
-        PointLight pointLight1 = new PointLight(new Color(500, 400, 400), new Point(60, 120, -40))
-                .setKl(0.00001).setKq(0.000005);
-        pointLight1.setRadius(15);
+        PointLight mainLight = new PointLight(
+                new Color(600, 500, 400),
+                new Point(80, 120, -40))
+                .setKl(0.0001).setKq(0.000002);
+        mainLight.setRadius(50);
+        scene.lights.add(mainLight);
 
-        PointLight pointLight2 = new PointLight(new Color(200, 200, 400), new Point(-60, 120, -40))
-                .setKl(0.0001).setKq(0.00005);
-        pointLight2.setRadius(10);
+        PointLight sideLight = new PointLight(
+                new Color(300, 300, 500),
+                new Point(-80, 100, -40))
+                .setKl(0.0002).setKq(0.000005);
+        sideLight.setRadius(40);
+        scene.lights.add(sideLight);
 
-        scene.lights.add(pointLight1);
-        scene.lights.add(pointLight2);
-        scene.lights.add(new SpotLight(new Color(400, 400, 400), new Point(0, 150, -50), new Vector(0, -1, 0))
-                .setKl(0.0001).setKq(0.00005));
+        SpotLight topSpot = new SpotLight(
+                new Color(400, 400, 400),
+                new Point(0, 200, -80),
+                new Vector(0, -1, 0))
+                .setKl(0.0001).setKq(0.000003);
+        topSpot.setRadius(45);
+        scene.lights.add(topSpot);
 
-        // ====================================================================
-        // הרצה ראשונה: ללא השיפור (Hard Shadows בלבד)
-        // ====================================================================
-
-        Camera cameraHard = new Camera.Builder()
-                .setLocation(new Point(0, -10, 150)) // הורדנו את ה-Y ל-10- כדי לקלוט את הכדורים והרצפה
-                .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) // וקטורים ניצבים מתמטית ב-100%!
+        Camera cameraHard = Camera.getBuilder()
+                .setLocation(new Point(0, 30, 800))
+                .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
                 .setVpSize(200, 200)
-                .setVpDistance(150)
+                .setVpDistance(800)
+                .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
                 .build();
 
@@ -78,33 +126,40 @@ public class SoftShadowsTest {
             simpleTracer.setSoftShadows(false);
         }
 
-        long startTimeHard = System.currentTimeMillis();
+        System.out.println("Starting Hard Shadows render...");
+        long startHard = System.currentTimeMillis();
         cameraHard.renderImage();
         cameraHard.writeToImage("Step5_Hard_Shadows");
-        long endTimeHard = System.currentTimeMillis();
-        System.out.println("Render time WITHOUT soft shadows (Hard Shadows): " + (endTimeHard - startTimeHard) + " ms");
+        long endHard = System.currentTimeMillis();
+        System.out.println("Hard Shadows render time: " + (endHard - startHard) + " ms");
 
-        // ====================================================================
-        // הרצה שנייה: עם הפעלת השיפור (Soft Shadows)
-        // ====================================================================
-
-        Camera cameraSoft = new Camera.Builder()
-                .setLocation(new Point(0, -10, 150)) // אותו מיקום בטוח וניצב
+        //  Soft Shadows
+        Camera cameraSoft = Camera.getBuilder()
+                .setLocation(new Point(0, 30, 800))
                 .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
                 .setVpSize(200, 200)
-                .setVpDistance(150)
+                .setVpDistance(800)
+                .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
                 .build();
 
         if (cameraSoft.getRayTracer() instanceof SimpleRayTracer simpleTracer) {
             simpleTracer.setSoftShadows(true)
-                    .setShadowTargetShape(TargetShape.CIRCLE);
+                    .setShadowTargetShape(TargetShape.CIRCLE)
+                    .setShadowSamples(9); // 9x9 = 81 samples
         }
 
-        long startTimeSoft = System.currentTimeMillis();
+        System.out.println("Starting Soft Shadows render (9x9 grid)...");
+        long startSoft = System.currentTimeMillis();
         cameraSoft.renderImage();
         cameraSoft.writeToImage("Step5_Soft_Shadows");
-        long endTimeSoft = System.currentTimeMillis();
-        System.out.println("Render time WITH soft shadows (Grid 9x9): " + (endTimeSoft - startTimeSoft) + " ms");
+        long endSoft = System.currentTimeMillis();
+        System.out.println("Soft Shadows render time: " + (endSoft - startSoft) + " ms");
+
+        System.out.println("\n=== Performance Comparison ===");
+        System.out.println("Hard Shadows: " + (endHard - startHard) + " ms");
+        System.out.println("Soft Shadows: " + (endSoft - startSoft) + " ms");
+        System.out.printf("Slowdown factor: %.1fx%n",
+                (double) (endSoft - startSoft) / (endHard - startHard));
     }
 }

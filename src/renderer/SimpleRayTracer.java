@@ -180,32 +180,38 @@ class SimpleRayTracer extends RayTracerBase {
     private double calcSoftShadowFactor(Intersection intersection, PointLight pointLight) {
         double radius = pointLight.getRadius();
         Point lightPosition = pointLight.getPosition();
-        Vector l = intersection.l.normalize();
-        Vector helperAxis = (Math.abs(l.dotProduct(AXIS_X)) > 0.9) ? new Vector(0, 1, 0) : new Vector(1, 0, 0);
-        Vector u = l.crossProduct(helperAxis).normalize();
-        Vector v = l.crossProduct(u).normalize();
-        List<Offset2D> offsets = this.shadowSampler.getSamplePoints(this.shadowTargetShape);
 
+        Vector toLight = lightPosition.subtract(intersection.point).normalize();
+
+        Vector helperAxis = (Math.abs(toLight.dotProduct(AXIS_X)) > 0.9)
+                ? new Vector(0, 1, 0)
+                : new Vector(1, 0, 0);
+        Vector u = toLight.crossProduct(helperAxis).normalize();
+        Vector v = toLight.crossProduct(u).normalize();
+
+        List<Offset2D> offsets = this.shadowSampler.getSamplePoints(this.shadowTargetShape);
         int unshadedRaysCount = 0;
         int totalRays = offsets.size();
+
         for (Offset2D offset : offsets) {
-            double deltaX = offset.getX() * radius;
-            double deltaY = offset.getY() * radius;
+            double deltaX = offset.getX() * 2 * radius;
+            double deltaY = offset.getY() * 2 * radius;
 
             Point samplePoint = lightPosition;
-            if (deltaX != 0) {
+            if (!primitives.Util.isZero(deltaX))
                 samplePoint = samplePoint.add(u.scale(deltaX));
-            }
-            if (deltaY != 0) {
+            if (!primitives.Util.isZero(deltaY))
                 samplePoint = samplePoint.add(v.scale(deltaY));
-            }
+
             Vector shadowRayDir = samplePoint.subtract(intersection.point);
             Ray shadowRay = new Ray(intersection.point, shadowRayDir, intersection.normal);
             var intersections = _scene.geometries.calcIntersections(shadowRay);
+
             if (intersections == null) {
                 unshadedRaysCount++;
                 continue;
             }
+
             double currentLightDistance = samplePoint.distance(intersection.point);
             boolean isRayBlocked = false;
             for (Intersection geo : intersections) {
@@ -216,9 +222,7 @@ class SimpleRayTracer extends RayTracerBase {
                     }
                 }
             }
-            if (!isRayBlocked) {
-                unshadedRaysCount++;
-            }
+            if (!isRayBlocked) unshadedRaysCount++;
         }
         return totalRays == 0 ? 1.0 : (double) unshadedRaysCount / totalRays;
     }
@@ -349,6 +353,15 @@ class SimpleRayTracer extends RayTracerBase {
      */
     public SimpleRayTracer setShadowSamplingPattern(SamplingPattern pattern) {
         this.shadowPattern = pattern;
+        return this;
+    }
+
+    /**
+     * Sets the number of samples (grid size dimension) for the soft shadows beam.
+     * For example, passing 9 will configure a 9x9 grid (81 samples).
+     */
+    public SimpleRayTracer setShadowSamples(int gridSize) {
+        this.shadowSampler = new Sampler(gridSize);
         return this;
     }
 }
