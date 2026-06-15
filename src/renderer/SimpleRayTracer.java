@@ -1,6 +1,5 @@
 package renderer;
 
-import java.util.ArrayList;
 import java.util.List;
 import lighting.LightSource;
 import lighting.PointLight;
@@ -9,7 +8,6 @@ import primitives.Double3;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import renderer.sampling.Offset2D;
 import renderer.sampling.Sampler;
 import renderer.sampling.SamplingPattern;
 import renderer.sampling.TargetShape;
@@ -17,7 +15,6 @@ import scene.Scene;
 
 import static geometries.api.Intersectable.Intersection;
 import static primitives.Util.alignZero;
-import static primitives.Vector.AXIS_X;
 
 /**
  * A simple implementation of RayTracerBase.
@@ -180,29 +177,15 @@ class SimpleRayTracer extends RayTracerBase {
     private double calcSoftShadowFactor(Intersection intersection, PointLight pointLight) {
         double radius = pointLight.getRadius();
         Point lightPosition = pointLight.getPosition();
-
         Vector toLight = lightPosition.subtract(intersection.point).normalize();
 
-        Vector helperAxis = (Math.abs(toLight.dotProduct(AXIS_X)) > 0.9)
-                ? new Vector(0, 1, 0)
-                : new Vector(1, 0, 0);
-        Vector u = toLight.crossProduct(helperAxis).normalize();
-        Vector v = toLight.crossProduct(u).normalize();
+        List<Point> samplePoints3D = this.shadowSampler.generateSamplePoints3D(
+                lightPosition, toLight, radius, this.shadowTargetShape, this.shadowPattern);
 
-        List<Offset2D> offsets = this.shadowSampler.getSamplePoints(this.shadowTargetShape);
         int unshadedRaysCount = 0;
-        int totalRays = offsets.size();
+        int totalRays = samplePoints3D.size();
 
-        for (Offset2D offset : offsets) {
-            double deltaX = offset.getX() * 2 * radius;
-            double deltaY = offset.getY() * 2 * radius;
-
-            Point samplePoint = lightPosition;
-            if (!primitives.Util.isZero(deltaX))
-                samplePoint = samplePoint.add(u.scale(deltaX));
-            if (!primitives.Util.isZero(deltaY))
-                samplePoint = samplePoint.add(v.scale(deltaY));
-
+        for (Point samplePoint : samplePoints3D) {
             Vector shadowRayDir = samplePoint.subtract(intersection.point);
             Ray shadowRay = new Ray(intersection.point, shadowRayDir, intersection.normal);
             var intersections = _scene.geometries.calcIntersections(shadowRay);
@@ -296,37 +279,6 @@ class SimpleRayTracer extends RayTracerBase {
         Ray refractedRay = constructRefractedRay(intersection);
         return calcGlobalEffect(reflectedRay, level, k, intersection.material.kR)
                 .add(calcGlobalEffect(refractedRay, level, k, intersection.material.kT));
-    }
-
-    /**
-     * Generates a beam of shadow rays from the given intersection point toward the surface of a dimensional area light source.
-     */
-    private List<Ray> generateShadowBeam(Intersection intersection, PointLight light, Vector l, Sampler sampler) {
-        List<Ray> beamRays = new ArrayList<>();
-        double radius = light.getRadius();
-        Point lightPosition = light.getPosition();
-        Vector xAxis = new Vector(1, 0, 0);
-        Vector helperAxis = (Math.abs(l.dotProduct(xAxis)) > 0.9) ? new Vector(0, 1, 0) : xAxis;
-
-        Vector u = l.crossProduct(helperAxis).normalize();
-        Vector v = l.crossProduct(u).normalize();
-
-        List<Offset2D> offsets = sampler.getSamplePoints(this.shadowTargetShape);
-        for (Offset2D offset : offsets) {
-            double deltaX = offset.getX() * radius;
-            double deltaY = offset.getY() * radius;
-
-            Point samplePoint = lightPosition;
-            if (deltaX != 0) {
-                samplePoint = samplePoint.add(u.scale(deltaX));
-            }
-            if (deltaY != 0) {
-                samplePoint = samplePoint.add(v.scale(deltaY));
-            }
-            Vector rayDirection = samplePoint.subtract(intersection.point);
-            beamRays.add(new Ray(intersection.point, rayDirection, intersection.normal));
-        }
-        return beamRays;
     }
 
     /**

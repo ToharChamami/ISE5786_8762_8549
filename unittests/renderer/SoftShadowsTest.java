@@ -11,6 +11,7 @@ import primitives.Double3;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
+import renderer.sampling.SamplingPattern;
 import renderer.sampling.TargetShape;
 import scene.Scene;
 
@@ -120,6 +121,8 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
+                .setMultithreading(-1)
+                .setDebugPrint(0.1)
                 .build();
 
         if (cameraHard.getRayTracer() instanceof SimpleRayTracer simpleTracer) {
@@ -141,12 +144,15 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
+                .setMultithreading(-1)
+                .setDebugPrint(0.1)
                 .build();
 
         if (cameraSoft.getRayTracer() instanceof SimpleRayTracer simpleTracer) {
             simpleTracer.setSoftShadows(true)
                     .setShadowTargetShape(TargetShape.CIRCLE)
-                    .setShadowSamples(9); // 9x9 = 81 samples
+                    .setShadowSamples(9) // 9x9 = 81 samples
+                    .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID); // הפעלת בונוס ה-Jittered!
         }
 
         System.out.println("Starting Soft Shadows render (9x9 grid)...");

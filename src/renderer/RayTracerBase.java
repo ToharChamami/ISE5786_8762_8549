@@ -12,7 +12,7 @@ import static primitives.Util.alignZero;
 /**
  * Abstract base class for ray tracers.
  */
-abstract class RayTracerBase {
+public abstract class RayTracerBase {
     /**
      * The scene to trace rays in
      */
