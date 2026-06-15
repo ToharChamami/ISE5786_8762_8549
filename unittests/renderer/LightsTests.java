@@ -287,6 +287,9 @@ class LightsTests {
                 .writeToImage("lightTrianglesSpotSharp");
     }
 
+    /**
+     * Test method for the getL function.
+     */
     @Test
     public void testGetL() {
         PointLight pointLight = new PointLight(new Color(255, 255, 255), new Point(1, 2, 3));

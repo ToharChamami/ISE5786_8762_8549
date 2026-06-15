@@ -37,10 +37,24 @@ class SimpleRayTracer extends RayTracerBase {
      */
     private static final Double3 INITIAL_K = Double3.ONE;
 
-    // --- MINI-PROJECT 1 CONFIGURATION FIELDS ---
-    private boolean softShadows = false; // Toggle: false = hard shadows (default), true = soft shadows
+    /**
+     * Toggle for soft shadows: false = hard shadows (default), true = soft shadows
+     */
+    private boolean softShadows = false;
+
+    /**
+     * The shape of the target area for soft shadows
+     */
     private TargetShape shadowTargetShape = TargetShape.CIRCLE;
+
+    /**
+     * The sampler used for generating shadow rays
+     */
     private Sampler shadowSampler = new Sampler(1);
+
+    /**
+     * The sampling pattern used for soft shadows
+     */
     private SamplingPattern shadowPattern = SamplingPattern.REGULAR_GRID;
 
     /**
@@ -144,6 +158,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Calculates the shadow attenuation factor (shading coefficient) for an intersection point.
+     *
+     * @param intersection the intersection data
+     * @return the shadow attenuation factor (0.0 for full shadow, 1.0 for no shadow, or intermediate for soft shadows)
      */
     @SuppressWarnings("unused")
     private double unshaded(Intersection intersection) {
@@ -173,6 +190,10 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Helper method to calculate the soft shadow illumination coefficient using a distributed beam of rays.
+     *
+     * @param intersection the intersection point data
+     * @param pointLight   the point light source
+     * @return the soft shadow attenuation factor
      */
     private double calcSoftShadowFactor(Intersection intersection, PointLight pointLight) {
         double radius = pointLight.getRadius();
@@ -212,6 +233,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Constructs the reflected ray from an intersection point.
+     *
+     * @param intersection the intersection data
+     * @return the reflected ray
      */
     private Ray constructReflectedRay(Intersection intersection) {
         Vector r = intersection.v.subtract(intersection.normal.scale(2 * intersection.vNormal));
@@ -220,6 +244,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Constructs the refracted (transparent) ray from an intersection point.
+     *
+     * @param intersection the intersection data
+     * @return the refracted ray
      */
     private Ray constructRefractedRay(Intersection intersection) {
         return new Ray(intersection.point, intersection.v, intersection.normal);
@@ -227,6 +254,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Calculates the transparency factor of the path between an intersection point and a light source.
+     *
+     * @param intersection the intersection data
+     * @return the transparency attenuation factor
      */
     private Double3 transparency(Intersection intersection) {
         Vector lightDirection = intersection.l.scale(-1);
@@ -252,6 +282,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Calculates and returns the closest intersection point to the start of the ray.
+     *
+     * @param ray the ray to trace
+     * @return the closest intersection point, or null if none
      */
     private Intersection findClosestIntersection(Ray ray) {
         return ray.findClosestIntersection(_scene.geometries.calcIntersections(ray));
@@ -259,6 +292,12 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Calculates the color of a secondary ray (reflection or refraction).
+     *
+     * @param ray   the secondary ray
+     * @param level the current recursion level
+     * @param k     the accumulated attenuation factor
+     * @param kx    the reflection or refraction coefficient
+     * @return the calculated color for the secondary ray
      */
     private Color calcGlobalEffect(Ray ray, int level, Double3 k, Double3 kx) {
         Double3 kkr = kx.product(k);
@@ -273,6 +312,11 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Calculates the global effects (reflection and refraction/transparency).
+     *
+     * @param intersection the intersection data
+     * @param level        the current recursion level
+     * @param k            the accumulated attenuation factor
+     * @return the combined color from global effects
      */
     private Color calcGlobalEffects(Intersection intersection, int level, Double3 k) {
         Ray reflectedRay = constructReflectedRay(intersection);
@@ -283,6 +327,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Toggles the soft shadows feature on or off.
+     *
+     * @param softShadows true to enable soft shadows, false to disable
+     * @return the SimpleRayTracer instance itself for chaining
      */
     public SimpleRayTracer setSoftShadows(boolean softShadows) {
         this.softShadows = softShadows;
@@ -294,6 +341,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Sets the shadow target shape.
+     *
+     * @param shape the target shape (e.g., CIRCLE, SQUARE)
+     * @return the SimpleRayTracer instance itself for chaining
      */
     public SimpleRayTracer setShadowTargetShape(TargetShape shape) {
         this.shadowTargetShape = shape;
@@ -302,6 +352,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Configures the mathematical distribution pattern template for the shadow beam rays.
+     *
+     * @param pattern the sampling pattern
+     * @return the SimpleRayTracer instance itself for chaining
      */
     public SimpleRayTracer setShadowSamplingPattern(SamplingPattern pattern) {
         this.shadowPattern = pattern;
@@ -310,7 +363,9 @@ class SimpleRayTracer extends RayTracerBase {
 
     /**
      * Sets the number of samples (grid size dimension) for the soft shadows beam.
-     * For example, passing 9 will configure a 9x9 grid (81 samples).
+     *
+     * @param gridSize the grid dimension (e.g., 9 for 9x9)
+     * @return the SimpleRayTracer instance itself for chaining
      */
     public SimpleRayTracer setShadowSamples(int gridSize) {
         this.shadowSampler = new Sampler(gridSize);

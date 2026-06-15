@@ -67,6 +67,9 @@ class SpotLightTests {
                 "SpotLight getIntensity() should be Black for points behind the light source");
     }
 
+    /**
+     * Test method for the getL function.
+     */
     @Test
     public void testGetL() {
         Point p = new Point(1, 2, 3);

@@ -20,7 +20,15 @@ import scene.Scene;
  * Scene is designed to clearly show the difference between hard and soft shadows.
  */
 public class SoftShadowsTest {
+    /**
+     * Default constructor for the SoftShadowsTest class.
+     */
+    public SoftShadowsTest() {
+    }
 
+    /**
+     * Test method for rendering a rich scene demonstrating soft shadows.
+     */
     @Test
     public void testRichSceneSoftShadows() {
 

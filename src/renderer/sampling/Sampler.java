@@ -10,12 +10,17 @@ import primitives.Vector;
  * Responsible for generating a normalized distribution of 2D offset points
  * within a target boundary. Implements caching to optimize performance.
  *
- * @author YourName & Partner
  */
 public class Sampler {
 
+    /**
+     * The density matrix size (number of rows/columns in the grid)
+     */
     private final int _gridSize;
 
+    /**
+     * Cached list of pre-calculated points for a square target area
+     */
     private final List<Offset2D> _cachedSquarePoints;
 
     /**
@@ -99,6 +104,11 @@ public class Sampler {
         return jitteredPoints;
     }
 
+    /**
+     * Returns the configured grid size.
+     *
+     * @return the grid size
+     */
     public int getGridSize() {
         return this._gridSize;
     }
@@ -106,6 +116,13 @@ public class Sampler {
     /**
      * Generates physical 3D points in the world coordinate system based on the sampling pattern,
      * target shape, and the coordinate system specified by the given normal vector.
+     *
+     * @param center      The center point of the sampling area (e.g., light position)
+     * @param normal      The direction/normal vector of the area (e.g., light direction)
+     * @param size        The physical size (radius or width) of the sampling area
+     * @param targetShape The target boundary shape (SQUARE or CIRCLE)
+     * @param pattern     The sampling pattern to use (e.g., REGULAR_GRID, JITTERED_GRID)
+     * @return A list of physical 3D points representing the samples
      */
     public List<Point> generateSamplePoints3D(Point center, Vector normal, double size, TargetShape targetShape, SamplingPattern pattern) {
 

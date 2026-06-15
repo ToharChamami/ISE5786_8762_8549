@@ -4,7 +4,14 @@ package renderer.sampling;
  * Supported geometric shapes for the target sampling area.
  */
 public enum TargetShape {
-    SQUARE, CIRCLE
+    /**
+     * Square target area
+     */
+    SQUARE,
+    /**
+     * Circular target area
+     */
+    CIRCLE
 }
 
 

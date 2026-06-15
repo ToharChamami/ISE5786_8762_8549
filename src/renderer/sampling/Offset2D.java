@@ -4,7 +4,6 @@ package renderer.sampling;
  * Value object representing a 2D offset in a normalized coordinate system ranging from -0.5 to 0.5.
  * This class is immutable to ensure absolute thread safety during multi-threaded rendering.
  *
- * @author YourName & Partner
  */
 public final class Offset2D {
 

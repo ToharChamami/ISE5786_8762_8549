@@ -49,6 +49,9 @@ class PointLightTests {
                 "PointLight getL() wrong direction vector");
     }
 
+    /**
+     * Test method for the getL function.
+     */
     @Test
     public void testGetL() {
         Point p = new Point(1, 2, 3);
