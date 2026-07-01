@@ -1,5 +1,6 @@
 package lighting;
 
+import java.util.List;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
@@ -35,4 +36,12 @@ public interface LightSource {
      * @return the normalized direction vector from the light source to the point
      */
     public Vector getL(Point p);
+
+    /**
+     * Returns a beam of direction vectors from the light source to the point.
+     * Default implementation returns a single directional vector.
+     */
+    default List<Vector> getLBeam(Point p) {
+        return List.of(getL(p));
+    }
 }

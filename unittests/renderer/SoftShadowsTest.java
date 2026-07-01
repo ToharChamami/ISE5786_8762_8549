@@ -137,12 +137,12 @@ public class SoftShadowsTest {
             simpleTracer.setSoftShadows(false);
         }
 
-        System.out.println("Starting Hard Shadows render...");
+        System.out.println("\nStarting Hard Shadows render...");
         long startHard = System.currentTimeMillis();
         cameraHard.renderImage();
         cameraHard.writeToImage("Step5_Hard_Shadows");
         long endHard = System.currentTimeMillis();
-        System.out.println("Hard Shadows render time: " + (endHard - startHard) + " ms");
+        System.out.println("\nHard Shadows render time: " + (endHard - startHard) + " ms");
 
         //  Soft Shadows
         Camera cameraSoft = Camera.getBuilder()
@@ -163,14 +163,14 @@ public class SoftShadowsTest {
                     .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID); // הפעלת בונוס ה-Jittered!
         }
 
-        System.out.println("Starting Soft Shadows render (9x9 grid)...");
+        System.out.println("\nStarting Soft Shadows render (9x9 grid)...");
         long startSoft = System.currentTimeMillis();
         cameraSoft.renderImage();
         cameraSoft.writeToImage("Step5_Soft_Shadows");
         long endSoft = System.currentTimeMillis();
-        System.out.println("Soft Shadows render time: " + (endSoft - startSoft) + " ms");
+        System.out.println("\nSoft Shadows render time: " + (endSoft - startSoft) + " ms");
 
-        System.out.println("\n=== Performance Comparison ===");
+        System.out.println("=== Performance Comparison ===");
         System.out.println("Hard Shadows: " + (endHard - startHard) + " ms");
         System.out.println("Soft Shadows: " + (endSoft - startSoft) + " ms");
         System.out.printf("Slowdown factor: %.1fx%n",

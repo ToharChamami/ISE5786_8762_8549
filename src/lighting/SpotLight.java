@@ -1,5 +1,6 @@
 package lighting;
 
+import java.util.List;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
@@ -8,82 +9,77 @@ import primitives.Vector;
  * Representation of a spotlight source in the scene (such as a flashlight).
  */
 public class SpotLight extends PointLight {
-    /**
-     * The direction of the spotlight
-     */
     private final Vector _direction;
-
-    /**
-     * The narrow beam factor
-     */
     private double narrowBeam = 1d;
 
-    /**
-     * Constructs a spotlight source with a given intensity, position, and direction.
-     *
-     * @param intensity the color intensity of the light source
-     * @param position  the position point of the light source
-     * @param direction the direction vector of the light beam
-     */
     public SpotLight(Color intensity, Point position, Vector direction) {
         super(intensity, position);
         this._direction = direction.normalize();
     }
 
-    /**
-     * Sets the concentration beam factor and returns the object itself.
-     *
-     * @param narrowBeam concentration factor exponent
-     * @return the SpotLight object itself for chaining
-     */
     public SpotLight setNarrowBeam(double narrowBeam) {
         this.narrowBeam = narrowBeam;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * Overrides to maintain Fluent Interface and return SpotLight type.
-     */
     @Override
     public SpotLight setKc(double kC) {
         return (SpotLight) super.setKc(kC);
     }
 
-    /**
-     * {@inheritDoc}
-     * Overrides to maintain Fluent Interface and return SpotLight type.
-     */
     @Override
     public SpotLight setKl(double kL) {
         return (SpotLight) super.setKl(kL);
     }
 
-    /**
-     * {@inheritDoc}
-     * Overrides to maintain Fluent Interface and return SpotLight type.
-     */
     @Override
     public SpotLight setKq(double kQ) {
         super.setKq(kQ);
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * Calculates the spotlight intensity factoring both distance attenuation and beam angle direction.
-     */
+    // דריסת הפונקציות כדי לתמוך בשרשור (Builder pattern)
+    @Override
+    public SpotLight setRadius(double radius) {
+        super.setRadius(radius);
+        return this;
+    }
+
+    @Override
+    public SpotLight setSampler(renderer.sampling.Sampler sampler) {
+        super.setSampler(sampler);
+        return this;
+    }
+
+    @Override
+    public SpotLight setShadowTargetShape(renderer.sampling.TargetShape shape) {
+        super.setShadowTargetShape(shape);
+        return this;
+    }
+
+    @Override
+    public SpotLight setShadowSamplingPattern(renderer.sampling.SamplingPattern pattern) {
+        super.setShadowSamplingPattern(pattern);
+        return this;
+    }
+
     @Override
     public Color getIntensity(Point p) {
         Vector l = getL(p);
         double cosAlpha = _direction.dotProduct(l);
-
-        if (cosAlpha <= 0) {
-            return Color.BLACK;
-        }
-
-        double factor = narrowBeam == 1d ? cosAlpha : Math.pow(cosAlpha, narrowBeam);
+        if (cosAlpha <= 0) return Color.BLACK;
+        double factor = (narrowBeam == 1d) ? cosAlpha : Math.pow(cosAlpha, narrowBeam);
         return super.getIntensity(p).scale(factor);
     }
 
+    @Override
+    public List<Vector> getLBeam(Point p) {
+        if (_sampler == null || getRadius() <= 0) return List.of(getL(p));
+
+        // ההבדל מהמרצה: שימוש ב-_direction של הספוט במקום ב-getL(p)
+        List<Point> points = _sampler.generateSamplePoints3D(getPosition(), this._direction, getRadius(), _targetShape, _samplingPattern);
+
+        // קריאה לפונקציית העזר שנמצאת ב-PointLight
+        return createBeam(points, p);
+    }
 }

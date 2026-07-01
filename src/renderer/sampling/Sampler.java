@@ -6,6 +6,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import primitives.Point;
 import primitives.Vector;
 
+import static primitives.Util.isZero;
+
 /**
  * Responsible for generating a normalized distribution of 2D offset points
  * within a target boundary. Implements caching to optimize performance.
@@ -64,7 +66,7 @@ public class Sampler {
      * @param pattern the sampling pattern to use
      * @return a list of Offset2D objects
      */
-    public List<Offset2D> getSamplePoints(TargetShape shape, SamplingPattern pattern) {
+    private List<Offset2D> getSamplePoints(TargetShape shape, SamplingPattern pattern) {
         // Grid
         if (pattern == SamplingPattern.REGULAR_GRID) {
             if (shape == TargetShape.SQUARE) {
@@ -72,7 +74,7 @@ public class Sampler {
             }
             List<Offset2D> circlePoints = new ArrayList<>();
             for (Offset2D pt : _cachedSquarePoints) {
-                if ((pt.getX() * pt.getX() + pt.getY() * pt.getY()) <= 0.25) {
+                if ((pt.x() * pt.x() + pt.y() * pt.y()) <= 0.25) {
                     circlePoints.add(pt);
                 }
             }
@@ -89,16 +91,13 @@ public class Sampler {
             double jitterX = (ThreadLocalRandom.current().nextDouble() - 0.5) * step;
             double jitterY = (ThreadLocalRandom.current().nextDouble() - 0.5) * step;
 
-            double jX = pt.getX() + jitterX;
-            double jY = pt.getY() + jitterY;
+            double jX = pt.x() + jitterX;
+            double jY = pt.y() + jitterY;
 
             // Filter in case of rounding
-            if (shape == TargetShape.CIRCLE) {
-                if (jX * jX + jY * jY > 0.25) {
-                    continue; // The point exceeded the radius, we will discard it
-                }
+            if (shape != TargetShape.CIRCLE || jX * jX + jY * jY <= 0.25) {
+                jitteredPoints.add(new Offset2D(jX, jY));
             }
-            jitteredPoints.add(new Offset2D(jX, jY));
         }
 
         return jitteredPoints;
@@ -133,8 +132,7 @@ public class Sampler {
         Vector vTo = normal.normalize();
         Vector vRight;
 
-        if (primitives.Util.isZero(vTo.dotProduct(Vector.AXIS_X) - 1) ||
-                primitives.Util.isZero(vTo.dotProduct(Vector.AXIS_X) + 1)) {
+        if (isZero(vTo.dotProduct(Vector.AXIS_X) - 1) || isZero(vTo.dotProduct(Vector.AXIS_X) + 1)) {
             vRight = vTo.crossProduct(Vector.AXIS_Y).normalize();
         } else {
             vRight = vTo.crossProduct(Vector.AXIS_X).normalize();
@@ -144,13 +142,13 @@ public class Sampler {
         // 2. Transform each 2D offset into a 3D point in the world system
         for (Offset2D offset : offsets) {
             Point p = center;
-            double deltaX = offset.getX() * size * 2;
-            double deltaY = offset.getY() * size * 2;
+            double deltaX = offset.x() * size * 2;
+            double deltaY = offset.y() * size * 2;
 
-            if (!primitives.Util.isZero(deltaX)) {
+            if (!isZero(deltaX)) {
                 p = p.add(vRight.scale(deltaX));
             }
-            if (!primitives.Util.isZero(deltaY)) {
+            if (!isZero(deltaY)) {
                 p = p.add(vUp.scale(deltaY));
             }
             points3D.add(p);

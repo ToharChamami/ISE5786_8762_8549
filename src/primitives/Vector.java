@@ -1,5 +1,7 @@
 package primitives;
 
+import java.util.List;
+
 /**
  * Class Vector is the basic class representing a vector in a 3D system.
  */
@@ -126,6 +128,29 @@ public final class Vector extends Point {
      */
     public Vector normalize() {
         return scale(1 / length());
+    }
+
+    /**
+     * Generates an orthogonal basis for the given vector.
+     * Returns a pair of vectors (vRight, vUp) such that they are orthogonal to this vector
+     * and to each other.
+     *
+     * @return a list containing [vRight, vUp]
+     */
+    public List<Vector> getOrthogonalBasis() {
+        Vector vTo = this.normalize();
+        Vector vRight;
+
+        // בודקים מקבילות לציר X כדי למנוע מכפלה וקטורית עם וקטור אפס
+        if (Math.abs(vTo.dotProduct(Vector.AXIS_X)) < 0.8) {
+            vRight = vTo.crossProduct(Vector.AXIS_X).normalize();
+        } else {
+            vRight = vTo.crossProduct(Vector.AXIS_Y).normalize();
+        }
+
+        Vector vUp = vRight.crossProduct(vTo).normalize();
+
+        return List.of(vRight, vUp);
     }
 
 }

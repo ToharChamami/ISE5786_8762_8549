@@ -1,143 +1,104 @@
 package lighting;
 
+import java.util.ArrayList;
+import java.util.List;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
+import renderer.sampling.Sampler;
+import renderer.sampling.SamplingPattern;
+import renderer.sampling.TargetShape;
 
-/**
- * Representation of a point light source in the scene (such as a light bulb).
- */
 public class PointLight extends Light implements LightSource {
-    /**
-     * The position of the point light
-     */
     private final Point _position;
+    private double kC = 1d, kL = 0d, kQ = 0d, _radius = 0;
 
-    /**
-     * Constant attenuation factor
-     */
-    private double kC = 1d;
+    protected Sampler _sampler = null;
+    protected TargetShape _targetShape = TargetShape.CIRCLE;
+    protected SamplingPattern _samplingPattern = SamplingPattern.REGULAR_GRID;
 
-    /**
-     * Linear attenuation factor
-     */
-    private double kL = 0d;
-
-    /**
-     * Quadratic attenuation factor
-     */
-    private double kQ = 0d;
-
-    /**
-     * NEW FIELD FOR MINI-PROJECT 1
-     * Default is 0 (infinitesimal point light)
-     */
-    private double _radius = 0;
-
-    /**
-     * Constructs a point light source with a given intensity and position.
-     *
-     * @param intensity the color intensity of the light source
-     * @param position  the position point of the light source in the scene
-     */
     public PointLight(Color intensity, Point position) {
         super(intensity);
         this._position = position;
     }
 
-    /**
-     * Sets the constant attenuation factor and returns the object itself.
-     *
-     * @param kC the constant attenuation factor
-     * @return the PointLight object itself for chaining
-     */
+    // Setter methods (Chaining)
     public PointLight setKc(double kC) {
         this.kC = kC;
         return this;
     }
 
-    /**
-     * Sets the linear attenuation factor and returns the object itself.
-     *
-     * @param kL the linear attenuation factor
-     * @return the PointLight object itself for chaining
-     */
     public PointLight setKl(double kL) {
         this.kL = kL;
         return this;
     }
 
-    /**
-     * Sets the quadratic attenuation factor and returns the object itself.
-     *
-     * @param kQ the quadratic attenuation factor
-     * @return the PointLight object itself for chaining
-     */
     public PointLight setKq(double kQ) {
         this.kQ = kQ;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * Calculates the intensity at a specific point taking distance attenuation into account.
-     */
-    @Override
-    public Color getIntensity(Point p) {
-        double d = _position.distance(p);
-        double attenuation = kC + kL * d + kQ * d * d;
-        return _intensity.scale(1d / attenuation);
-    }
-
-    /**
-     * {@inheritDoc}
-     * Calculates the normalized direction vector from the light source to the point.
-     */
-    @Override
-    public Vector getL(Point p) {
-        if (p.equals(_position)) {
-            return null;
-        }
-        return p.subtract(_position).normalize();
-    }
-
-    @Override
-    public double getDistance(Point point) {
-        return this._position.distance(point);
-    }
-
-    /**
-     * Sets the physical radius of the light source to enable soft shadows.
-     * Uses the builder pattern for method chaining.
-     *
-     * @param _radius the size/radius of the area light source
-     * @return the PointLight object itself for chaining
-     * @throws IllegalArgumentException if the radius parameter is negative
-     */
-    public PointLight setRadius(double _radius) {
-        if (_radius < 0) {
-            throw new IllegalArgumentException("Light radius cannot be negative");
-        }
-        this._radius = _radius;
+    public PointLight setRadius(double radius) {
+        this._radius = radius;
         return this;
     }
 
-    /**
-     * Gets the physical radius of this light source.
-     *
-     * @return the radius of the light source
-     */
+    public PointLight setSampler(Sampler sampler) {
+        this._sampler = sampler;
+        return this;
+    }
+
+    public PointLight setShadowTargetShape(TargetShape shape) {
+        this._targetShape = shape;
+        return this;
+    }
+
+    public PointLight setShadowSamplingPattern(SamplingPattern pattern) {
+        this._samplingPattern = pattern;
+        return this;
+    }
+
     public double getRadius() {
         return this._radius;
     }
 
-    /**
-     * Gets the position of this light source.
-     *
-     * @return the position of the light source
-     */
     public Point getPosition() {
         return this._position;
     }
 
+    @Override
+    public Color getIntensity(Point p) {
+        double d = _position.distance(p);
+        return _intensity.scale(1d / (kC + kL * d + kQ * d * d));
+    }
+
+    @Override
+    public Vector getL(Point p) {
+        return p.equals(_position) ? null : p.subtract(_position).normalize();
+    }
+
+    @Override
+    public double getDistance(Point point) {
+        return _position.distance(point);
+    }
+
+    @Override
+    public List<Vector> getLBeam(Point p) {
+        if (_sampler == null || _radius <= 0) return List.of(getL(p));
+
+        // יצירת הנקודות במרחב לפי ה-Sampler שלך
+        List<Point> points = _sampler.generateSamplePoints3D(_position, getL(p), _radius, _targetShape, _samplingPattern);
+        return createBeam(points, p);
+    }
+
+    // פונקציית העזר המשותפת (DRY)
+    // פונקציית עזר למניעת כפילות קוד (DRY)
+    protected List<Vector> createBeam(List<Point> points, Point p) {
+        List<Vector> beam = new ArrayList<>(points.size());
+        for (Point point : points) {
+            // התיקון הקריטי: p פחות point! (כדי שהוקטור יצא מהאור אל הנקודה)
+            beam.add(p.subtract(point).normalize());
+        }
+        return beam;
+    }
 }

@@ -27,7 +27,7 @@ public final class Ray {
     /**
      * Small offset to prevent self-intersection
      */
-    private static final double DELTA = 0.1;
+    private static final double DELTA = 0.0001;
 
     /**
      * Constructs a new Ray with a given origin and direction.

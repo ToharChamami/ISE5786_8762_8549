@@ -5,7 +5,6 @@ import lighting.LightSource;
 import lighting.PointLight;
 import primitives.Color;
 import primitives.Double3;
-import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 import renderer.sampling.Sampler;
@@ -36,26 +35,11 @@ class SimpleRayTracer extends RayTracerBase {
      * Initial attenuation coefficient for recursion.
      */
     private static final Double3 INITIAL_K = Double3.ONE;
-
-    /**
-     * Toggle for soft shadows: false = hard shadows (default), true = soft shadows
-     */
+    // אלו השדות שחסרים לך - תוודאי שהם מופיעים בחלק העליון של המחלקה:
     private boolean softShadows = false;
-
-    /**
-     * The shape of the target area for soft shadows
-     */
     private TargetShape shadowTargetShape = TargetShape.CIRCLE;
-
-    /**
-     * The sampler used for generating shadow rays
-     */
-    private Sampler shadowSampler = new Sampler(1);
-
-    /**
-     * The sampling pattern used for soft shadows
-     */
     private SamplingPattern shadowPattern = SamplingPattern.REGULAR_GRID;
+    private Sampler shadowSampler = new Sampler(1);
 
     /**
      * Constructor
@@ -114,19 +98,15 @@ class SimpleRayTracer extends RayTracerBase {
 
         for (LightSource lightSource : _scene.lights) {
             if (preprocessLightSource(intersection, lightSource)) {
-                // קריאה לפונקציית ה-unshaded שבודקת צל רך או קשיח
-                double shadowFactor = unshaded(intersection);
 
-                if (shadowFactor > MIN_CALC_COLOR_K) {
-                    // שילוב השקיפות הרגילה יחד עם פקטור הצל שהתקבל
-                    Double3 ktr = transparency(intersection).scale(shadowFactor);
+                // האורות כבר עודכנו מראש, פשוט קוראים לחישוב!
+                Double3 ktr = transparency(intersection, lightSource);
 
-                    if (ktr.product(k).isGreaterThan(MIN_CALC_COLOR_K)) {
-                        Color lightIntensity = lightSource.getIntensity(intersection.point).scale(ktr);
-                        color = color.add(
-                                lightIntensity.scale(calcDiffuse(intersection).add(calcSpecular(intersection)))
-                        );
-                    }
+                if (ktr.product(k).isGreaterThan(MIN_CALC_COLOR_K)) {
+                    Color lightIntensity = lightSource.getIntensity(intersection.point).scale(ktr);
+                    color = color.add(
+                            lightIntensity.scale(calcDiffuse(intersection).add(calcSpecular(intersection)))
+                    );
                 }
             }
         }
@@ -157,81 +137,6 @@ class SimpleRayTracer extends RayTracerBase {
     }
 
     /**
-     * Calculates the shadow attenuation factor (shading coefficient) for an intersection point.
-     *
-     * @param intersection the intersection data
-     * @return the shadow attenuation factor (0.0 for full shadow, 1.0 for no shadow, or intermediate for soft shadows)
-     */
-    @SuppressWarnings("unused")
-    private double unshaded(Intersection intersection) {
-        if (this.softShadows
-                && this.shadowSampler != null
-                && this.shadowSampler.getGridSize() > 1
-                && intersection.light instanceof PointLight pointLight
-                && pointLight.getRadius() > 0) {
-            return calcSoftShadowFactor(intersection, pointLight);
-        }
-        Vector lightDirection = intersection.l.scale(-1);
-        Ray lightRay = new Ray(intersection.point, lightDirection, intersection.normal);
-        var intersections = _scene.geometries.calcIntersections(lightRay);
-        if (intersections == null) {
-            return 1.0;
-        }
-        double lightDistance = intersection.light.getDistance(intersection.point);
-        for (Intersection geo : intersections) {
-            if (alignZero(geo.point.distance(intersection.point) - lightDistance) <= 0) {
-                if (geo.material.kT.isLowerThan(MIN_CALC_COLOR_K)) {
-                    return 0.0;
-                }
-            }
-        }
-        return 1.0;
-    }
-
-    /**
-     * Helper method to calculate the soft shadow illumination coefficient using a distributed beam of rays.
-     *
-     * @param intersection the intersection point data
-     * @param pointLight   the point light source
-     * @return the soft shadow attenuation factor
-     */
-    private double calcSoftShadowFactor(Intersection intersection, PointLight pointLight) {
-        double radius = pointLight.getRadius();
-        Point lightPosition = pointLight.getPosition();
-        Vector toLight = lightPosition.subtract(intersection.point).normalize();
-
-        List<Point> samplePoints3D = this.shadowSampler.generateSamplePoints3D(
-                lightPosition, toLight, radius, this.shadowTargetShape, this.shadowPattern);
-
-        int unshadedRaysCount = 0;
-        int totalRays = samplePoints3D.size();
-
-        for (Point samplePoint : samplePoints3D) {
-            Vector shadowRayDir = samplePoint.subtract(intersection.point);
-            Ray shadowRay = new Ray(intersection.point, shadowRayDir, intersection.normal);
-            var intersections = _scene.geometries.calcIntersections(shadowRay);
-
-            if (intersections == null) {
-                unshadedRaysCount++;
-                continue;
-            }
-
-            double currentLightDistance = samplePoint.distance(intersection.point);
-            boolean isRayBlocked = false;
-            for (Intersection geo : intersections) {
-                if (alignZero(geo.point.distance(intersection.point) - currentLightDistance) <= 0) {
-                    if (geo.material.kT.isLowerThan(MIN_CALC_COLOR_K)) {
-                        isRayBlocked = true;
-                        break;
-                    }
-                }
-            }
-            if (!isRayBlocked) unshadedRaysCount++;
-        }
-        return totalRays == 0 ? 1.0 : (double) unshadedRaysCount / totalRays;
-    }
-
-    /**
      * Constructs the reflected ray from an intersection point.
      *
      * @param intersection the intersection data
@@ -253,31 +158,48 @@ class SimpleRayTracer extends RayTracerBase {
     }
 
     /**
-     * Calculates the transparency factor of the path between an intersection point and a light source.
+     * Calculates the transparency/shadow factor of the path between an intersection point and a light source.
+     * Evaluates a beam of rays for soft shadows and averages their contribution.
      *
      * @param intersection the intersection data
-     * @return the transparency attenuation factor
+     * @param lightSource  the light source to check
+     * @return the average transparency attenuation factor (Double3)
      */
-    private Double3 transparency(Intersection intersection) {
-        Vector lightDirection = intersection.l.scale(-1);
-        Ray lightRay = new Ray(intersection.point, lightDirection, intersection.normal);
+    private Double3 transparency(Intersection intersection, LightSource lightSource) {
+        // 1. קבלת אלומת הוקטורים (קרניים) ממקור האור אל הנקודה
+        List<Vector> lightDirectionBeam = lightSource.getLBeam(intersection.point);
+        
+        Double3 totalKtr = Double3.ZERO;
+        double lightDistance = lightSource.getDistance(intersection.point);
 
-        var intersections = _scene.geometries.calcIntersections(lightRay);
-        if (intersections == null) {
-            return Double3.ONE;
-        }
-        Double3 ktr = Double3.ONE;
-        double lightDistance = intersection.light.getDistance(intersection.point);
+        // 2. מעבר על כל קרן באלומה
+        for (Vector beamL : lightDirectionBeam) {
+            // הוקטור שהתקבל הוא מהאור לנקודה, נהפוך אותו כדי שייצא מהנקודה אל האור
+            Vector lightDirection = beamL.scale(-1);
+            Ray shadowRay = new Ray(intersection.point, lightDirection, intersection.normal);
 
-        for (Intersection geo : intersections) {
-            if (alignZero(geo.point.distance(intersection.point) - lightDistance) <= 0) {
-                ktr = ktr.product(geo.material.kT);
-                if (ktr.isLowerThan(MIN_CALC_COLOR_K)) {
-                    return Double3.ZERO;
+            var shadowIntersections = _scene.geometries.calcIntersections(shadowRay);
+            Double3 ktr = Double3.ONE;
+
+            if (shadowIntersections != null) {
+                for (Intersection geo : shadowIntersections) {
+                    // מוודאים שהחוסם נמצא בין הנקודה למקור האור ולא מאחוריו
+                    if (alignZero(geo.point.distance(intersection.point) - lightDistance) <= 0) {
+                        ktr = ktr.product(geo.material.kT);
+                        // עצירת חישוב מוקדמת אם הקרן נחסמה לחלוטין (פגעה באובייקט אטום)
+                        if (ktr.isLowerThan(MIN_CALC_COLOR_K)) {
+                            ktr = Double3.ZERO;
+                            break;
+                        }
+                    }
                 }
             }
+            // הוספת התרומה של הקרן הנוכחית לסך הכל
+            totalKtr = totalKtr.add(ktr);
         }
-        return ktr;
+
+        // 3. חישוב הממוצע (חלוקת הסכום במספר הקרניים)
+        return totalKtr.scale(1.0 / lightDirectionBeam.size());
     }
 
     /**
@@ -325,50 +247,41 @@ class SimpleRayTracer extends RayTracerBase {
                 .add(calcGlobalEffect(refractedRay, level, k, intersection.material.kT));
     }
 
-    /**
-     * Toggles the soft shadows feature on or off.
-     *
-     * @param softShadows true to enable soft shadows, false to disable
-     * @return the SimpleRayTracer instance itself for chaining
-     */
+    // פונקציית עזר שדוחפת את ההגדרות לכל האורות בסצנה (פועלת פעם אחת)
+    private void updateLightsWithShadows() {
+        if (_scene != null && _scene.lights != null) {
+            for (LightSource light : _scene.lights) {
+                if (light instanceof PointLight pointLight) {
+                    pointLight.setSampler(this.shadowSampler)
+                            .setShadowTargetShape(this.shadowTargetShape)
+                            .setShadowSamplingPattern(this.shadowPattern);
+                }
+            }
+        }
+    }
+
+    // העדכון של ה-Setters שיקראו לפונקציה:
     public SimpleRayTracer setSoftShadows(boolean softShadows) {
         this.softShadows = softShadows;
-        if (softShadows && this.shadowSampler == null) {
-            this.shadowSampler = new Sampler(9);
-        }
         return this;
     }
 
-    /**
-     * Sets the shadow target shape.
-     *
-     * @param shape the target shape (e.g., CIRCLE, SQUARE)
-     * @return the SimpleRayTracer instance itself for chaining
-     */
     public SimpleRayTracer setShadowTargetShape(TargetShape shape) {
         this.shadowTargetShape = shape;
+        updateLightsWithShadows();
         return this;
     }
 
-    /**
-     * Configures the mathematical distribution pattern template for the shadow beam rays.
-     *
-     * @param pattern the sampling pattern
-     * @return the SimpleRayTracer instance itself for chaining
-     */
     public SimpleRayTracer setShadowSamplingPattern(SamplingPattern pattern) {
         this.shadowPattern = pattern;
+        updateLightsWithShadows();
         return this;
     }
 
-    /**
-     * Sets the number of samples (grid size dimension) for the soft shadows beam.
-     *
-     * @param gridSize the grid dimension (e.g., 9 for 9x9)
-     * @return the SimpleRayTracer instance itself for chaining
-     */
     public SimpleRayTracer setShadowSamples(int gridSize) {
         this.shadowSampler = new Sampler(gridSize);
+        updateLightsWithShadows();
         return this;
     }
+
 }

@@ -101,6 +101,12 @@ public class Camera implements Cloneable {
     private Camera() {
     }
 
+    // נוסיף שדות להגדרות הצללים בתוך ה-Camera
+    final boolean _softShadows = false;
+    final private renderer.sampling.TargetShape _shadowTargetShape = renderer.sampling.TargetShape.CIRCLE;
+    final private renderer.sampling.SamplingPattern _shadowSamplingPattern = renderer.sampling.SamplingPattern.REGULAR_GRID;
+    final private int _shadowSamples = 1;
+
     /**
      * Renders the image by casting rays for every pixel.
      * Chooses the rendering method based on threadsCount.
@@ -441,7 +447,12 @@ public class Camera implements Cloneable {
             if (_camera._rayTracer == null) {
                 setRayTracer(new Scene("test"), RayTracerType.SIMPLE);
             }
-
+            if (_camera._rayTracer instanceof SimpleRayTracer tracer) {
+                tracer.setSoftShadows(_camera._softShadows)
+                        .setShadowTargetShape(_camera._shadowTargetShape)
+                        .setShadowSamplingPattern(_camera._shadowSamplingPattern)
+                        .setShadowSamples(_camera._shadowSamples);
+            }
             try {
                 return _camera.clone();
             } catch (Exception _) {
