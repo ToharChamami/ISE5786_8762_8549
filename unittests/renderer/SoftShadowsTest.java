@@ -33,18 +33,18 @@ public class SoftShadowsTest {
     public void testRichSceneSoftShadows() {
 
         Scene scene = new Scene("RichSceneSoftShadows")
-                .setAmbientLight(new AmbientLight(new Color(25, 25, 25), Double3.ONE))
+                .setAmbientLight(new AmbientLight(new Color(15, 15, 15), Double3.ONE))
                 .setBackground(new Color(10, 10, 30));
 
-        Material floorMat = new Material().setKD(0.6).setKS(0.2).setShininess(20);
+        // חומר חדש לרצפה - הוספנו kR (Reflection)
+        Material floorMat = new Material().setKD(0.4).setKS(0.2).setShininess(20).setKR(0.4);
         Material sphereMat = new Material().setKD(0.5).setKS(0.4).setShininess(60);
 
         scene.geometries.add(
                 new Plane(new Point(0, -50, 0), new Vector(0, 1, 0))
-                        .setEmission(new Color(30, 30, 30))
+                        .setEmission(new Color(10, 10, 10)) // רצפה כהה יותר כדי לראות השתקפות
                         .setMaterial(floorMat)
         );
-
         // כדור מרכזי גדול - מטיל צל ברור על הרצפה
         scene.geometries.add(
                 new Sphere(new Point(0, -10, -80), 35)
@@ -94,34 +94,36 @@ public class SoftShadowsTest {
                         .setMaterial(sphereMat)
         );
         // כדור מרחף באוויר
+        // כדור מרחף באוויר - עכשיו הוא כדור זכוכית שקוף!
         scene.geometries.add(
                 new Sphere(new Point(0, 40, -120), 18)
-                        .setEmission(new Color(100, 100, 100))
-                        .setMaterial(sphereMat)
+                        .setEmission(Color.BLACK) // זכוכית לא מאירה מעצמה
+                        .setMaterial(new Material()
+                                .setKD(0.1).setKS(0.9).setShininess(80)
+                                .setKT(0.85) // שקיפות גבוהה
+                                .setKR(0.1)) // מעט השתקפות על הזכוכית
         );
-
+// אור מרכזי - עוצמה מתונה יותר וגוון מעט חמים
         PointLight mainLight = new PointLight(
-                new Color(600, 500, 400),
+                new Color(250, 200, 150),
                 new Point(80, 120, -40))
-                .setKl(0.0001).setKq(0.000002);
-        mainLight.setRadius(50);
+                .setKl(0.0001).setKq(0.000002).setRadius(50);
         scene.lights.add(mainLight);
 
+        // אור אחורי - עוצמה מתונה
         PointLight sideLight = new PointLight(
-                new Color(300, 300, 500),
+                new Color(100, 100, 200),
                 new Point(-80, 100, -40))
-                .setKl(0.0002).setKq(0.000005);
-        sideLight.setRadius(40);
+                .setKl(0.0002).setKq(0.000005).setRadius(40);
         scene.lights.add(sideLight);
 
+        // ספוט עליון - הוחלש משמעותית כדי למנוע את הכתם הלבן למעלה
         SpotLight topSpot = new SpotLight(
-                new Color(400, 400, 400),
+                new Color(100, 100, 100),
                 new Point(0, 200, -80),
                 new Vector(0, -1, 0))
-                .setKl(0.0001).setKq(0.000003);
-        topSpot.setRadius(45);
+                .setKl(0.0001).setKq(0.000003).setRadius(45);
         scene.lights.add(topSpot);
-
         Camera cameraHard = Camera.getBuilder()
                 .setLocation(new Point(0, 30, 800))
                 .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
