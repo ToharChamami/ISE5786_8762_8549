@@ -95,17 +95,26 @@ public class Camera implements Cloneable {
      */
     private PixelManager _pixelManager;
 
+    // סוג הטיפוס לבחירת מצב הריצה
+    public enum RenderingMode {
+        NONE,       // ללא תהליכונים (קוד ישן)
+        THREADS,    // תהליכונים גולמיים חכמים
+        STREAMS     // זרימה מקבילית
+    }
+
+    private RenderingMode _renderingMode = RenderingMode.NONE;
+
     /**
      * Private default constructor for Camera.
      */
     private Camera() {
     }
 
-    // נוסיף שדות להגדרות הצללים בתוך ה-Camera
-    final boolean _softShadows = false;
-    final private renderer.sampling.TargetShape _shadowTargetShape = renderer.sampling.TargetShape.CIRCLE;
-    final private renderer.sampling.SamplingPattern _shadowSamplingPattern = renderer.sampling.SamplingPattern.REGULAR_GRID;
-    final private int _shadowSamples = 1;
+    // Soft shadow settings for the Camera
+    private boolean _softShadows = false;
+    private renderer.sampling.TargetShape _shadowTargetShape = renderer.sampling.TargetShape.CIRCLE;
+    private renderer.sampling.SamplingPattern _shadowSamplingPattern = renderer.sampling.SamplingPattern.REGULAR_GRID;
+    private int _shadowSamples = 1;
 
     /**
      * Renders the image by casting rays for every pixel.
@@ -114,12 +123,27 @@ public class Camera implements Cloneable {
      * @return the camera itself for chaining
      */
     public Camera renderImage() {
-        _pixelManager = new PixelManager(_nY, _nX, _printInterval);
-        return switch (_threadsCount) {
-            case 0 -> renderImageNoThreads();
-            case -1 -> renderImageStream();
-            default -> renderImageRawThreads();
-        };
+        // 1. בדיקת תנאי קדם (שהמצלמה מאותחלת, רזולוציה, וכו')
+        // ... (הקוד הקיים שלך לבדיקות תקינות)
+
+        // 2. אתחול מנהל הפיקסלים (בהנחה שרוחב וגובה התמונה מוגדרים ב-nX, nY)
+        // הערה: נניח שזמן ההדפסה המבוקש הוא כל 1% או לפי הגדרת ה-PixelManager שקיבלתם
+        long printInterval = 1000; // לדוגמה, הדפסה כל שנייה או לפי הכללים של המרצה
+
+        // 3. ניתוב לפי המצב שנבחר
+        switch (_renderingMode) {
+            case NONE -> renderImageNoThreads();
+            case STREAMS -> {
+                _pixelManager = new PixelManager(_nY, _nX, printInterval);
+                renderImageStream();
+            }
+            case THREADS -> {
+                _pixelManager = new PixelManager(_nY, _nX, printInterval);
+                renderImageRawThreads();
+            }
+        }
+
+        return this;
     }
 
     /**
@@ -309,6 +333,19 @@ public class Camera implements Cloneable {
         public Builder() {
         }
 
+        public Builder setRenderingMode(RenderingMode mode) {
+            this._target._renderingMode = mode;
+            return this;
+        }
+
+        public Builder setThreadsCount(int threadsCount) {
+            if (threadsCount < 1) {
+                throw new IllegalArgumentException("Threads count must be at least 1");
+            }
+            this._target._threadsCount = threadsCount;
+            return this;
+        }
+
         /**
          * Sets the camera's location.
          *
@@ -417,6 +454,50 @@ public class Camera implements Cloneable {
             } else {
                 _camera._threadsCount = threads;
             }
+            return this;
+        }
+
+        /**
+         * Enables or disables soft shadows for the camera's ray tracer.
+         *
+         * @param softShadows true to enable soft shadows, false for hard shadows
+         * @return the Builder object
+         */
+        public Builder setSoftShadows(boolean softShadows) {
+            _camera._softShadows = softShadows;
+            return this;
+        }
+
+        /**
+         * Sets the target shape used for soft shadow sampling.
+         *
+         * @param shape the shadow target shape (SQUARE or CIRCLE)
+         * @return the Builder object
+         */
+        public Builder setShadowTargetShape(renderer.sampling.TargetShape shape) {
+            _camera._shadowTargetShape = shape;
+            return this;
+        }
+
+        /**
+         * Sets the sampling pattern used for soft shadow sampling.
+         *
+         * @param pattern the sampling pattern (REGULAR_GRID or JITTERED_GRID)
+         * @return the Builder object
+         */
+        public Builder setShadowSamplingPattern(renderer.sampling.SamplingPattern pattern) {
+            _camera._shadowSamplingPattern = pattern;
+            return this;
+        }
+
+        /**
+         * Sets the grid size (number of samples per axis) used for soft shadow sampling.
+         *
+         * @param gridSize the sampling grid size
+         * @return the Builder object
+         */
+        public Builder setShadowSamples(int gridSize) {
+            _camera._shadowSamples = gridSize;
             return this;
         }
 
