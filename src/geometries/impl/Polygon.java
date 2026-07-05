@@ -1,5 +1,6 @@
 package geometries.impl;
 
+import geometries.api.BoundingBox;
 import geometries.api.Geometry;
 import java.util.List;
 import primitives.Point;
@@ -114,5 +115,25 @@ public class Polygon extends Geometry {
             v1 = v2;
         }
         return List.of(new Intersection(this, planeIntersections.getFirst()));
+    }
+
+    @Override
+    protected void createBoundingBoxHelper() {
+        if (_vertices == null || _vertices.isEmpty()) return;
+
+        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
+        double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
+
+        for (Point p : _vertices) {
+            if (p.getX() < minX) minX = p.getX();
+            if (p.getX() > maxX) maxX = p.getX();
+            if (p.getY() < minY) minY = p.getY();
+            if (p.getY() > maxY) maxY = p.getY();
+            if (p.getZ() < minZ) minZ = p.getZ();
+            if (p.getZ() > maxZ) maxZ = p.getZ();
+        }
+
+        this.box = new BoundingBox(minX, maxX, minY, maxY, minZ, maxZ);
     }
 }

@@ -80,4 +80,5 @@ public abstract class Geometry extends Intersectable {
      * @return A normalized {@code Vector} representing the normal to the body at the given point.
      */
     public abstract Vector getNormal(Point point);
+
 }

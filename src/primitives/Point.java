@@ -119,4 +119,31 @@ public class Point {
         return _xyz.hashCode();
     }
 
+    /**
+     * Returns the X coordinate.
+     *
+     * @return X value
+     */
+    public double getX() {
+        return _xyz._d1();
+    }
+
+    /**
+     * Returns the Y coordinate.
+     *
+     * @return Y value
+     */
+    public double getY() {
+        return _xyz._d2();
+    }
+
+    /**
+     * Returns the Z coordinate.
+     *
+     * @return Z value
+     */
+    public double getZ() {
+        return _xyz._d3();
+    }
+
 }

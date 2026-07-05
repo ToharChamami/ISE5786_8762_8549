@@ -11,12 +11,11 @@ import primitives.Vector;
 /**
  * Abstract class representing objects that can be intersected by a ray.
  * This class serves as the base for all geometries in the scene.
- * * @author Tohar Chamami
  */
 public abstract class Intersectable {
 
     /**
-     * Default constructor to satisfy JavaDoc.
+     * Default constructor
      */
     public Intersectable() {
     }
@@ -97,16 +96,6 @@ public abstract class Intersectable {
     }
 
     /**
-     * Public API for finding intersections using the NVI (Non-Virtual Interface) pattern.
-     *
-     * @param ray The ray to intersect with the objects
-     * @return List of Intersections, or null if no intersections found
-     */
-    public final List<Intersection> calcIntersections(Ray ray) {
-        return calcIntersectionsHelper(ray);
-    }
-
-    /**
      * Finds intersections between a ray and the geometry (backward compatibility).
      *
      * @param ray the ray to intersect with
@@ -128,4 +117,46 @@ public abstract class Intersectable {
      * @return List of Intersections
      */
     protected abstract List<Intersection> calcIntersectionsHelper(Ray ray);
+
+    /**
+     * Bounding box for CBR acceleration (null if CBR is disabled or not computed yet)
+     */
+    protected BoundingBox box = null;
+
+    /**
+     * Creates and activates the bounding box for this geometry/hierarchy.
+     */
+    public void createBoundingBox() {
+        createBoundingBoxHelper();
+    }
+
+    /**
+     * Abstract helper method for subclasses to calculate their specific Bounding Box.
+     */
+    protected void createBoundingBoxHelper() {
+        // ברירת מחדל: גופים שלא מממשים קופסה (כמו מישור אינסופי Plane) נשארים ללא קופסה (box = null)
+    }
+
+    /**
+     * Public API for finding intersections using the NVI (Non-Virtual Interface) pattern.
+     *
+     * @param ray The ray to intersect with the objects
+     * @return List of Intersections, or null if no intersections found
+     */
+    public final List<Intersection> calcIntersections(Ray ray) {
+        // Early Rejection: אם קיימת קופסה והקרן לא פוגעת בה, מדלגים על החישוב היקר!
+        if (box != null && !box.intersect(ray)) {
+            return null;
+        }
+        return calcIntersectionsHelper(ray);
+    }
+
+    /**
+     * Returns the bounding box of the geometry.
+     *
+     * @return the bounding box, or null if it wasn't created.
+     */
+    public BoundingBox getBoundingBox() {
+        return this.box;
+    }
 }

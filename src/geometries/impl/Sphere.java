@@ -1,5 +1,6 @@
 package geometries.impl;
 
+import geometries.api.BoundingBox;
 import java.util.List;
 import primitives.Point;
 import primitives.Ray;
@@ -56,5 +57,17 @@ public final class Sphere extends RadialGeometry {
         return t1 <= 0
                 ? List.of(new Intersection(this, ray.getPoint(t2)))
                 : List.of(new Intersection(this, ray.getPoint(t1)), new Intersection(this, ray.getPoint(t2)));
+    }
+
+    @Override
+    protected void createBoundingBoxHelper() {
+        double x = _center.getX();
+        double y = _center.getY();
+        double z = _center.getZ();
+        this.box = new BoundingBox(
+                x - _radius, x + _radius,
+                y - _radius, y + _radius,
+                z - _radius, z + _radius
+        );
     }
 }
