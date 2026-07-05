@@ -124,6 +124,7 @@ public class SoftShadowsTest {
                 new Vector(0, -1, 0))
                 .setKl(0.0001).setKq(0.000003).setRadius(45);
         scene.lights.add(topSpot);
+        // --- יצירת מצלמה לצללים קשיחים ---
         Camera cameraHard = Camera.getBuilder()
                 .setLocation(new Point(0, 30, 800))
                 .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
@@ -131,13 +132,10 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
-                .setMultithreading(-1)
+                .setMultithreading(-1) // מריץ במקביל באמצעות Streams
                 .setDebugPrint(0.1)
+                .setSoftShadows(false) // <--- משורשר ישירות ל-Builder!
                 .build();
-
-        if (cameraHard.getRayTracer() instanceof SimpleRayTracer simpleTracer) {
-            simpleTracer.setSoftShadows(false);
-        }
 
         System.out.println("\nStarting Hard Shadows render...");
         long startHard = System.currentTimeMillis();
@@ -146,7 +144,7 @@ public class SoftShadowsTest {
         long endHard = System.currentTimeMillis();
         System.out.println("\nHard Shadows render time: " + (endHard - startHard) + " ms");
 
-        //  Soft Shadows
+        // --- יצירת מצלמה לצללים רכים ---
         Camera cameraSoft = Camera.getBuilder()
                 .setLocation(new Point(0, 30, 800))
                 .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
@@ -154,16 +152,14 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
-                .setMultithreading(-1)
+                .setMultithreading(-1) // מריץ במקביל באמצעות Streams
                 .setDebugPrint(0.1)
+                // <--- כל הגדרות הצללים משורשרות ישירות ל-Builder!
+                .setSoftShadows(true)
+                .setShadowTargetShape(TargetShape.CIRCLE)
+                .setShadowSamples(9) // 9x9 = 81 samples
+                .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID)
                 .build();
-
-        if (cameraSoft.getRayTracer() instanceof SimpleRayTracer simpleTracer) {
-            simpleTracer.setSoftShadows(true)
-                    .setShadowTargetShape(TargetShape.CIRCLE)
-                    .setShadowSamples(9) // 9x9 = 81 samples
-                    .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID); // הפעלת בונוס ה-Jittered!
-        }
 
         System.out.println("\nStarting Soft Shadows render (9x9 grid)...");
         long startSoft = System.currentTimeMillis();
@@ -178,4 +174,5 @@ public class SoftShadowsTest {
         System.out.printf("Slowdown factor: %.1fx%n",
                 (double) (endSoft - startSoft) / (endHard - startHard));
     }
+
 }

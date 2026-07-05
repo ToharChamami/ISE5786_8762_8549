@@ -96,13 +96,6 @@ public class Camera implements Cloneable {
     private PixelManager _pixelManager;
 
     // סוג הטיפוס לבחירת מצב הריצה
-    public enum RenderingMode {
-        NONE,       // ללא תהליכונים (קוד ישן)
-        THREADS,    // תהליכונים גולמיים חכמים
-        STREAMS     // זרימה מקבילית
-    }
-
-    private RenderingMode _renderingMode = RenderingMode.NONE;
 
     /**
      * Private default constructor for Camera.
@@ -123,27 +116,15 @@ public class Camera implements Cloneable {
      * @return the camera itself for chaining
      */
     public Camera renderImage() {
-        // 1. בדיקת תנאי קדם (שהמצלמה מאותחלת, רזולוציה, וכו')
-        // ... (הקוד הקיים שלך לבדיקות תקינות)
+        // 1. אתחול מנהל הפיקסלים - הוא יקבל את מספר השורות, העמודות וזמן ההדפסה
+        _pixelManager = new PixelManager(_nY, _nX, _printInterval);
 
-        // 2. אתחול מנהל הפיקסלים (בהנחה שרוחב וגובה התמונה מוגדרים ב-nX, nY)
-        // הערה: נניח שזמן ההדפסה המבוקש הוא כל 1% או לפי הגדרת ה-PixelManager שקיבלתם
-        long printInterval = 1000; // לדוגמה, הדפסה כל שנייה או לפי הכללים של המרצה
-
-        // 3. ניתוב לפי המצב שנבחר
-        switch (_renderingMode) {
-            case NONE -> renderImageNoThreads();
-            case STREAMS -> {
-                _pixelManager = new PixelManager(_nY, _nX, printInterval);
-                renderImageStream();
-            }
-            case THREADS -> {
-                _pixelManager = new PixelManager(_nY, _nX, printInterval);
-                renderImageRawThreads();
-            }
-        }
-
-        return this;
+        // 2. ניתוב המצב לפי מה שהוגדר ב-Builder
+        return switch (_threadsCount) {
+            case 0 -> renderImageNoThreads();
+            case -1 -> renderImageStream();
+            default -> renderImageRawThreads();
+        };
     }
 
     /**
@@ -331,19 +312,6 @@ public class Camera implements Cloneable {
          * Default constructor for Builder
          */
         public Builder() {
-        }
-
-        public Builder setRenderingMode(RenderingMode mode) {
-            this._target._renderingMode = mode;
-            return this;
-        }
-
-        public Builder setThreadsCount(int threadsCount) {
-            if (threadsCount < 1) {
-                throw new IllegalArgumentException("Threads count must be at least 1");
-            }
-            this._target._threadsCount = threadsCount;
-            return this;
         }
 
         /**
