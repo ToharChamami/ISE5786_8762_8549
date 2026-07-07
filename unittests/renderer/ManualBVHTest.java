@@ -21,6 +21,7 @@ import primitives.Vector;
 import renderer.sampling.SamplingPattern;
 import renderer.sampling.TargetShape;
 import scene.Scene;
+import special.TeapotTest;
 
 /**
  * Test class generating a dark, moody 3D desk with papers and flowers.
@@ -40,7 +41,7 @@ public class ManualBVHTest {
     /**
      * Helper function to create the common dark scene and lighting.
      */
-    private Scene createDarkScene(String name) {
+    protected Scene createDarkScene(String name) {
         Scene scene = new Scene(name)
                 .setBackground(new Color(10, 10, 15)) // חדר כמעט שחור
                 .setAmbientLight(new AmbientLight(new Color(15, 15, 15), Double3.ONE));
@@ -66,11 +67,12 @@ public class ManualBVHTest {
     /**
      * Helper function for common camera setup.
      */
-    private Camera.Builder getCameraBuilder(Scene scene) {
+    protected Camera.Builder getCameraBuilder(Scene scene) {
         return Camera.getBuilder()
                 .setLocation(new Point(0, 150, 350)) // מבט מלמעלה וקדימה
                 .setDirection(new Vector(0, -0.3, -1), new Vector(0, 1, -0.3))
                 .setVpSize(200, 200)
+                .setSoftShadows(true)
                 .setVpDistance(300)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
@@ -102,6 +104,10 @@ public class ManualBVHTest {
             // הערה: לצורך בדיקה מחמירה, אנו מניחים שאין קופסאות.
         }
 
+        // הקומקן (~1000 משולשים) בלי כל עטיפה היררכית - ידגיש עוד יותר את האיטיות של המבנה השטוח
+        scene.geometries.add(getTeapotOnTable());
+
+        Intersectable.cbrActive = true;
         scene.geometries.createBoundingBox(); // יצירת קופסה אחת ענקית לכולם
         Camera camera = getCameraBuilder(scene).build();
 
@@ -139,10 +145,14 @@ public class ManualBVHTest {
             vaseGroup.add(flower); // כל פרח הוא כבר קבוצה (BVH node) קטנה והדוקה משלו!
         }
 
-        // 6. הוספת קבוצות העל (Hierarchy Nodes) לסצנה
-        scene.geometries.add(fullDesk, papersGroup, vaseGroup);
+        // 6. קבוצת הקומקן - צומת נפרד משלה כדי שה-BVH יבנה עבורה תת-עץ יעיל בפני עצמו
+        Geometries teapotGroup = getTeapotOnTable();
 
-        // 7. יצירת עץ הקופסאות התוחמות (BVH Construction)
+        // 7. הוספת קבוצות העל (Hierarchy Nodes) לסצנה
+        scene.geometries.add(fullDesk, papersGroup, vaseGroup, teapotGroup);
+
+        // 8. יצירת עץ הקופסאות התוחמות (BVH Construction)
+        Intersectable.cbrActive = true;
         scene.geometries.createBoundingBox();
 
         Camera camera = getCameraBuilder(scene).build();
@@ -160,7 +170,7 @@ public class ManualBVHTest {
     // פונקציות בנאי - יוצרות את החפצים בסצנה
     // =====================================================================
 
-    private List<Intersectable> getTableTop() {
+    protected List<Intersectable> getTableTop() {
         List<Intersectable> list = new ArrayList<>();
         list.add(new Polygon(new Point(120, 0, 80), new Point(120, 0, -80), new Point(-120, 0, -80), new Point(-120, 0, 80)).setEmission(woodColor).setMaterial(woodMat));
         list.add(new Polygon(new Point(120, -5, -80), new Point(120, -5, 80), new Point(-120, -5, 80), new Point(-120, -5, -80)).setEmission(woodColor).setMaterial(woodMat));
@@ -171,28 +181,28 @@ public class ManualBVHTest {
         return list;
     }
 
-    private List<Intersectable> getRightLegs() {
+    protected List<Intersectable> getRightLegs() {
         return List.of(
                 new Cylinder(95, new Ray(new Point(105, -5, 65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat),
                 new Cylinder(95, new Ray(new Point(105, -5, -65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat)
         );
     }
 
-    private List<Intersectable> getLeftLegs() {
+    protected List<Intersectable> getLeftLegs() {
         return List.of(
                 new Cylinder(95, new Ray(new Point(-105, -5, 65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat),
                 new Cylinder(95, new Ray(new Point(-105, -5, -65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat)
         );
     }
 
-    private List<Intersectable> getPapers() {
+    protected List<Intersectable> getPapers() {
         return List.of(
                 new Polygon(new Point(20, 0.1, 30), new Point(20, 0.1, -10), new Point(-20, 0.1, -10), new Point(-20, 0.1, 30)).setEmission(paperColor).setMaterial(paperMat),
                 new Polygon(new Point(-5, 0.3, 40), new Point(-35, 0.3, 25), new Point(-25, 0.3, -5), new Point(5, 0.3, 10)).setEmission(paperColor).setMaterial(paperMat)
         );
     }
 
-    private List<Intersectable> getVaseBody() {
+    protected List<Intersectable> getVaseBody() {
         Point vaseBaseCenter = new Point(60, 10, -20);
         return List.of(
                 new Sphere(vaseBaseCenter, 12).setEmission(vaseColor).setMaterial(vaseMat),
@@ -200,7 +210,7 @@ public class ManualBVHTest {
         );
     }
 
-    private List<Geometries> getFlowers() {
+    protected List<Geometries> getFlowers() {
         List<Geometries> flowers = new ArrayList<>();
         flowers.add(createSingleFlowerGroup(new Point(50, 38, -10), new Color(200, 30, 80))); // ורוד כהה
         flowers.add(createSingleFlowerGroup(new Point(72, 42, -25), new Color(180, 20, 20))); // אדום עמוק
@@ -208,13 +218,62 @@ public class ManualBVHTest {
         return flowers;
     }
 
+    protected Geometries createFlower(Point center, Color petalColor) {
+        Geometries flowerGroup = new Geometries();
+
+        // --- הוספת גבעול: שרשרת עיגולים (כדורים) ירוקים מהשולחן ועד לפרח ---
+        Color stemColor = new Color(34, 139, 34); // ירוק כהה
+        Material stemMat = new Material().setKD(0.6).setKS(0.1).setShininess(10);
+
+        double startY = 0.0; // בגובה השולחן
+        double endY = center.getY(); // בגובה ראש הפרח
+        int steps = 6; // מספר החוליות בשרשרת הגבעול
+        for (int j = 0; j <= steps; j++) {
+            double currentY = startY + (endY - startY) * j / steps;
+            flowerGroup.add(new Sphere(new Point(center.getX(), currentY, center.getZ()), 0.8)
+                    .setEmission(stemColor)
+                    .setMaterial(stemMat));
+        }
+
+        // --- עלי הכותרת של הפרח ---
+        Material plantMat = new Material().setKD(0.5).setKS(0.5).setShininess(20);
+        int petalsCount = 8;
+        for (int i = 0; i < petalsCount; i++) {
+            double angle = 2 * Math.PI * i / petalsCount;
+            double px = center.getX() + 3.5 * Math.cos(angle);
+            double py = center.getY() + 1.0;
+            double pz = center.getZ() + 3.5 * Math.sin(angle);
+            flowerGroup.add(new Sphere(new Point(px, py, pz), 2.2).setEmission(petalColor).setMaterial(plantMat));
+        }
+
+        flowerGroup.createBoundingBox();
+        return flowerGroup;
+    }
+    /**
+     * יוצר קבוצה היררכית עצמאית עבור הקומקן, מוקטן וממוקם על משטח השולחן.
+     * ה-BVH הכללי (createBoundingBox / buildBVH) יבנה תת-עץ יעיל לקבוצה הזו
+     * ברגע שהיא מוצבת כילד בתוך scene.geometries - אין צורך לבנות עבורה BVH בנפרד.
+     */
+    /**
+     * יוצר קבוצה היררכית עצמאית עבור הקומקום, מוקטן משמעותית וממוקם בפינה בטוחה על השולחן.
+     */
+    protected Geometries getTeapotOnTable() {
+        // X = -80 (שמאלה), Y = 2 (ממש מעל פני השולחן), Z = 40 (קרוב יותר למצלמה)
+        Point teapotCenter = new Point(-80, 10, 40);
+
+        // הקטנה דרסטית של הקומקום כדי שייראה בגודל הגיוני ביחס לדפים ולאגרטל
+        double scale = 0.2;
+
+        return TeapotTest.buildTeapot(teapotCenter, scale);
+    }
+
     /**
      * יוצר פרח כקבוצה היררכית (Geometries) בפני עצמה.
      * כל פרח עטוף בקופסה משלו, מה שמונע בדיקות מיותרות מול כל עלי הכותרת.
      */
-    private Geometries createSingleFlowerGroup(Point center, Color petalColor) {
+    protected Geometries createSingleFlowerGroup(Point center, Color petalColor) {
         Geometries flowerGroup = new Geometries();
-        Point vaseTop = new Point(60, 20, -20);
+        Point vaseTop = new Point(60, 12, -20); // יורד לתוך פתח האגרטל, לא נעצר בשפה העליונה
 
         Vector stemDir = vaseTop.subtract(center).normalize();
         double stemLength = center.distance(vaseTop);
@@ -242,10 +301,13 @@ public class ManualBVHTest {
         scene.geometries.add(getPapers().toArray(new Intersectable[0]));
         scene.geometries.add(getVaseBody().toArray(new Intersectable[0]));
         for (Geometries flower : getFlowers()) scene.geometries.add(flower);
+        scene.geometries.add(getTeapotOnTable());
 
         // הקסם האוטומטי - המערכת תסדר את הכל בעצמה!
         scene.geometries.buildBVH();
 
+        Intersectable.cbrActive = true;
+        scene.geometries.createBoundingBox();
         Camera camera = getCameraBuilder(scene).build();
 
         System.out.println("Starting AUTOMATIC BVH Render...");

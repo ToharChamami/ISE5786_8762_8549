@@ -62,6 +62,11 @@ public class BoundingBox {
             tzMax = temp;
         }
 
-        return (tMin <= tzMax) && (tzMin <= tMax);
+        // תיקון קריטי: נוספה שורת הבדיקה לחיתוך בציר ה-Z
+        if ((tMin > tzMax) || (tzMin > tMax)) return false;
+        if (tzMax < tMax) tMax = tzMax;
+
+        // וידוא קריטי 2: האם הקופסה נמצאת כולה מאחורי המצלמה? אם כן - נפסל!
+        return tMax > 0;
     }
 }

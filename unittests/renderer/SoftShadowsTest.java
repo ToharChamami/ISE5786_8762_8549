@@ -152,7 +152,7 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
-                .setMultithreading(-1) // מריץ במקביל באמצעות Streams
+                .setMultithreading(4) // מריץ במקביל באמצעות Streams
                 .setDebugPrint(0.1)
                 // <--- כל הגדרות הצללים משורשרות ישירות ל-Builder!
                 .setSoftShadows(true)

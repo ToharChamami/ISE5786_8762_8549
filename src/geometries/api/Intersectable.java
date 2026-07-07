@@ -20,6 +20,8 @@ public abstract class Intersectable {
     public Intersectable() {
     }
 
+    public static boolean cbrActive = false;
+
     /**
      * Passive Data Structure (PDS) to bundle a point and the geometry it belongs to.
      * This class is final and cannot be inherited.
@@ -127,7 +129,9 @@ public abstract class Intersectable {
      * Creates and activates the bounding box for this geometry/hierarchy.
      */
     public void createBoundingBox() {
-        createBoundingBoxHelper();
+        if (box == null) {
+            createBoundingBoxHelper();
+        }
     }
 
     /**
@@ -145,7 +149,7 @@ public abstract class Intersectable {
      */
     public final List<Intersection> calcIntersections(Ray ray) {
         // Early Rejection: אם קיימת קופסה והקרן לא פוגעת בה, מדלגים על החישוב היקר!
-        if (box != null && !box.intersect(ray)) {
+        if (cbrActive && box != null && !box.intersect(ray)) {
             return null;
         }
         return calcIntersectionsHelper(ray);

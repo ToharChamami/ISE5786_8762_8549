@@ -87,19 +87,18 @@ public class Geometries extends Intersectable {
         }
     }
 
-    /**
-     * Builds an Automatic Bounding Volume Hierarchy (BVH) for the geometries in this collection.
-     * Separates finite objects (with boxes) from infinite ones, and recursively builds a tree
-     * using the existing Geometries composite pattern.
-     */
     public void buildBVH() {
-        // שימוש ב-this.geometries כדי למנוע בלבול עם שם החבילה
+        // תיקון קריטי 1: קריאה רקורסיבית לכל תתי-הקבוצות (כדי שגם מודלים כמו הקומקום יקבלו עץ משלהם!)
+        for (Intersectable item : this.geometries) {
+            if (item instanceof Geometries) {
+                ((Geometries) item).buildBVH();
+            }
+        }
+
         if (this.geometries.size() <= 1) return;
 
-        // 1. דואגים שלכל הגופים יחושבו קופסאות
         createBoundingBox();
 
-        // 2. הפרדה בין גופים סופיים (שיש להם קופסה) לאינסופיים
         List<Intersectable> finites = new ArrayList<>();
         List<Intersectable> infinites = new ArrayList<>();
         for (Intersectable item : this.geometries) {
@@ -112,18 +111,13 @@ public class Geometries extends Intersectable {
 
         if (finites.size() <= 1) return;
 
-        // 3. בניית ה-BVH
         Intersectable root = buildBVHTree(finites);
 
-        // 4. עדכון הרשימה
         this.geometries.clear();
         this.geometries.addAll(infinites);
         this.geometries.add(root);
     }
 
-    /**
-     * Helper recursive function to build the BVH tree by splitting along the longest axis.
-     */
     private Intersectable buildBVHTree(List<Intersectable> list) {
         if (list.isEmpty()) return new Geometries();
         if (list.size() == 1) return list.get(0);
@@ -153,7 +147,6 @@ public class Geometries extends Intersectable {
         double sizeY = maxY - minY;
         double sizeZ = maxZ - minZ;
 
-        // מיון קצר ואלגנטי בעזרת Comparator - בדיוק כמו ש-IntelliJ המליץ!
         if (sizeX > sizeY && sizeX > sizeZ) {
             list.sort(java.util.Comparator.comparingDouble(g -> (g.getBoundingBox().minX + g.getBoundingBox().maxX) / 2));
         } else if (sizeY > sizeX && sizeY > sizeZ) {
@@ -163,8 +156,9 @@ public class Geometries extends Intersectable {
         }
 
         int mid = list.size() / 2;
-        List<Intersectable> leftList = list.subList(0, mid);
-        List<Intersectable> rightList = list.subList(mid, list.size());
+        // תיקון קריטי 2: המרה ל-ArrayList חדש מונעת באגים של ConcurrentModification במיון הרקורסיבי
+        List<Intersectable> leftList = new ArrayList<>(list.subList(0, mid));
+        List<Intersectable> rightList = new ArrayList<>(list.subList(mid, list.size()));
 
         Intersectable left = buildBVHTree(leftList);
         Intersectable right = buildBVHTree(rightList);

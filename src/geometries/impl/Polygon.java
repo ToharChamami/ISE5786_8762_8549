@@ -102,7 +102,7 @@ public class Polygon extends Geometry {
 
         for (Point vertex : _vertices) {
             Vector v2 = vertex.subtract(rayHead);
-            Vector edgeNormal = v1.crossProduct(v2).normalize();
+            Vector edgeNormal = v1.crossProduct(v2);
 
             double currentSign = alignZero(rayDirection.dotProduct(edgeNormal));
             if (currentSign == 0) return null;
