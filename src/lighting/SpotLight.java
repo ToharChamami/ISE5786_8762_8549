@@ -12,11 +12,28 @@ public class SpotLight extends PointLight {
     private final Vector _direction;
     private double narrowBeam = 1d;
 
+    /**
+     * Constructs a new SpotLight with a specified intensity, position, and direction.
+     * The constructor initializes the spotlight source by invoking the parent light's constructor
+     * and stores a normalized copy of the given direction vector.
+     *
+     * @param intensity The color intensity of the spotlight.
+     * @param position  The point in space where the spotlight is located.
+     * @param direction The orientation vector of the light beam.
+     */
     public SpotLight(Color intensity, Point position, Vector direction) {
         super(intensity, position);
         this._direction = direction.normalize();
     }
 
+    /**
+     * Sets the narrow beam concentration factor for this spotlight.
+     * The method updates the inner beam concentration property and returns the current
+     * instance to allow for method chaining (builder pattern style).
+     *
+     * @param narrowBeam The exponent factor representing the narrowness or concentration of the beam.
+     * @return The current {@code SpotLight} instance for chaining method calls.
+     */
     public SpotLight setNarrowBeam(double narrowBeam) {
         this.narrowBeam = narrowBeam;
         return this;
@@ -38,7 +55,6 @@ public class SpotLight extends PointLight {
         return this;
     }
 
-    // דריסת הפונקציות כדי לתמוך בשרשור (Builder pattern)
     @Override
     public SpotLight setRadius(double radius) {
         super.setRadius(radius);
@@ -76,10 +92,8 @@ public class SpotLight extends PointLight {
     public List<Vector> getLBeam(Point p) {
         if (_sampler == null || getRadius() <= 0) return List.of(getL(p));
 
-        // ההבדל מהמרצה: שימוש ב-_direction של הספוט במקום ב-getL(p)
         List<Point> points = _sampler.generateSamplePoints3D(getPosition(), this._direction, getRadius(), _targetShape, _samplingPattern);
 
-        // קריאה לפונקציית העזר שנמצאת ב-PointLight
         return createBeam(points, p);
     }
 }

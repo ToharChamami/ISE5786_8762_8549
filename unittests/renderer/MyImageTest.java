@@ -27,11 +27,9 @@ public class MyImageTest {
     @Test
     public void myCustomScene() {
         Scene scene = new Scene("My Custom Scene");
-        // Set a dark grey background (so the mirror doesn't just reflect black and disappear)
         scene.setBackground(new primitives.Color(40, 40, 40));
         scene.setAmbientLight(new AmbientLight(new primitives.Color(java.awt.Color.WHITE), new Double3(0.15)));
 
-        //  Configure camera (looking straight ahead)
         Camera.Builder cameraBuilder = Camera.getBuilder()
                 .setRayTracer(scene, RayTracerType.SIMPLE)
                 .setLocation(new Point(0, 0, 1000))
@@ -41,24 +39,20 @@ public class MyImageTest {
                 .setResolution(600, 600);
 
         scene.geometries.add(
-                // Mirror floor (a giant triangle lying flat on the Y-axis at height -50)
                 new Triangle(new Point(-500, -50, 500), new Point(500, -50, 500), new Point(0, -50, -500))
                         .setEmission(new primitives.Color(20, 20, 20))
                         .setMaterial(new Material().setKR(0.8)), // Almost perfect mirror
 
-                // Blue transparent sphere (hovering slightly above the floor)
                 new Sphere(new Point(-20, 0, 50), 30D)
                         .setEmission(new primitives.Color(java.awt.Color.BLUE))
                         .setMaterial(new Material().setKD(0.2).setKS(0.2).setShininess(30).setKT(0.6)),
 
-                // Red opaque sphere (sitting exactly on the mirror floor)
                 new Sphere(new Point(40, -30, 0), 20D)
                         .setEmission(new primitives.Color(java.awt.Color.RED))
                         .setMaterial(new Material().setKD(0.5).setKS(0.5).setShininess(60))
         );
 
         scene.lights.add(
-                // Spotlight shining from above and to the right, casting nice shadows on the left side of the floor
                 new SpotLight(new primitives.Color(700, 400, 400), new Point(50, 150, 150), new Vector(-1, -1, -2))
                         .setKl(4E-5).setKq(2E-7)
         );

@@ -67,7 +67,6 @@ public class Sampler {
      * @return a list of Offset2D objects
      */
     private List<Offset2D> getSamplePoints(TargetShape shape, SamplingPattern pattern) {
-        // Grid
         if (pattern == SamplingPattern.REGULAR_GRID) {
             if (shape == TargetShape.SQUARE) {
                 return _cachedSquarePoints;
@@ -80,21 +79,16 @@ public class Sampler {
             }
             return circlePoints;
         }
-
-        // Jittered
         List<Offset2D> jitteredPoints = new ArrayList<>();
         double step = 1.0 / _gridSize;
 
         for (Offset2D pt : _cachedSquarePoints) {
-            // Draw a value between -0.5 and 0.5,
-            // and multiply it by the cell size to stay within the cell boundaries
             double jitterX = (ThreadLocalRandom.current().nextDouble() - 0.5) * step;
             double jitterY = (ThreadLocalRandom.current().nextDouble() - 0.5) * step;
 
             double jX = pt.x() + jitterX;
             double jY = pt.y() + jitterY;
 
-            // Filter in case of rounding
             if (shape != TargetShape.CIRCLE || jX * jX + jY * jY <= 0.25) {
                 jitteredPoints.add(new Offset2D(jX, jY));
             }
@@ -128,7 +122,6 @@ public class Sampler {
         List<Offset2D> offsets = getSamplePoints(targetShape, pattern);
         List<Point> points3D = new ArrayList<>(offsets.size());
 
-        // 1. Build a local coordinate system orthogonal to the normal vector
         Vector vTo = normal.normalize();
         Vector vRight;
 
@@ -139,7 +132,6 @@ public class Sampler {
         }
         Vector vUp = vRight.crossProduct(vTo).normalize();
 
-        // 2. Transform each 2D offset into a 3D point in the world system
         for (Offset2D offset : offsets) {
             Point p = center;
             double deltaX = offset.x() * size * 2;

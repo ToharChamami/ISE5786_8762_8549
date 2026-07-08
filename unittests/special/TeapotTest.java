@@ -39,10 +39,10 @@ public class TeapotTest {
     @Test
     @Disabled
     void testTeapot1() {
-        prepareTeapot() //
-                .build() //
-                .renderImage() //
-                .printGrid(50, new Color(YELLOW)) //
+        prepareTeapot()
+                .build()
+                .renderImage()
+                .printGrid(50, new Color(YELLOW))
                 .writeToImage("teapot1");
     }
 
@@ -73,16 +73,11 @@ public class TeapotTest {
      */
     void teapot2() {
         Camera.Builder cameraBuilder = prepareTeapot();
-        // Access the scene via the ray tracer or rebuild the pipeline if needed,
-        // or apply the optimization directly if you extract the Scene reference.
-        // Alternatively, update the scene geometries optimization directly:
-        // Note: ensure your Scene/Geometries class exposes the appropriate method,
-        // e.g., scene.geometries.enableCBR() or similar depending on your engine stage.
 
-        cameraBuilder //
-                .build() //
-                .renderImage() //
-                .printGrid(50, new Color(YELLOW)) //
+        cameraBuilder
+                .build()
+                .renderImage()
+                .printGrid(50, new Color(YELLOW))
                 .writeToImage("teapot2");
     }
 
@@ -92,10 +87,10 @@ public class TeapotTest {
     void teapot3() {
         Camera.Builder cameraBuilder = prepareTeapot();
 
-        cameraBuilder //
-                .build() //
-                .renderImage() //
-                .printGrid(50, new Color(YELLOW)) //
+        cameraBuilder
+                .build()
+                .renderImage()
+                .printGrid(50, new Color(YELLOW))
                 .writeToImage("teapot3");
     }
 
@@ -118,21 +113,12 @@ public class TeapotTest {
 
         scene.lights.add(new PointLight(new Color(500, 500, 500), new Point(100, 0, -100)).setKq(0.000001));
 
-        return Camera.getBuilder() //
-                .setResolution(1000, 1000) //
-                // .setResolution(1, 1) //
-                .setRayTracer(scene, RayTracerType.SIMPLE) //
-                .setLocation(new Point(0, 0, -1000)).setDirection(Point.ZERO, Vector.AXIS_Y) //
-                .setVpDistance(1000).setVpSize(200, 200) //
-                // .setMultithreading(-3) // fail - paging file size
-                // .setMultithreading(-2) // 9.3
-                // .setMultithreading(-1) // 9.6
-                .setMultithreading(0) // 25
-                // .setMultithreading(1) // 25.8
-                // .setMultithreading(2) // 13.6
-                // .setMultithreading(3) // 10.7
-                // .setMultithreading(4) // 10.7
-                // .setDebugPrint(1.0) //
+        return Camera.getBuilder()
+                .setResolution(1000, 1000)
+                .setRayTracer(scene, RayTracerType.SIMPLE)
+                .setLocation(new Point(0, 0, -1000)).setDirection(Point.ZERO, Vector.AXIS_Y)
+                .setVpDistance(1000).setVpSize(200, 200)
+                .setMultithreading(0)
                 ;
     }
 
@@ -149,64 +135,64 @@ public class TeapotTest {
      * The vertices point list in the teapot's triangle mesh
      */
     private static Point[] points = new Point[]
-            {null,                                                                                     //
-                    new Point(40.6266, 28.3457, -1.10804),                                                    //
-                    new Point(40.0714, 30.4443, -1.10804),                                                    //
-                    new Point(40.7155, 31.1438, -1.10804),                                                    //
-                    new Point(42.0257, 30.4443, -1.10804),                                                    //
-                    new Point(43.4692, 28.3457, -1.10804),                                                    //
-                    new Point(37.5425, 28.3457, 14.5117),                                                     //
-                    new Point(37.0303, 30.4443, 14.2938),                                                     //
-                    new Point(37.6244, 31.1438, 14.5466),                                                     //
-                    new Point(38.8331, 30.4443, 15.0609),                                                     //
-                    new Point(40.1647, 28.3457, 15.6274),                                                     //
-                    new Point(29.0859, 28.3457, 27.1468),                                                     //
-                    new Point(28.6917, 30.4443, 26.7527),                                                     //
-                    new Point(29.149, 31.1438, 27.2099),                                                      //
-                    new Point(30.0792, 30.4443, 28.1402),                                                     //
-                    new Point(31.1041, 28.3457, 29.165),                                                      //
-                    new Point(16.4508, 28.3457, 35.6034),                                                     //
-                    new Point(16.2329, 30.4443, 35.0912),                                                     //
-                    new Point(16.4857, 31.1438, 35.6853),                                                     //
-                    new Point(16.9999, 30.4443, 36.894),                                                      //
-                    new Point(17.5665, 28.3457, 38.2256),                                                     //
-                    new Point(0.831025, 28.3457, 38.6876),                                                    //
-                    new Point(0.831025, 30.4443, 38.1324),                                                    //
-                    new Point(0.831025, 31.1438, 38.7764),                                                    //
-                    new Point(0.831025, 30.4443, 40.0866),                                                    //
-                    new Point(0.831025, 28.3457, 41.5301),                                                    //
-                    new Point(-15.868, 28.3457, 35.6034),                                                     //
-                    new Point(-15.0262, 30.4443, 35.0912),                                                    //
-                    new Point(-14.9585, 31.1438, 35.6853),                                                    //
-                    new Point(-15.3547, 30.4443, 36.894),                                                     //
-                    new Point(-15.9044, 28.3457, 38.2256),                                                    //
-                    new Point(-28.3832, 28.3457, 27.1468),                                                    //
-                    new Point(-27.4344, 30.4443, 26.7527),                                                    //
-                    new Point(-27.6068, 31.1438, 27.2099),                                                    //
-                    new Point(-28.4322, 30.4443, 28.1402),                                                    //
-                    new Point(-29.4421, 28.3457, 29.165),                                                     //
-                    new Point(-36.2402, 28.3457, 14.5117),                                                    //
-                    new Point(-35.52, 30.4443, 14.2938),                                                      //
-                    new Point(-36.0073, 31.1438, 14.5466),                                                    //
-                    new Point(-37.1767, 30.4443, 15.0609),                                                    //
-                    new Point(-38.5027, 28.3457, 15.6274),                                                    //
-                    new Point(-38.9646, 28.3457, -1.10804),                                                   //
-                    new Point(-38.4094, 30.4443, -1.10804),                                                   //
-                    new Point(-39.0534, 31.1438, -1.10804),                                                   //
-                    new Point(-40.3636, 30.4443, -1.10804),                                                   //
-                    new Point(-41.8071, 28.3457, -1.10804),                                                   //
-                    new Point(-35.8804, 28.3457, -16.7278),                                                   //
-                    new Point(-35.3683, 30.4443, -16.5099),                                                   //
-                    new Point(-35.9624, 31.1438, -16.7627),                                                   //
-                    new Point(-37.1711, 30.4443, -17.2769),                                                   //
-                    new Point(-38.5027, 28.3457, -17.8435),                                                   //
-                    new Point(-27.4238, 28.3457, -29.3629),                                                   //
-                    new Point(-27.0297, 30.4443, -28.9687),                                                   //
-                    new Point(-27.4869, 31.1438, -29.426),                                                    //
-                    new Point(-28.4172, 30.4443, -30.3562),                                                   //
-                    new Point(-29.4421, 28.3457, -31.3811),                                                   //
-                    new Point(-14.7887, 28.3457, -37.8195),                                                   //
-                    new Point(-14.5708, 30.4443, -37.3073),                                                   //
+            {null,
+                    new Point(40.6266, 28.3457, -1.10804),
+                    new Point(40.0714, 30.4443, -1.10804),
+                    new Point(40.7155, 31.1438, -1.10804),
+                    new Point(42.0257, 30.4443, -1.10804),
+                    new Point(43.4692, 28.3457, -1.10804),
+                    new Point(37.5425, 28.3457, 14.5117),
+                    new Point(37.0303, 30.4443, 14.2938),
+                    new Point(37.6244, 31.1438, 14.5466),
+                    new Point(38.8331, 30.4443, 15.0609),
+                    new Point(40.1647, 28.3457, 15.6274),
+                    new Point(29.0859, 28.3457, 27.1468),
+                    new Point(28.6917, 30.4443, 26.7527),
+                    new Point(29.149, 31.1438, 27.2099),
+                    new Point(30.0792, 30.4443, 28.1402),
+                    new Point(31.1041, 28.3457, 29.165),
+                    new Point(16.4508, 28.3457, 35.6034),
+                    new Point(16.2329, 30.4443, 35.0912),
+                    new Point(16.4857, 31.1438, 35.6853),
+                    new Point(16.9999, 30.4443, 36.894),
+                    new Point(17.5665, 28.3457, 38.2256),
+                    new Point(0.831025, 28.3457, 38.6876),
+                    new Point(0.831025, 30.4443, 38.1324),
+                    new Point(0.831025, 31.1438, 38.7764),
+                    new Point(0.831025, 30.4443, 40.0866),
+                    new Point(0.831025, 28.3457, 41.5301),
+                    new Point(-15.868, 28.3457, 35.6034),
+                    new Point(-15.0262, 30.4443, 35.0912),
+                    new Point(-14.9585, 31.1438, 35.6853),
+                    new Point(-15.3547, 30.4443, 36.894),
+                    new Point(-15.9044, 28.3457, 38.2256),
+                    new Point(-28.3832, 28.3457, 27.1468),
+                    new Point(-27.4344, 30.4443, 26.7527),
+                    new Point(-27.6068, 31.1438, 27.2099),
+                    new Point(-28.4322, 30.4443, 28.1402),
+                    new Point(-29.4421, 28.3457, 29.165),
+                    new Point(-36.2402, 28.3457, 14.5117),
+                    new Point(-35.52, 30.4443, 14.2938),
+                    new Point(-36.0073, 31.1438, 14.5466),
+                    new Point(-37.1767, 30.4443, 15.0609),
+                    new Point(-38.5027, 28.3457, 15.6274),
+                    new Point(-38.9646, 28.3457, -1.10804),
+                    new Point(-38.4094, 30.4443, -1.10804),
+                    new Point(-39.0534, 31.1438, -1.10804),
+                    new Point(-40.3636, 30.4443, -1.10804),
+                    new Point(-41.8071, 28.3457, -1.10804),
+                    new Point(-35.8804, 28.3457, -16.7278),
+                    new Point(-35.3683, 30.4443, -16.5099),
+                    new Point(-35.9624, 31.1438, -16.7627),
+                    new Point(-37.1711, 30.4443, -17.2769),
+                    new Point(-38.5027, 28.3457, -17.8435),
+                    new Point(-27.4238, 28.3457, -29.3629),
+                    new Point(-27.0297, 30.4443, -28.9687),
+                    new Point(-27.4869, 31.1438, -29.426),
+                    new Point(-28.4172, 30.4443, -30.3562),
+                    new Point(-29.4421, 28.3457, -31.3811),
+                    new Point(-14.7887, 28.3457, -37.8195),
+                    new Point(-14.5708, 30.4443, -37.3073),
                     new Point(-14.8236, 31.1438, -37.9014),                                                   //
                     new Point(-15.3379, 30.4443, -39.1101),                                                   //
                     new Point(-15.9044, 28.3457, -40.4417),                                                   //

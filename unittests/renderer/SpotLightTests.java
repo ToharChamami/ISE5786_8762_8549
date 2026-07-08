@@ -32,7 +32,6 @@ class SpotLightTests {
         Point lightPosition = new Point(0, 0, 0);
         Vector lightDirection = new Vector(0, 0, 1); // Pointing straight up Z axis
 
-        // SpotLight setup with factors: kC=1, kL=1, kQ=1
         SpotLight light = new SpotLight(lightColor, lightPosition, lightDirection)
                 .setKc(1).setKl(1).setKq(1);
 

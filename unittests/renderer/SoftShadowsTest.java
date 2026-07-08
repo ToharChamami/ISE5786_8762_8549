@@ -36,65 +36,54 @@ public class SoftShadowsTest {
                 .setAmbientLight(new AmbientLight(new Color(15, 15, 15), Double3.ONE))
                 .setBackground(new Color(10, 10, 30));
 
-        // חומר חדש לרצפה - הוספנו kR (Reflection)
         Material floorMat = new Material().setKD(0.4).setKS(0.2).setShininess(20).setKR(0.4);
         Material sphereMat = new Material().setKD(0.5).setKS(0.4).setShininess(60);
 
         scene.geometries.add(
                 new Plane(new Point(0, -50, 0), new Vector(0, 1, 0))
-                        .setEmission(new Color(10, 10, 10)) // רצפה כהה יותר כדי לראות השתקפות
+                        .setEmission(new Color(10, 10, 10))
                         .setMaterial(floorMat)
         );
-        // כדור מרכזי גדול - מטיל צל ברור על הרצפה
         scene.geometries.add(
                 new Sphere(new Point(0, -10, -80), 35)
                         .setEmission(new Color(180, 30, 30))
                         .setMaterial(sphereMat)
         );
-        // כדור ירוק שמאל
         scene.geometries.add(
                 new Sphere(new Point(-70, -25, -80), 22)
                         .setEmission(new Color(30, 160, 30))
                         .setMaterial(sphereMat)
         );
-        // כדור כחול ימין
         scene.geometries.add(
                 new Sphere(new Point(70, -25, -80), 22)
                         .setEmission(new Color(30, 30, 180))
                         .setMaterial(sphereMat)
         );
-        // כדור צהוב קטן - שמאל קדימה
         scene.geometries.add(
                 new Sphere(new Point(-40, -38, -30), 12)
                         .setEmission(new Color(180, 180, 0))
                         .setMaterial(sphereMat)
         );
-        // כדור ציאן קטן - ימין קדימה
         scene.geometries.add(
                 new Sphere(new Point(40, -38, -30), 12)
                         .setEmission(new Color(0, 180, 180))
                         .setMaterial(sphereMat)
         );
-        // כדור סגול - שמאל רחוק
         scene.geometries.add(
                 new Sphere(new Point(-90, -40, -40), 8)
                         .setEmission(new Color(140, 0, 140))
                         .setMaterial(sphereMat)
         );
-        // כדור כתום - ימין רחוק
         scene.geometries.add(
                 new Sphere(new Point(90, -40, -40), 8)
                         .setEmission(new Color(200, 80, 0))
                         .setMaterial(sphereMat)
         );
-        // כדור אחורי רחוק
         scene.geometries.add(
                 new Sphere(new Point(0, -38, -160), 12)
                         .setEmission(new Color(60, 120, 60))
                         .setMaterial(sphereMat)
         );
-        // כדור מרחף באוויר
-        // כדור מרחף באוויר - עכשיו הוא כדור זכוכית שקוף!
         scene.geometries.add(
                 new Sphere(new Point(0, 40, -120), 18)
                         .setEmission(Color.BLACK) // זכוכית לא מאירה מעצמה
@@ -103,28 +92,25 @@ public class SoftShadowsTest {
                                 .setKT(0.85) // שקיפות גבוהה
                                 .setKR(0.1)) // מעט השתקפות על הזכוכית
         );
-// אור מרכזי - עוצמה מתונה יותר וגוון מעט חמים
         PointLight mainLight = new PointLight(
                 new Color(250, 200, 150),
                 new Point(80, 120, -40))
                 .setKl(0.0001).setKq(0.000002).setRadius(50);
         scene.lights.add(mainLight);
 
-        // אור אחורי - עוצמה מתונה
         PointLight sideLight = new PointLight(
                 new Color(100, 100, 200),
                 new Point(-80, 100, -40))
                 .setKl(0.0002).setKq(0.000005).setRadius(40);
         scene.lights.add(sideLight);
 
-        // ספוט עליון - הוחלש משמעותית כדי למנוע את הכתם הלבן למעלה
         SpotLight topSpot = new SpotLight(
                 new Color(100, 100, 100),
                 new Point(0, 200, -80),
                 new Vector(0, -1, 0))
                 .setKl(0.0001).setKq(0.000003).setRadius(45);
         scene.lights.add(topSpot);
-        // --- יצירת מצלמה לצללים קשיחים ---
+
         Camera cameraHard = Camera.getBuilder()
                 .setLocation(new Point(0, 30, 800))
                 .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
@@ -132,9 +118,9 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
-                .setMultithreading(-1) // מריץ במקביל באמצעות Streams
+                .setMultithreading(-1)
                 .setDebugPrint(0.1)
-                .setSoftShadows(false) // <--- משורשר ישירות ל-Builder!
+                .setSoftShadows(false)
                 .build();
 
         System.out.println("\nStarting Hard Shadows render...");
@@ -144,7 +130,6 @@ public class SoftShadowsTest {
         long endHard = System.currentTimeMillis();
         System.out.println("\nHard Shadows render time: " + (endHard - startHard) + " ms");
 
-        // --- יצירת מצלמה לצללים רכים ---
         Camera cameraSoft = Camera.getBuilder()
                 .setLocation(new Point(0, 30, 800))
                 .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
@@ -152,12 +137,12 @@ public class SoftShadowsTest {
                 .setVpDistance(800)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
-                .setMultithreading(4) // מריץ במקביל באמצעות Streams
+                .setMultithreading(4)
                 .setDebugPrint(0.1)
-                // <--- כל הגדרות הצללים משורשרות ישירות ל-Builder!
+
                 .setSoftShadows(true)
                 .setShadowTargetShape(TargetShape.CIRCLE)
-                .setShadowSamples(9) // 9x9 = 81 samples
+                .setShadowSamples(9)
                 .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID)
                 .build();
 

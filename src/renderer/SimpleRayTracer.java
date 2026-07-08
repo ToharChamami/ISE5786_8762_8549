@@ -35,7 +35,6 @@ class SimpleRayTracer extends RayTracerBase {
      * Initial attenuation coefficient for recursion.
      */
     private static final Double3 INITIAL_K = Double3.ONE;
-    // אלו השדות שחסרים לך - תוודאי שהם מופיעים בחלק העליון של המחלקה:
     private boolean softShadows = false;
     private TargetShape shadowTargetShape = TargetShape.CIRCLE;
     private SamplingPattern shadowPattern = SamplingPattern.REGULAR_GRID;
@@ -67,7 +66,7 @@ class SimpleRayTracer extends RayTracerBase {
     private Color calcColor(Intersection intersection, Ray ray) {
         return preprocessIntersection(intersection, ray.direction()) ?
                 _scene.ambientLight.getIntensity().scale(intersection.material.kA)
-                .add(calcColor(intersection, MAX_CALC_COLOR_LEVEL, INITIAL_K))
+                        .add(calcColor(intersection, MAX_CALC_COLOR_LEVEL, INITIAL_K))
                 : Color.BLACK;
     }
 
@@ -99,7 +98,6 @@ class SimpleRayTracer extends RayTracerBase {
         for (LightSource lightSource : _scene.lights) {
             if (preprocessLightSource(intersection, lightSource)) {
 
-                // האורות כבר עודכנו מראש, פשוט קוראים לחישוב!
                 Double3 ktr = transparency(intersection, lightSource);
 
                 if (ktr.product(k).isGreaterThan(MIN_CALC_COLOR_K)) {
@@ -166,15 +164,12 @@ class SimpleRayTracer extends RayTracerBase {
      * @return the average transparency attenuation factor (Double3)
      */
     private Double3 transparency(Intersection intersection, LightSource lightSource) {
-        // 1. קבלת אלומת הוקטורים (קרניים) ממקור האור אל הנקודה
         List<Vector> lightDirectionBeam = lightSource.getLBeam(intersection.point);
-        
+
         Double3 totalKtr = Double3.ZERO;
         double lightDistance = lightSource.getDistance(intersection.point);
 
-        // 2. מעבר על כל קרן באלומה
         for (Vector beamL : lightDirectionBeam) {
-            // הוקטור שהתקבל הוא מהאור לנקודה, נהפוך אותו כדי שייצא מהנקודה אל האור
             Vector lightDirection = beamL.scale(-1);
             Ray shadowRay = new Ray(intersection.point, lightDirection, intersection.normal);
 
@@ -183,10 +178,8 @@ class SimpleRayTracer extends RayTracerBase {
 
             if (shadowIntersections != null) {
                 for (Intersection geo : shadowIntersections) {
-                    // מוודאים שהחוסם נמצא בין הנקודה למקור האור ולא מאחוריו
                     if (alignZero(geo.point.distance(intersection.point) - lightDistance) <= 0) {
                         ktr = ktr.product(geo.material.kT);
-                        // עצירת חישוב מוקדמת אם הקרן נחסמה לחלוטין (פגעה באובייקט אטום)
                         if (ktr.isLowerThan(MIN_CALC_COLOR_K)) {
                             ktr = Double3.ZERO;
                             break;
@@ -194,11 +187,9 @@ class SimpleRayTracer extends RayTracerBase {
                     }
                 }
             }
-            // הוספת התרומה של הקרן הנוכחית לסך הכל
             totalKtr = totalKtr.add(ktr);
         }
 
-        // 3. חישוב הממוצע (חלוקת הסכום במספר הקרניים)
         return totalKtr.scale(1.0 / lightDirectionBeam.size());
     }
 
@@ -247,7 +238,11 @@ class SimpleRayTracer extends RayTracerBase {
                 .add(calcGlobalEffect(refractedRay, level, k, intersection.material.kT));
     }
 
-    // פונקציית עזר שדוחפת את ההגדרות לכל האורות בסצנה (פועלת פעם אחת)
+    /**
+     * Updates all point light sources in the scene with the current shadow sampling configurations.
+     * The method iterates through the scene's light sources, checks for instances of point lights,
+     * and configures their sampler, target shape, and sampling pattern properties.
+     */
     private void updateLightsWithShadows() {
         if (_scene != null && _scene.lights != null) {
             for (LightSource light : _scene.lights) {
@@ -260,24 +255,55 @@ class SimpleRayTracer extends RayTracerBase {
         }
     }
 
-    // העדכון של ה-Setters שיקראו לפונקציה:
+    /**
+     * Sets whether soft shadows are enabled or disabled for the ray tracer.
+     * The method updates the inner soft shadows boolean flag and returns the current
+     * tracer instance to support fluent method chaining.
+     *
+     * @param softShadows A boolean flag indicating whether to enable soft shadows.
+     * @return The current {@code SimpleRayTracer} instance for chaining method calls.
+     */
     public SimpleRayTracer setSoftShadows(boolean softShadows) {
         this.softShadows = softShadows;
         return this;
     }
 
+    /**
+     * Sets the target geometric shape used for light source shadow sampling.
+     * The method updates the shadow target shape setting, synchronizes the configuration
+     * across existing scene lights, and returns the current tracer instance.
+     *
+     * @param shape The {@code TargetShape} to be used as the sampling target area.
+     * @return The current {@code SimpleRayTracer} instance for chaining method calls.
+     */
     public SimpleRayTracer setShadowTargetShape(TargetShape shape) {
         this.shadowTargetShape = shape;
         updateLightsWithShadows();
         return this;
     }
 
+    /**
+     * Sets the sampling pattern used for distributed shadow ray calculation.
+     * The method updates the inner shadow sampling pattern, applies the new configurations
+     * to the point lights in the scene, and returns the current instance.
+     *
+     * @param pattern The {@code SamplingPattern} layout strategy to be used.
+     * @return The current {@code SimpleRayTracer
+     */
     public SimpleRayTracer setShadowSamplingPattern(SamplingPattern pattern) {
         this.shadowPattern = pattern;
         updateLightsWithShadows();
         return this;
     }
 
+    /**
+     * Sets the grid size for shadow sampling to configure soft shadows.
+     * The method initializes a new sampler object using the specified grid size, updates the
+     * light sources to reflect the change in shadow rendering, and returns the current instance.
+     *
+     * @param gridSize The dimension of the sampling grid (e.g., number of rays along an edge) used for shadows.
+     * @return The current {@code SimpleRayTracer} instance for chaining method calls.
+     */
     public SimpleRayTracer setShadowSamples(int gridSize) {
         this.shadowSampler = new Sampler(gridSize);
         updateLightsWithShadows();

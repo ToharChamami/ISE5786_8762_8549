@@ -1,7 +1,6 @@
 package geometries.api;
 
 import java.util.List;
-
 import lighting.LightSource;
 import primitives.Material;
 import primitives.Point;
@@ -20,6 +19,11 @@ public abstract class Intersectable {
     public Intersectable() {
     }
 
+    /**
+     * Global configuration flag to enable or disable Conservative Bounding Region (CBR) optimization.
+     * When set to {@code true}, the rendering engine computes and utilizes bounding boxes (AABB)
+     * to accelerate spatial intersection tests across geometries.
+     */
     public static boolean cbrActive = false;
 
     /**
@@ -107,8 +111,8 @@ public abstract class Intersectable {
         var intersections = calcIntersections(ray);
         return intersections == null ? null
                 : intersections.stream()
-                  .map(intersection -> intersection.point)
-                  .toList();
+                .map(intersection -> intersection.point)
+                .toList();
     }
 
     /**

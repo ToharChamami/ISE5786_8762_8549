@@ -53,15 +53,11 @@ class MultipleLightsTests {
 
         scene.geometries.add(sphere);
 
-        // Light sources
-        // 1. Directional Light: Dim red light coming from the top right
         scene.lights.add(new DirectionalLight(new Color(150, 0, 0), new Vector(1, -1, -1)));
 
-        // 2. Point Light: Green light placed on the bottom left
         scene.lights.add(new PointLight(new Color(0, 250, 0), new Point(-50, -50, 25))
                 .setKl(0.001).setKq(0.0002));
 
-        // 3. Spot Light: Bright white-yellowish spotlight focused from the front right
         scene.lights.add(new SpotLight(new Color(400, 300, 100), new Point(40, 40, 50), new Vector(-1, -1, -2))
                 .setKl(0.001).setKq(0.0001));
 
@@ -76,7 +72,6 @@ class MultipleLightsTests {
      */
     @Test
     void trianglesMultipleLights() {
-        // Scene and Camera setup with specific ambient light
         Scene scene = new Scene("Test scene multiple lights triangles")
                 .setAmbientLight(new AmbientLight(new Color(38, 38, 38)));
 
@@ -105,15 +100,11 @@ class MultipleLightsTests {
 
         scene.geometries.add(triangle1, triangle2);
 
-        // Light sources
-        // 1. Directional Light: Dim blueish overall lighting
         scene.lights.add(new DirectionalLight(new Color(0, 0, 150), new Vector(0, -1, 0)));
 
-        // 2. Point Light: Bright red light located near the center bottom
         scene.lights.add(new PointLight(new Color(400, 0, 0), new Point(10, -80, -100))
                 .setKl(0.002).setKq(0.0002));
 
-        // 3. Spot Light: Strong green spotlight hitting the top triangle
         scene.lights.add(new SpotLight(new Color(0, 400, 0), new Point(-40, 40, -50), new Vector(2, -1, -2))
                 .setKl(0.001).setKq(0.0001));
 

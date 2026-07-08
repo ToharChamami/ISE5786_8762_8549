@@ -7,39 +7,43 @@ import primitives.Vector;
 
 /**
  * Interface representing external light sources in the scene.
- * Defines functionality needed for lighting calculations on geometries.
+ * Defines functionality needed for directional and intensity lighting calculations on geometries.
  */
 public interface LightSource {
 
     /**
-     * Calculates the distance from the light source to a given point.
+     * Calculates the absolute distance from the light source position to a given target point.
+     * Used primary to evaluate shadow ray intersections and range attenuation thresholds.
      *
-     * @param point the point in space to measure the distance to
-     * @return the distance between the light source and the point
+     * @param point The point in 3D space to measure the distance to.
+     * @return The distance value between the light source and the target point.
      */
     double getDistance(Point point);
 
     /**
-     * Calculates the intensity of the light reaching a given point.
-     * Takes attenuation factors into account based on the implementation.
+     * Calculates the intensity color of the light reaching a given spatial point.
+     * Takes distance-based attenuation factors into account depending on the specific source implementation.
      *
-     * @param p the target point on a geometry
-     * @return the color intensity at the given point
+     * @param p The target point on a geometry surface.
+     * @return The calculated color intensity reaching the point.
      */
-    public Color getIntensity(Point p);
+    Color getIntensity(Point p);
 
     /**
-     * Calculates the direction vector of the light from the source to a given point.
-     * The returned vector must be normalized.
+     * Calculates the normalized direction vector of the light pointing from the source to a given target point.
      *
-     * @param p the target point on a geometry
-     * @return the normalized direction vector from the light source to the point
+     * @param p The target point on a geometry surface.
+     * @return The normalized direction vector from the light source to the point.
      */
-    public Vector getL(Point p);
+    Vector getL(Point p);
 
     /**
-     * Returns a beam of direction vectors from the light source to the point.
-     * Default implementation returns a single directional vector.
+     * Returns a collection beam of directional vectors from the light source boundary to the target point.
+     * Used to calculate distributed ray configurations for soft shadowing features.
+     * The default implementation fallback returns a single standard structural directional vector.
+     *
+     * @param p The target point on a geometry surface.
+     * @return A {@code List} containing the generated normalized directional vectors forming the beam.
      */
     default List<Vector> getLBeam(Point p) {
         return List.of(getL(p));

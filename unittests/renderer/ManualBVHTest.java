@@ -29,35 +29,61 @@ import special.TeapotTest;
  */
 public class ManualBVHTest {
 
-    // --- חומרים וצבעים משותפים לסצנה החשוכה ---
+    /**
+     * Material property for wooden objects in the scene.
+     */
     private final Material woodMat = new Material().setKD(0.7).setKS(0.2).setShininess(30);
-    private final Color woodColor = new Color(50, 25, 15); // עץ כהה מאוד
+
+    /**
+     * Color representation for the dark wood textures.
+     */
+    private final Color woodColor = new Color(50, 25, 15);
+
+    /**
+     * Material property for paper sheets placed on the desk.
+     */
     private final Material paperMat = new Material().setKD(0.8).setKS(0.1).setShininess(10);
-    private final Color paperColor = new Color(180, 180, 180); // דפים אפרפרים כדי לא להסתנוור
+
+    /**
+     * Diffuse gray color representation for papers to avoid overexposure.
+     */
+    private final Color paperColor = new Color(180, 180, 180);
+
+    /**
+     * Material property for the reflective ceramic vase body.
+     */
     private final Material vaseMat = new Material().setKD(0.7).setKS(0.6).setShininess(80).setKR(0.1);
-    private final Color vaseColor = new Color(30, 60, 100); // אגרטל כחול עמוק
+
+    /**
+     * Deep blue color representation for the vase.
+     */
+    private final Color vaseColor = new Color(30, 60, 100);
+
+    /**
+     * Material property allocated to organic plant and flower components.
+     */
     private final Material plantMat = new Material().setKD(0.6).setKS(0.2).setShininess(20);
 
     /**
-     * Helper function to create the common dark scene and lighting.
+     * Helper function to create the common dark scene and lighting environment.
+     *
+     * @param name The name of the scene.
+     * @return A configured {@code Scene} instance with baseline dark elements.
      */
     protected Scene createDarkScene(String name) {
         Scene scene = new Scene(name)
-                .setBackground(new Color(10, 10, 15)) // חדר כמעט שחור
+                .setBackground(new Color(10, 10, 15))
                 .setAmbientLight(new AmbientLight(new Color(15, 15, 15), Double3.ONE));
 
-        // רצפה כהה
         scene.geometries.add(
                 new Plane(new Point(0, -100, 0), new Vector(0, 1, 0))
                         .setEmission(new Color(20, 20, 25))
                         .setMaterial(new Material().setKD(0.5).setKS(0.1).setShininess(5))
         );
 
-        // תאורה ממוקדת מלמעלה (דרמטית) שיוצרת צללים על השולחן והרצפה
         scene.lights.add(new SpotLight(new Color(300, 270, 220), new Point(100, 250, 100), new Vector(-1, -2, -1))
-                .setKl(0.00001).setKq(0.000001).setRadius(10)); // רדיוס לצללים רכים
+                .setKl(0.00001).setKq(0.000001).setRadius(10));
 
-        // אור מילוי חלש מאוד מצד שמאל להדגשת קווי המתאר
         scene.lights.add(new PointLight(new Color(40, 50, 80), new Point(-200, 100, 200))
                 .setKl(0.0001).setKq(0.00001));
 
@@ -65,7 +91,10 @@ public class ManualBVHTest {
     }
 
     /**
-     * Helper function for common camera setup.
+     * Helper function for common camera builder setups.
+     *
+     * @param scene The scene being tracked by the camera builder.
+     * @return A pre-configured {@code Camera.Builder} instance.
      */
     protected Camera.Builder getCameraBuilder(Scene scene) {
         return Camera.getBuilder()
@@ -84,31 +113,31 @@ public class ManualBVHTest {
                 .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID);
     }
 
+    // ============ Equivalence Partitions Tests ==============
+    // EP01: Adding all components explicitly as a flattened sequence without structured nests
     // =====================================================================
-    // מבחן מס' 1: המבנה השטוח (FLAT) - ללא היררכיה (איטי מאוד!)
-    // =====================================================================
+
+    /**
+     * Test method analyzing unaccelerated, flat unorganized rendering loops.
+     */
     @Test
     public void testDarkDeskFlat() {
         Scene scene = createDarkScene("DarkDeskFlat");
 
-        // מוסיפים את כל העצמים באופן ישיר ("שטוח") לסצנה
         scene.geometries.add(getTableTop().toArray(new Intersectable[0]));
         scene.geometries.add(getRightLegs().toArray(new Intersectable[0]));
         scene.geometries.add(getLeftLegs().toArray(new Intersectable[0]));
         scene.geometries.add(getPapers().toArray(new Intersectable[0]));
         scene.geometries.add(getVaseBody().toArray(new Intersectable[0]));
 
-        // מפרקים גם את הפרחים לחתיכות קטנות וזורקים פנימה
         for (Geometries flower : getFlowers()) {
-            scene.geometries.add(flower); // Geometries פשוט מוסיף את הילדים במקרה של flat (אם לא בנוי טוב)
-            // הערה: לצורך בדיקה מחמירה, אנו מניחים שאין קופסאות.
+            scene.geometries.add(flower);
         }
 
-        // הקומקן (~1000 משולשים) בלי כל עטיפה היררכית - ידגיש עוד יותר את האיטיות של המבנה השטוח
         scene.geometries.add(getTeapotOnTable());
 
         Intersectable.cbrActive = true;
-        scene.geometries.createBoundingBox(); // יצירת קופסה אחת ענקית לכולם
+        scene.geometries.createBoundingBox();
         Camera camera = getCameraBuilder(scene).build();
 
         System.out.println("Starting FLAT Render (Dark Scene)...");
@@ -122,43 +151,35 @@ public class ManualBVHTest {
     // =====================================================================
     // מבחן מס' 2: המבנה ההיררכי (HIERARCHICAL) - שלב 2-B (מהיר מאוד!)
     // =====================================================================
+
+    /**
+     * Test method assessing manual spatial grouping structures and hardcoded layer optimization.
+     */
     @Test
     public void testDarkDeskHierarchical() {
         Scene scene = createDarkScene("DarkDeskHierarchical");
 
-        // 1. קבוצת הפלטה העליונה
         Geometries tableTop = new Geometries(getTableTop().toArray(new Intersectable[0]));
-
-        // 2. קבוצות רגליים מקובצות לפי צד (כדי שהקופסה תהיה צרה ולא תתפוס את כל האוויר תחת השולחן)
         Geometries rightLegs = new Geometries(getRightLegs().toArray(new Intersectable[0]));
         Geometries leftLegs = new Geometries(getLeftLegs().toArray(new Intersectable[0]));
-
-        // 3. איגוד השולחן המלא לקבוצה אחת
         Geometries fullDesk = new Geometries(tableTop, rightLegs, leftLegs);
-
-        // 4. קבוצת הדפים
         Geometries papersGroup = new Geometries(getPapers().toArray(new Intersectable[0]));
-
-        // 5. קבוצת האגרטל
         Geometries vaseGroup = new Geometries(getVaseBody().toArray(new Intersectable[0]));
         for (Geometries flower : getFlowers()) {
-            vaseGroup.add(flower); // כל פרח הוא כבר קבוצה (BVH node) קטנה והדוקה משלו!
+            vaseGroup.add(flower);
         }
-
-        // 6. קבוצת הקומקן - צומת נפרד משלה כדי שה-BVH יבנה עבורה תת-עץ יעיל בפני עצמו
         Geometries teapotGroup = getTeapotOnTable();
-
-        // 7. הוספת קבוצות העל (Hierarchy Nodes) לסצנה
         scene.geometries.add(fullDesk, papersGroup, vaseGroup, teapotGroup);
 
         // 8. יצירת עץ הקופסאות התוחמות (BVH Construction)
+
         Intersectable.cbrActive = true;
         scene.geometries.createBoundingBox();
 
         Camera camera = getCameraBuilder(scene).build();
 
         System.out.println("Starting HIERARCHICAL Render (Dark Scene)...");
-        long start = System.currentTimeMillis();// הפיכת רשימה שטוחה להיררכיה חכמה ואוטומטית לחלוטין!
+        long start = System.currentTimeMillis();
         scene.geometries.buildBVH();
         camera.renderImage();
         camera.writeToImage("Table_Dark_Hierarchical");
@@ -170,6 +191,11 @@ public class ManualBVHTest {
     // פונקציות בנאי - יוצרות את החפצים בסצנה
     // =====================================================================
 
+    /**
+     * Helper function generating table surface components.
+     *
+     * @return A list of geometries representing the tabletop planks and boundaries.
+     */
     protected List<Intersectable> getTableTop() {
         List<Intersectable> list = new ArrayList<>();
         list.add(new Polygon(new Point(120, 0, 80), new Point(120, 0, -80), new Point(-120, 0, -80), new Point(-120, 0, 80)).setEmission(woodColor).setMaterial(woodMat));
@@ -181,6 +207,11 @@ public class ManualBVHTest {
         return list;
     }
 
+    /**
+     * Helper function generating right side legs.
+     *
+     * @return A list containing cylinders matching the right structural support.
+     */
     protected List<Intersectable> getRightLegs() {
         return List.of(
                 new Cylinder(95, new Ray(new Point(105, -5, 65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat),
@@ -188,6 +219,11 @@ public class ManualBVHTest {
         );
     }
 
+    /**
+     * Helper function generating left side legs.
+     *
+     * @return A list containing cylinders matching the left structural support.
+     */
     protected List<Intersectable> getLeftLegs() {
         return List.of(
                 new Cylinder(95, new Ray(new Point(-105, -5, 65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat),
@@ -195,6 +231,11 @@ public class ManualBVHTest {
         );
     }
 
+    /**
+     * Helper function constructing flat layered papers on the desk surface.
+     *
+     * @return A list of flat bounding polygons representing papers.
+     */
     protected List<Intersectable> getPapers() {
         return List.of(
                 new Polygon(new Point(20, 0.1, 30), new Point(20, 0.1, -10), new Point(-20, 0.1, -10), new Point(-20, 0.1, 30)).setEmission(paperColor).setMaterial(paperMat),
@@ -202,6 +243,11 @@ public class ManualBVHTest {
         );
     }
 
+    /**
+     * Helper function creating the localized vase frame geometries.
+     *
+     * @return A list of intersecting elements forming the flower base holder.
+     */
     protected List<Intersectable> getVaseBody() {
         Point vaseBaseCenter = new Point(60, 10, -20);
         return List.of(
@@ -210,6 +256,11 @@ public class ManualBVHTest {
         );
     }
 
+    /**
+     * Helper function collecting all generated plant groupings.
+     *
+     * @return A list of aggregated flower structures.
+     */
     protected List<Geometries> getFlowers() {
         List<Geometries> flowers = new ArrayList<>();
         flowers.add(createSingleFlowerGroup(new Point(50, 38, -10), new Color(200, 30, 80))); // ורוד כהה
@@ -218,16 +269,22 @@ public class ManualBVHTest {
         return flowers;
     }
 
+    /**
+     * Constructs a unified flower cluster including individual stems and surrounding pedal globes.
+     *
+     * @param center     The baseline central cluster anchor point.
+     * @param petalColor The emission color factor allocated to outer spheres.
+     * @return An asset collection representing the fully populated flower structure.
+     */
     protected Geometries createFlower(Point center, Color petalColor) {
         Geometries flowerGroup = new Geometries();
 
-        // --- הוספת גבעול: שרשרת עיגולים (כדורים) ירוקים מהשולחן ועד לפרח ---
         Color stemColor = new Color(34, 139, 34); // ירוק כהה
         Material stemMat = new Material().setKD(0.6).setKS(0.1).setShininess(10);
 
-        double startY = 0.0; // בגובה השולחן
-        double endY = center.getY(); // בגובה ראש הפרח
-        int steps = 6; // מספר החוליות בשרשרת הגבעול
+        double startY = 0.0;
+        double endY = center.getY();
+        int steps = 6;
         for (int j = 0; j <= steps; j++) {
             double currentY = startY + (endY - startY) * j / steps;
             flowerGroup.add(new Sphere(new Point(center.getX(), currentY, center.getZ()), 0.8)
@@ -235,7 +292,6 @@ public class ManualBVHTest {
                     .setMaterial(stemMat));
         }
 
-        // --- עלי הכותרת של הפרח ---
         Material plantMat = new Material().setKD(0.5).setKS(0.5).setShininess(20);
         int petalsCount = 8;
         for (int i = 0; i < petalsCount; i++) {
@@ -249,27 +305,24 @@ public class ManualBVHTest {
         flowerGroup.createBoundingBox();
         return flowerGroup;
     }
+
     /**
-     * יוצר קבוצה היררכית עצמאית עבור הקומקן, מוקטן וממוקם על משטח השולחן.
-     * ה-BVH הכללי (createBoundingBox / buildBVH) יבנה תת-עץ יעיל לקבוצה הזו
-     * ברגע שהיא מוצבת כילד בתוך scene.geometries - אין צורך לבנות עבורה BVH בנפרד.
-     */
-    /**
-     * יוצר קבוצה היררכית עצמאית עבור הקומקום, מוקטן משמעותית וממוקם בפינה בטוחה על השולחן.
+     * Builds and downscales the classic Utah Teapot mesh item to fit precisely on the desk surface boundaries.
+     *
+     * @return A spatial network representing a simplified teapot object.
      */
     protected Geometries getTeapotOnTable() {
-        // X = -80 (שמאלה), Y = 2 (ממש מעל פני השולחן), Z = 40 (קרוב יותר למצלמה)
         Point teapotCenter = new Point(-80, 10, 40);
-
-        // הקטנה דרסטית של הקומקום כדי שייראה בגודל הגיוני ביחס לדפים ולאגרטל
         double scale = 0.2;
-
         return TeapotTest.buildTeapot(teapotCenter, scale);
     }
 
     /**
-     * יוצר פרח כקבוצה היררכית (Geometries) בפני עצמה.
-     * כל פרח עטוף בקופסה משלו, מה שמונע בדיקות מיותרות מול כל עלי הכותרת.
+     * Generates a fully contained tight individual flower group bounding space wrapper.
+     *
+     * @param center     Anchor target coordinate.
+     * @param petalColor Base color for surrounding petal components.
+     * @return A standalone encapsulated structural geometry tree node.
      */
     protected Geometries createSingleFlowerGroup(Point center, Color petalColor) {
         Geometries flowerGroup = new Geometries();
@@ -290,11 +343,12 @@ public class ManualBVHTest {
         return flowerGroup;
     }
 
+    /**
+     * Test method checking automatic pipeline sorting and partitioning on unstructured linear shapes.
+     */
     @Test
     public void testDarkDeskAutomaticBVH() {
         Scene scene = createDarkScene("DarkDeskAutoBVH");
-
-        // הוספה שטוחה רגילה (כאילו אין היררכיה)
         scene.geometries.add(getTableTop().toArray(new Intersectable[0]));
         scene.geometries.add(getRightLegs().toArray(new Intersectable[0]));
         scene.geometries.add(getLeftLegs().toArray(new Intersectable[0]));
@@ -303,7 +357,6 @@ public class ManualBVHTest {
         for (Geometries flower : getFlowers()) scene.geometries.add(flower);
         scene.geometries.add(getTeapotOnTable());
 
-        // הקסם האוטומטי - המערכת תסדר את הכל בעצמה!
         scene.geometries.buildBVH();
 
         Intersectable.cbrActive = true;

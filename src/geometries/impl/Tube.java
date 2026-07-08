@@ -30,17 +30,10 @@ public class Tube extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        // TDD Fix implementation
-        // the origin of the axis
         Point origin = _axis.origin();
-        // V is the direction of the axis
         Vector v = _axis.direction();
-        // t = v * (P - P0)
         double t = v.dotProduct(point.subtract(origin));
-        // O' = P0 + t * v
-        // If t is 0, the projection is exactly at the origin of the ray
         Point oTag = isZero(t) ? origin : origin.add(v.scale(t));
-        // Normal = (P - O') normalized
         return point.subtract(oTag).normalize();
     }
 

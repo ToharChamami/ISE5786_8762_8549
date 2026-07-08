@@ -9,10 +9,13 @@ import renderer.Camera;
  */
 public class MultiThreadingTest extends TeapotTest {
 
+    /**
+     * EP01: Single-threaded sequential ray tracing comparison test
+     * Test method checking baseline sequential execution performance without multithreading active.
+     */
     @Test
     public void test01_NoThreads() {
         System.out.println("--- Starting Base Render (0 Threads) ---");
-        // הקריאה החוזרת ל-setMultithreading תדרוס את הערך המקורי שב-prepareTeapot
         Camera camera = prepareTeapot()
                 .setMultithreading(0)
                 .setDebugPrint(1.0)
@@ -26,6 +29,10 @@ public class MultiThreadingTest extends TeapotTest {
         System.out.println("\nBase Render Time: " + (end - start) / 1000.0 + " seconds\n");
     }
 
+    /**
+     * EP01: Automated pool parallel pipeline scaling evaluation
+     * Test method validating concurrent image rendering acceleration using a parallel streams framework.
+     */
     @Test
     public void test02_ParallelStreams() {
         System.out.println("--- Starting Parallel Streams Render (-1) ---");
@@ -42,11 +49,15 @@ public class MultiThreadingTest extends TeapotTest {
         System.out.println("\nStreams Render Time: " + (end - start) / 1000.0 + " seconds\n");
     }
 
+    /**
+     * EP01: Distributed raw concurrent runtime metric gathering
+     * Test method benchmarking concurrent pixel processing utilizing manual raw thread allocations.
+     */
     @Test
     public void test03_RawThreads() {
         System.out.println("--- Starting Raw Threads Render (-2) ---");
         Camera camera = prepareTeapot()
-                .setMultithreading(-2) // ניתן גם לנסות מספר חיובי כמו 3 או 4
+                .setMultithreading(-2)
                 .setDebugPrint(1.0)
                 .build();
 

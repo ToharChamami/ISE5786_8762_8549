@@ -10,116 +10,137 @@ import scene.Scene;
 import static primitives.Util.alignZero;
 
 /**
- * Camera class representing the observer's location and orientation.
- * Implements the Builder pattern.
+ * Camera class representing the observer's location and orientation in 3D space.
+ * Implements the Builder design pattern for structured initialization and parameter validation.
  */
 public class Camera implements Cloneable {
 
     /**
-     * The image writer used to generate the image file
+     * The image writer used to generate and handle the output image file.
      */
     private ImageWriter _imageWriter;
+
     /**
-     * The ray tracer used to calculate pixel colors
+     * The ray tracer scene processor used to calculate individual pixel colors.
      */
     private RayTracerBase _rayTracer;
+
     /**
-     * Camera location
+     * Camera core physical location position point in 3D coordinate space.
      */
     private Point _p0;
+
     /**
-     * Vector pointing towards the scene
+     * Forward vector pointing directly towards the view plane scene center.
      */
     private Vector _vTo;
+
     /**
-     * Vector pointing up
+     * Upward orientation vector pointing to the local top sky frame boundary.
      */
     private Vector _vUp;
+
     /**
-     * Vector pointing to the right
+     * Rightward orientation vector calculated orthogonally from the to and up axes.
      */
     private Vector _vRight;
 
     /**
-     * View plane width
+     * Absolute width dimension allocated to the virtual view plane layer.
      */
     private double _width = 0;
+
     /**
-     * View plane height
+     * Absolute height dimension allocated to the virtual view plane layer.
      */
     private double _height = 0;
+
     /**
-     * Distance from camera to the view plane
+     * Distance length separating the camera focal center point from the view plane.
      */
     private double _distance = 0;
 
     /**
-     * Number of pixels in the X axis (columns)
+     * Total number of discrete pixels spanning along the horizontal X axis.
      */
     private int _nX = 1;
+
     /**
-     * Number of pixels in the Y axis (rows)
+     * Total number of discrete pixels spanning along the vertical Y axis.
      */
     private int _nY = 1;
 
     /**
-     * Center point of the view plane
+     * Absolute central spatial point coordinate of the projected view plane grid.
      */
     private Point _vpCenter;
+
     /**
-     * Width of a single pixel
+     * Individual width step factor calculated for a single horizontal pixel block.
      */
     private double _pixelWidth;
+
     /**
-     * Height of a single pixel
+     * Individual height step factor calculated for a single vertical pixel block.
      */
     private double _pixelHeight;
 
     /**
-     * Amount of threads to use for rendering image by the camera
+     * Total runtime thread count allocated to process the active image loop.
      */
-    private int _threadsCount = 0; // 0 means no multithreading by default
+    private int _threadsCount = 0;
 
     /**
-     * Amount of threads to spare for Java VM threads
+     * Amount of background operational threads reserved exclusively for JVM management tasks.
      */
     private static final int SPARE_THREADS = 2;
 
     /**
-     * Debug print interval in seconds. If 0, no progress output
+     * Active debug logging print refresh time threshold interval parameter measured in seconds.
      */
     private double _printInterval = 0;
 
     /**
-     * Pixel manager for supporting multi-threading and progress print
+     * Internal pixel indexing progress coordinator used to safe-sync thread tasks.
      */
     private PixelManager _pixelManager;
 
-    // סוג הטיפוס לבחירת מצב הריצה
+    /**
+     * Soft shadow global toggle determining if distributed ray bundling is applied.
+     */
+    private boolean _softShadows = false;
+
+    /**
+     * Geometric bounding grid boundary profile template allocated for shadow calculations.
+     */
+    private renderer.sampling.TargetShape _shadowTargetShape = renderer.sampling.TargetShape.CIRCLE;
+
+    /**
+     * Spatial arrangement configuration strategy used to plot shadow grid target arrays.
+     */
+    private renderer.sampling.SamplingPattern _shadowSamplingPattern = renderer.sampling.SamplingPattern.REGULAR_GRID;
+
+    /**
+     * Total number of sample rays cast into light source bounding vectors for soft shadowing.
+     */
+    private int _shadowSamples = 1;
 
     /**
      * Private default constructor for Camera.
+     * Prevents direct instance creations outside the associated static builder workflow.
      */
     private Camera() {
     }
 
-    // Soft shadow settings for the Camera
-    private boolean _softShadows = false;
-    private renderer.sampling.TargetShape _shadowTargetShape = renderer.sampling.TargetShape.CIRCLE;
-    private renderer.sampling.SamplingPattern _shadowSamplingPattern = renderer.sampling.SamplingPattern.REGULAR_GRID;
-    private int _shadowSamples = 1;
-
     /**
-     * Renders the image by casting rays for every pixel.
-     * Chooses the rendering method based on threadsCount.
+     * Renders the complete scene image by triggering rays through every individual view plane pixel.
+     * Selects and delegates processing loops based on the configured concurrency thread strategies.
      *
-     * @return the camera itself for chaining
+     * @return The current {@code Camera} instance for chained operational setups.
      */
     public Camera renderImage() {
-        // 1. אתחול מנהל הפיקסלים - הוא יקבל את מספר השורות, העמודות וזמן ההדפסה
         _pixelManager = new PixelManager(_nY, _nX, _printInterval);
 
-        // 2. ניתוב המצב לפי מה שהוגדר ב-Builder
         return switch (_threadsCount) {
             case 0 -> renderImageNoThreads();
             case -1 -> renderImageStream();
@@ -128,9 +149,9 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Render image without multi-threading
+     * Render engine fallback processing pixel loops sequentially inside the primary caller thread.
      *
-     * @return the camera object itself
+     * @return The current {@code Camera} instance reference.
      */
     private Camera renderImageNoThreads() {
         for (int i = 0; i < _nY; ++i) {
@@ -142,9 +163,9 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Render image using multi-threading by parallel streaming
+     * Render engine processing image grids concurrently utilizing Java parallel stream pipelines.
      *
-     * @return the camera object itself
+     * @return The current {@code Camera} instance reference.
      */
     private Camera renderImageStream() {
         java.util.stream.IntStream.range(0, _nY).parallel()
@@ -154,9 +175,9 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Render image using multi-threading by creating and running raw threads
+     * Render engine processing image grids using raw low-level synchronized thread workers.
      *
-     * @return the camera object itself
+     * @return The current {@code Camera} instance reference.
      */
     private Camera renderImageRawThreads() {
         var threads = new java.util.LinkedList<Thread>();
@@ -170,12 +191,10 @@ public class Camera implements Cloneable {
             }));
         }
 
-        // start threads here
         for (var thread : threads) {
             thread.start();
         }
 
-        // wait for all the threads
         try {
             for (var thread : threads) {
                 thread.join();
@@ -187,10 +206,10 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Casts a ray through a specific pixel and colors it.
+     * Casts a generated ray through a specific pixel center coordinate and updates the image target color.
      *
-     * @param j column index
-     * @param i row index
+     * @param j Horizontal column pixel element coordinate index.
+     * @param i Vertical row pixel element coordinate index.
      */
     private void castRay(int j, int i) {
         Ray ray = constructRay(j, i);
@@ -203,11 +222,11 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Prints a grid on the image.
+     * Prints a visual validation orientation grid overlay across the output image boundaries.
      *
-     * @param interval the grid interval
-     * @param color    the grid color
-     * @return the camera itself for chaining
+     * @param interval Step sequence interval defining row and column grid spacing lines.
+     * @param color    The designated color factor value painted onto the line markers.
+     * @return The current {@code Camera} instance reference for call chaining.
      */
     public Camera printGrid(int interval, Color color) {
         for (int i = 0; i < _nY; ++i) {
@@ -221,18 +240,18 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Delegates writing the image to the ImageWriter.
+     * Triggers the internal image writer to commit and serialize data fields to a physical image file.
      *
-     * @param imageName the name of the file to save the image as
+     * @param imageName The file name identification string assigned to the generated output graphic.
      */
     public void writeToImage(String imageName) {
         _imageWriter.writeToImage(imageName);
     }
 
     /**
-     * Returns the ray tracer used by the camera.
+     * Returns the active scene tracing processing model linked to this camera.
      *
-     * @return the current ray tracer instance
+     * @return The current {@code RayTracerBase} processing instance.
      */
     public RayTracerBase getRayTracer() {
         return this._rayTracer;
@@ -255,20 +274,20 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * Static method to get a new Builder object.
+     * Instantiates a clean setup instance of the Camera Builder helper tool.
      *
-     * @return a new Camera.Builder instance
+     * @return A new {@code Camera.Builder} instance.
      */
     public static Builder getBuilder() {
         return new Builder();
     }
 
     /**
-     * Constructs a ray passing through the center of a specific pixel on the view plane.
+     * Constructs a calculated viewing ray passing directly through the geometric center of a designated pixel element.
      *
-     * @param j column index of the pixel
-     * @param i row index of the pixel
-     * @return Ray from the camera's origin through the pixel center
+     * @param j Horizontal column grid position index.
+     * @param i Vertical row grid position index.
+     * @return A new {@code Ray} starting from the camera location and passing through the targeted pixel midpoints.
      */
     public Ray constructRay(int j, int i) {
         Point pIJ = _vpCenter;
@@ -288,37 +307,42 @@ public class Camera implements Cloneable {
 
     /**
      * Inner static class for building Camera objects.
+     * Handles parameter gathering, coordinate checks, and structural orthogonality validations.
      */
     public static class Builder {
 
         /**
-         * The camera object being built
+         * The configuration camera target instance being assembled by the builder.
          */
-        final private Camera _camera = new Camera();
+        private final Camera _camera = new Camera();
+
         /**
-         * Vector pointing towards the scene
+         * Temporary storage for the forward target orientation vector.
          */
         private Vector _vTo = null;
+
         /**
-         * Target point for the camera to look at
+         * Target coordinate spot position point the camera is designated to track.
          */
         private Point _target = null;
+
         /**
-         * Vector pointing up
+         * Temporary storage for the upward vertical orientation vector.
          */
         private Vector _vUp = Vector.AXIS_Y;
 
         /**
-         * Default constructor for Builder
+         * Default constructor for Builder.
+         * Sets up standard uninitialized parameters ready for properties population.
          */
         public Builder() {
         }
 
         /**
-         * Sets the camera's location.
+         * Sets the physical location coordinates for the camera focus center point.
          *
-         * @param location the location point
-         * @return the Builder object
+         * @param location The coordinate spot point representing the camera base positioning.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setLocation(Point location) {
             _camera._p0 = location;
@@ -326,11 +350,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the camera's direction vectors.
+         * Sets the camera directional tracking parameters using absolute forward and up vector guides.
          *
-         * @param to vector pointing towards the view plane
-         * @param up vector pointing up
-         * @return the Builder object
+         * @param to Vector indicating the forward view direction axis path.
+         * @param up Vector indicating the upward sky alignment axis path.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setDirection(Vector to, Vector up) {
             this._vTo = to;
@@ -340,11 +364,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the camera's target point and up vector.
+         * Sets camera directional vectors automatically based on a fixed spatial coordinate point target.
          *
-         * @param target the point the camera is looking at
-         * @param up     vector pointing up
-         * @return the Builder object
+         * @param target Geometric destination point position to align the lens vectors towards.
+         * @param up     Vector indicating the upward sky alignment axis path.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setDirection(Point target, Vector up) {
             this._target = target;
@@ -354,10 +378,10 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the camera's target point (default up vector is Y-axis).
+         * Sets camera direction fields towards a specific point using a default vertical Y-axis vector guide.
          *
-         * @param target the point the camera is looking at
-         * @return the Builder object
+         * @param target Geometric destination point position to align the lens vectors towards.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setDirection(Point target) {
             this._target = target;
@@ -367,11 +391,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the view plane size.
+         * Sets the absolute physical size dimensions assigned to the virtual view plane grid.
          *
-         * @param width  the width of the view plane
-         * @param height the height of the view plane
-         * @return the Builder object
+         * @param width  Horizontal length width boundary value.
+         * @param height Vertical length height boundary value.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setVpSize(double width, double height) {
             _camera._width = width;
@@ -380,10 +404,10 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the distance to the view plane.
+         * Sets the distance length threshold separating the camera origin from the view plane surface.
          *
-         * @param distance distance from camera to view plane
-         * @return the Builder object
+         * @param distance Numerical distance dimension value.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setVpDistance(double distance) {
             _camera._distance = distance;
@@ -391,11 +415,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the resolution of the view plane.
+         * Sets the image matrix resolution split parameters (total pixel counts across major layout axes).
          *
-         * @param nX number of pixels in X axis
-         * @param nY number of pixels in Y axis
-         * @return the Builder object
+         * @param nX Horizontal coordinate total pixel rows.
+         * @param nY Vertical coordinate total pixel rows.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setResolution(int nX, int nY) {
             _camera._nX = nX;
@@ -404,13 +428,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Set multi-threading.
+         * Sets the thread execution counts and model settings for handling image processing tasks.
          *
-         * @param threads number of threads.
-         *                -2 = logical processors less SPARE_THREADS
-         *                -1 = stream processing parallelization
-         *                0 = no multi-threading
-         * @return builder object itself
+         * @param threads Multi-thread allocation parameter indicator code (-2 for auto, -1 for streams, 0 for single).
+         * @return The active {@code Builder} instance reference.
+         * @throws IllegalArgumentException If the input parameter value falls below -2.
          */
         public Builder setMultithreading(int threads) {
             if (threads < -2) {
@@ -426,10 +448,10 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Enables or disables soft shadows for the camera's ray tracer.
+         * Enables or disables soft shadow calculations within the active ray tracing framework.
          *
-         * @param softShadows true to enable soft shadows, false for hard shadows
-         * @return the Builder object
+         * @param softShadows {@code true} to activate soft shadows, {@code false} for default sharp shadows.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setSoftShadows(boolean softShadows) {
             _camera._softShadows = softShadows;
@@ -437,10 +459,10 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the target shape used for soft shadow sampling.
+         * Sets the geometric layout target sampling matrix profile used to calculate soft shading.
          *
-         * @param shape the shadow target shape (SQUARE or CIRCLE)
-         * @return the Builder object
+         * @param shape Designated sampling geometric shape structure (SQUARE or CIRCLE).
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setShadowTargetShape(renderer.sampling.TargetShape shape) {
             _camera._shadowTargetShape = shape;
@@ -448,10 +470,10 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the sampling pattern used for soft shadow sampling.
+         * Sets the distribution algorithm strategy configuration used to drop rays over soft shadow planes.
          *
-         * @param pattern the sampling pattern (REGULAR_GRID or JITTERED_GRID)
-         * @return the Builder object
+         * @param pattern The active grid distribution configuration pattern (REGULAR_GRID or JITTERED_GRID).
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setShadowSamplingPattern(renderer.sampling.SamplingPattern pattern) {
             _camera._shadowSamplingPattern = pattern;
@@ -459,10 +481,10 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the grid size (number of samples per axis) used for soft shadow sampling.
+         * Sets the maximum amount of individual bundle rays cast per light profile area to calculate soft shadow boundaries.
          *
-         * @param gridSize the sampling grid size
-         * @return the Builder object
+         * @param gridSize Sample count density step value.
+         * @return The active {@code Builder} instance reference.
          */
         public Builder setShadowSamples(int gridSize) {
             _camera._shadowSamples = gridSize;
@@ -470,10 +492,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Set debug printing interval. If it's zero, there won't be printing at all.
+         * Sets the print step logging timeout parameters used to output console render status indicators.
          *
-         * @param interval printing interval in seconds
-         * @return builder object itself
+         * @param interval Time tracking gap threshold input measured in seconds.
+         * @return The active {@code Builder} instance reference.
+         * @throws IllegalArgumentException If the provided interval parameter value drops below zero.
          */
         public Builder setDebugPrint(double interval) {
             if (interval < 0) {
@@ -484,9 +507,9 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Validates all parameters and builds the camera.
+         * Validates all gathered field inputs, processes geometric alignments, and instantiates the compiled camera model.
          *
-         * @return a new cloned Camera object
+         * @return A validated, cloned {@code Camera} instance configuration block, or {@code null} if initialization fails.
          */
         public Camera build() {
             checkResolution();
@@ -510,7 +533,9 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Checks if resolution data is positive.
+         * Checks if the resolution fields are valid and initializes the interior ImageWriter dependency.
+         *
+         * @throws IllegalArgumentException If horizontal or vertical pixel dimensions drop below or equal 0.
          */
         private void checkResolution() {
             if (_camera._nX <= 0 || _camera._nY <= 0) {
@@ -520,10 +545,12 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Checks location and direction, and computes orthogonal vectors.
+         * Evaluates camera position points and ensures direction tracking vectors maintain accurate 90-degree orthogonal states.
+         *
+         * @throws MissingResourceException If the baseline position parameters or targeted vector parameters are omitted.
+         * @throws IllegalArgumentException If the direction vectors are parallel or fail mutual orthogonality parameters.
          */
         private void checkLocationAndDirection() {
-
             if (_camera._p0 == null) {
                 throw new MissingResourceException("Missing camera location", "Camera", "Location");
             }
@@ -547,10 +574,11 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Checks view plane data and calculates helper fields.
+         * Validates view plane dimensional measurements and pre-computes operational pixel width and height scaling factors.
+         *
+         * @throws IllegalArgumentException If plane size bounds or focal distance entries evaluate to zero or lower.
          */
         private void checkViewPlane() {
-
             if (alignZero(_camera._width) <= 0 || alignZero(_camera._height) <= 0) {
                 throw new IllegalArgumentException("View Plane width and height must be positive");
             }
@@ -564,11 +592,12 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Sets the ray tracer for the camera.
+         * Sets up and attaches a specific ray tracing scene execution engine template to the active camera.
          *
-         * @param scene the scene to render
-         * @param type  the type of ray tracer to use
-         * @return the Builder object
+         * @param scene The global environment data matrix tracking objects and lighting maps.
+         * @param type  The target tracer algorithm structural identifier code.
+         * @return The active {@code Builder} instance reference.
+         * @throws IllegalArgumentException If the input type parameter does not map to recognized engine variations.
          */
         public Builder setRayTracer(Scene scene, RayTracerType type) {
             if (type == RayTracerType.SIMPLE) {
@@ -579,5 +608,4 @@ public class Camera implements Cloneable {
             return this;
         }
     }
-
 }

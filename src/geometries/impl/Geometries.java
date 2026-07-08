@@ -66,9 +66,8 @@ public class Geometries extends Intersectable {
 
         boolean hasBoxes = false;
         for (Intersectable item : geometries) {
-            item.createBoundingBox(); // דואגים שלכל איבר פנימי תחושב קופסה
+            item.createBoundingBox();
 
-            // שימוש ב-Getter במקום גישה ישירה לשדה המוגן
             BoundingBox itemBox = item.getBoundingBox();
 
             if (itemBox != null) {
@@ -87,8 +86,12 @@ public class Geometries extends Intersectable {
         }
     }
 
+    /**
+     * Builds a Bounding Volume Hierarchy tree for the geometries to optimize intersection performance.
+     * The method recursively processes nested geometry groups and splits finite items from infinite items
+     * using bounding boxes to construct the acceleration structure.
+     */
     public void buildBVH() {
-        // תיקון קריטי 1: קריאה רקורסיבית לכל תתי-הקבוצות (כדי שגם מודלים כמו הקומקום יקבלו עץ משלהם!)
         for (Intersectable item : this.geometries) {
             if (item instanceof Geometries) {
                 ((Geometries) item).buildBVH();
@@ -118,6 +121,14 @@ public class Geometries extends Intersectable {
         this.geometries.add(root);
     }
 
+    /**
+     * Recursively builds a Bounding Volume Hierarchy tree from a list of finite geometries.
+     * The method finds the longest axis of the overall bounding box, sorts the items by their centers
+     * along that axis, and splits them into two halves to form a balanced binary tree structure.
+     *
+     * @param list The list of intersectable geometries to be organized into the BVH tree.
+     * @return representing the root node (parent) of the generated tree structure.
+     */
     private Intersectable buildBVHTree(List<Intersectable> list) {
         if (list.isEmpty()) return new Geometries();
         if (list.size() == 1) return list.get(0);
@@ -156,7 +167,6 @@ public class Geometries extends Intersectable {
         }
 
         int mid = list.size() / 2;
-        // תיקון קריטי 2: המרה ל-ArrayList חדש מונעת באגים של ConcurrentModification במיון הרקורסיבי
         List<Intersectable> leftList = new ArrayList<>(list.subList(0, mid));
         List<Intersectable> rightList = new ArrayList<>(list.subList(mid, list.size()));
 
