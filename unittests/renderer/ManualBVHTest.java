@@ -65,6 +65,14 @@ public class ManualBVHTest {
     private final Material plantMat = new Material().setKD(0.6).setKS(0.2).setShininess(20);
 
     /**
+     * ctor for javadock
+     */
+    public ManualBVHTest() {
+    }
+
+    ;
+
+    /**
      * Helper function to create the common dark scene and lighting environment.
      *
      * @param name The name of the scene.

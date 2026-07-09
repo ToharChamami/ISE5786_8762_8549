@@ -35,11 +35,27 @@ class SimpleRayTracer extends RayTracerBase {
      * Initial attenuation coefficient for recursion.
      */
     private static final Double3 INITIAL_K = Double3.ONE;
-    private boolean softShadows = false;
-    private TargetShape shadowTargetShape = TargetShape.CIRCLE;
-    private SamplingPattern shadowPattern = SamplingPattern.REGULAR_GRID;
-    private Sampler shadowSampler = new Sampler(1);
 
+    /**
+     * Boolean flag to enable or disable soft shadows feature across the renderer.
+     */
+    private boolean softShadows = false;
+
+    /**
+     * Geometric plane shape configuration used as the target boundary framework for shadow ray sampling.
+     */
+    private TargetShape shadowTargetShape = TargetShape.CIRCLE;
+
+    /**
+     * Distribution grid pattern allocation algorithm layout used to place scattered sample points.
+     */
+    private SamplingPattern shadowPattern = SamplingPattern.REGULAR_GRID;
+
+    /**
+     * Inner sampling coordinator instance tasked with generating distributed vector offsets over target light sources.
+     */
+    private Sampler shadowSampler = new Sampler(1);
+    
     /**
      * Constructor
      *
@@ -287,8 +303,8 @@ class SimpleRayTracer extends RayTracerBase {
      * The method updates the inner shadow sampling pattern, applies the new configurations
      * to the point lights in the scene, and returns the current instance.
      *
-     * @param pattern The {@code SamplingPattern} layout strategy to be used.
-     * @return The current {@code SimpleRayTracer
+     * @param pattern The  layout strategy to be used.
+     * @return The current SimpleRayTracer
      */
     public SimpleRayTracer setShadowSamplingPattern(SamplingPattern pattern) {
         this.shadowPattern = pattern;

@@ -9,7 +9,16 @@ import primitives.Vector;
  * Representation of a spotlight source in the scene (such as a flashlight).
  */
 public class SpotLight extends PointLight {
+
+    /**
+     * Normalized direction vector representing the primary axis of the spotlight beam.
+     */
     private final Vector _direction;
+
+    /**
+     * Concentration exponent value regulating the sharpness and angular width of the spotlight beam.
+     * Higher values focus the light toward the central axis, resulting in a narrower and sharper beam spotlight cone.
+     */
     private double narrowBeam = 1d;
 
     /**

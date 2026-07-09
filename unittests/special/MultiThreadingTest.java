@@ -10,6 +10,14 @@ import renderer.Camera;
 public class MultiThreadingTest extends TeapotTest {
 
     /**
+     * fefult ctor
+     */
+    public MultiThreadingTest() {
+    }
+
+    ;
+
+    /**
      * EP01: Single-threaded sequential ray tracing comparison test
      * Test method checking baseline sequential execution performance without multithreading active.
      */
