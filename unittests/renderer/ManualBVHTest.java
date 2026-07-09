@@ -93,7 +93,7 @@ public class ManualBVHTest {
                 .setKl(0.00001).setKq(0.000001).setRadius(10));
 
         scene.lights.add(new PointLight(new Color(40, 50, 80), new Point(-200, 100, 200))
-                .setKl(0.0001).setKq(0.00001));
+                .setKl(0.0001).setKq(0.00001).setRadius(15));
 
         return scene;
     }

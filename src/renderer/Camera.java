@@ -248,15 +248,6 @@ public class Camera implements Cloneable {
         _imageWriter.writeToImage(imageName);
     }
 
-    /**
-     * Returns the active scene tracing processing model linked to this camera.
-     *
-     * @return The current {@code RayTracerBase} processing instance.
-     */
-    public RayTracerBase getRayTracer() {
-        return this._rayTracer;
-    }
-
     @Override
     public Camera clone() {
         try {

@@ -97,7 +97,7 @@ class PixelManager {
      * is the shared data of this critical section.<br/>
      * The function provides next available pixel number each call.
      *
-     * @return true if next pixel is allocated, false if there are no more pixels
+     * @return true if next pixel is allocated,
      */
     Pixel nextPixel() {
         synchronized (mutexNext) {
