@@ -116,7 +116,7 @@ public class BvhPerformanceTest extends ManualBVHTest {
         // EP01: Simple unaccelerated single-threaded rendering baseline loop
         Scene scene = createDarkScene("Flat_NoAcc_NoMT");
         scene.geometries.add(flattenGeometries(getManualHierarchyRoot()));
-        runConfig("01_Flat_NoAcc_NoMT", scene, true, 0);
+        runConfig("01_Flat_NoAcc_NoMT", scene, false, 0);
     }
 
     /**
@@ -128,7 +128,7 @@ public class BvhPerformanceTest extends ManualBVHTest {
         // EP01: Simple unaccelerated execution scaling utilizing multi-core workers
         Scene scene = createDarkScene("Flat_NoAcc_WithMT");
         scene.geometries.add(flattenGeometries(getManualHierarchyRoot()));
-        runConfig("02_Flat_NoAcc_WithMT", scene, true, -1);
+        runConfig("02_Flat_NoAcc_WithMT", scene, false, -1);
     }
 
     /**
@@ -168,7 +168,7 @@ public class BvhPerformanceTest extends ManualBVHTest {
         // EP01: Verifying rendering calculations for hardcoded group nestings
         Scene scene = createDarkScene("Manual_NoAcc_NoMT");
         scene.geometries.add(getManualHierarchyRoot());
-        runConfig("05_Manual_NoAcc_NoMT", scene, true, 0);
+        runConfig("05_Manual_NoAcc_NoMT", scene, false, 0);
     }
 
     /**
@@ -180,7 +180,7 @@ public class BvhPerformanceTest extends ManualBVHTest {
         // EP01: Scaling manual cluster groups over concurrent thread pools
         Scene scene = createDarkScene("Manual_NoAcc_WithMT");
         scene.geometries.add(getManualHierarchyRoot());
-        runConfig("06_Manual_NoAcc_WithMT", scene, true, -1);
+        runConfig("06_Manual_NoAcc_WithMT", scene, false, -1);
     }
 
     /**
@@ -226,7 +226,7 @@ public class BvhPerformanceTest extends ManualBVHTest {
         long endTree = System.currentTimeMillis();
         System.out.println("Automatic BVH Tree build time: " + (endTree - startTree) + " ms.");
 
-        runConfig("09_Auto_NoAcc_NoMT", scene, true, 0);
+        runConfig("09_Auto_NoAcc_NoMT", scene, false, 0);
     }
 
     /**
@@ -239,7 +239,7 @@ public class BvhPerformanceTest extends ManualBVHTest {
         Scene scene = createDarkScene("Auto_NoAcc_WithMT");
         scene.geometries.add(flattenGeometries(getManualHierarchyRoot()));
         scene.geometries.buildBVH();
-        runConfig("10_Auto_NoAcc_WithMT", scene, true, -1);
+        runConfig("10_Auto_NoAcc_WithMT", scene, false, -1);
     }
 
     /**
