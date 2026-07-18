@@ -21,7 +21,6 @@ import primitives.Vector;
 import renderer.sampling.SamplingPattern;
 import renderer.sampling.TargetShape;
 import scene.Scene;
-import special.TeapotTest;
 
 /**
  * Test class generating a dark, moody 3D desk with papers and flowers.
@@ -144,7 +143,7 @@ public class ManualBVHTest {
 
         scene.geometries.add(getTeapotOnTable());
 
-        Intersectable.cbrActive = true;
+        Intersectable.cbrActive = false;
         scene.geometries.createBoundingBox();
         Camera camera = getCameraBuilder(scene).build();
 

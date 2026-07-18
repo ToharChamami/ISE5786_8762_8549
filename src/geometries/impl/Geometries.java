@@ -65,6 +65,8 @@ public class Geometries extends Intersectable {
         double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
 
         boolean hasBoxes = false;
+        boolean hasInfinites = false;
+
         for (Intersectable item : geometries) {
             item.createBoundingBox();
 
@@ -78,11 +80,15 @@ public class Geometries extends Intersectable {
                 if (itemBox.maxY > maxY) maxY = itemBox.maxY;
                 if (itemBox.minZ < minZ) minZ = itemBox.minZ;
                 if (itemBox.maxZ > maxZ) maxZ = itemBox.maxZ;
+            } else {
+                hasInfinites = true;
             }
         }
 
-        if (hasBoxes) {
+        if (hasBoxes && !hasInfinites) {
             this.box = new BoundingBox(minX, maxX, minY, maxY, minZ, maxZ);
+        } else {
+            this.box = null;
         }
     }
 

@@ -1,7 +1,6 @@
-package special;
+package renderer;
 
 import org.junit.jupiter.api.Test;
-import renderer.Camera;
 
 /**
  * Test class to measure multi-threading performance improvements.

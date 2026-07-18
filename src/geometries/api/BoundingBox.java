@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import static primitives.Util.alignZero;
+
 /**
  * Represents an Axis-Aligned Bounding Box (AABB) for Conservative Bounding Region (CBR) acceleration.
  * The box is defined by minimum and maximum coordinates along the X, Y, and Z axes to restrict spatial bounds.
@@ -40,6 +42,8 @@ public class BoundingBox {
      */
     public final double maxZ;
 
+    private static final double DELTA = 0.1;
+
     /**
      * Constructs a BoundingBox with specific minimum and maximum values for each axis.
      * The method initializes the absolute geometric boundaries of the volume across all three spatial dimensions.
@@ -52,12 +56,13 @@ public class BoundingBox {
      * @param maxZ The highest bounds along the Z axis.
      */
     public BoundingBox(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
-        this.minZ = minZ;
-        this.maxZ = maxZ;
+        // הרחיבי את הקופסה מעט לכל כיוון
+        this.minX = minX - DELTA;
+        this.maxX = maxX + DELTA;
+        this.minY = minY - DELTA;
+        this.maxY = maxY + DELTA;
+        this.minZ = minZ - DELTA;
+        this.maxZ = maxZ + DELTA;
     }
 
     /**
@@ -72,37 +77,47 @@ public class BoundingBox {
         Point orig = ray._origin;
         Vector dir = ray._direction;
 
-        double tMin = (minX - orig.getX()) / dir.getX();
-        double tMax = (maxX - orig.getX()) / dir.getX();
+        // 1. נחלץ את ערכי הכיוון ונוודא שהם לעולם לא 0 מוחלט
+        double dirX = alignZero(dir.getX()) == 0 ? 0.00001 : dir.getX();
+        double dirY = alignZero(dir.getY()) == 0 ? 0.00001 : dir.getY();
+        double dirZ = alignZero(dir.getZ()) == 0 ? 0.00001 : dir.getZ();
+
+        // 2. ציר ה-X
+        double tMin = (minX - orig.getX()) / dirX;
+        double tMax = (maxX - orig.getX()) / dirX;
         if (tMin > tMax) {
             double temp = tMin;
             tMin = tMax;
             tMax = temp;
         }
 
-        double tyMin = (minY - orig.getY()) / dir.getY();
-        double tyMax = (maxY - orig.getY()) / dir.getY();
+        // 3. ציר ה-Y
+        double tyMin = (minY - orig.getY()) / dirY;
+        double tyMax = (maxY - orig.getY()) / dirY;
         if (tyMin > tyMax) {
             double temp = tyMin;
             tyMin = tyMax;
             tyMax = temp;
         }
 
+        // בדיקת חפיפה בין X ל-Y
         if ((tMin > tyMax) || (tyMin > tMax)) return false;
         if (tyMin > tMin) tMin = tyMin;
         if (tyMax < tMax) tMax = tyMax;
 
-        double tzMin = (minZ - orig.getZ()) / dir.getZ();
-        double tzMax = (maxZ - orig.getZ()) / dir.getZ();
+        // 4. ציר ה-Z
+        double tzMin = (minZ - orig.getZ()) / dirZ;
+        double tzMax = (maxZ - orig.getZ()) / dirZ;
         if (tzMin > tzMax) {
             double temp = tzMin;
             tzMin = tzMax;
             tzMax = temp;
         }
 
+        // בדיקת חפיפה סופית עם Z
         if ((tMin > tzMax) || (tzMin > tMax)) return false;
-        if (tzMax < tMax) tMax = tzMax;
 
-        return tMax > 0;
+        // אם עברנו הכל, יש פגיעה בקופסה!
+        return true;
     }
 }

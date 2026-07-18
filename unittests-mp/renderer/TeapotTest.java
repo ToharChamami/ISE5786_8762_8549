@@ -1,4 +1,4 @@
-package special;
+package renderer;
 
 import geometries.impl.Geometries;
 import geometries.impl.Sphere;
@@ -11,8 +11,6 @@ import primitives.Double3;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
-import renderer.Camera;
-import renderer.RayTracerType;
 import scene.Scene;
 
 import static java.awt.Color.YELLOW;
