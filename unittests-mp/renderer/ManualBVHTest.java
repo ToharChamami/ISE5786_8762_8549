@@ -69,8 +69,6 @@ public class ManualBVHTest {
     public ManualBVHTest() {
     }
 
-    ;
-
     /**
      * Helper function to create the common dark scene and lighting environment.
      *
@@ -105,14 +103,14 @@ public class ManualBVHTest {
      */
     protected Camera.Builder getCameraBuilder(Scene scene) {
         return Camera.getBuilder()
-                .setLocation(new Point(0, 150, 350)) // מבט מלמעלה וקדימה
+                .setLocation(new Point(0, 150, 350))
                 .setDirection(new Vector(0, -0.3, -1), new Vector(0, 1, -0.3))
                 .setVpSize(200, 200)
                 .setSoftShadows(true)
                 .setVpDistance(300)
                 .setResolution(800, 800)
                 .setRayTracer(scene, RayTracerType.SIMPLE)
-                .setMultithreading(0) // **מכובה!** כדי למדוד נטו את ה-BVH
+                .setMultithreading(0) //
                 .setDebugPrint(0.1)
                 .setSoftShadows(true)
                 .setShadowTargetShape(TargetShape.CIRCLE)
@@ -150,7 +148,7 @@ public class ManualBVHTest {
         System.out.println("Starting FLAT Render (Dark Scene)...");
         long start = System.currentTimeMillis();
         camera.renderImage();
-        camera.writeToImage("Table_Dark_Flat");
+        camera.writeToImage("Table_Dark_Flat_3");
         long end = System.currentTimeMillis();
         System.out.println("FLAT Render Time: " + (end - start) / 1000.0 + " seconds");
     }
@@ -189,7 +187,7 @@ public class ManualBVHTest {
         long start = System.currentTimeMillis();
         scene.geometries.buildBVH();
         camera.renderImage();
-        camera.writeToImage("Table_Dark_Hierarchical");
+        camera.writeToImage("Table_Dark_Hierarchical_3");
         long end = System.currentTimeMillis();
         System.out.println("HIERARCHICAL Render Time: " + (end - start) / 1000.0 + " seconds");
     }
@@ -215,14 +213,39 @@ public class ManualBVHTest {
     }
 
     /**
+     * Helper method to create a square table leg using four polygons.
+     * The polygons are constructed with vertices ordered counter-clockwise
+     * to ensure the normal vectors face outwards.
+     *
+     * @param topCenter The center point at the top of the leg.
+     * @param width     The width and depth of the square leg.
+     * @param height    The height of the leg extending downwards.
+     * @return A Geometries object containing the four polygon faces of the leg.
+     */
+    private Geometries createSquareLeg(Point topCenter, double width, double height) {
+        Geometries leg = new Geometries();
+        double w = width / 2;
+        double x = topCenter.getX();
+        double y = topCenter.getY();
+        double z = topCenter.getZ();
+
+        leg.add(new Polygon(new Point(x - w, y, z + w), new Point(x - w, y - height, z + w), new Point(x + w, y - height, z + w), new Point(x + w, y, z + w)).setEmission(woodColor).setMaterial(woodMat));
+        leg.add(new Polygon(new Point(x + w, y, z - w), new Point(x + w, y - height, z - w), new Point(x - w, y - height, z - w), new Point(x - w, y, z - w)).setEmission(woodColor).setMaterial(woodMat));
+        leg.add(new Polygon(new Point(x + w, y, z + w), new Point(x + w, y - height, z + w), new Point(x + w, y - height, z - w), new Point(x + w, y, z - w)).setEmission(woodColor).setMaterial(woodMat));
+        leg.add(new Polygon(new Point(x - w, y, z - w), new Point(x - w, y - height, z - w), new Point(x - w, y - height, z + w), new Point(x - w, y, z + w)).setEmission(woodColor).setMaterial(woodMat));
+
+        return leg;
+    }
+
+    /**
      * Helper function generating right side legs.
      *
      * @return A list containing cylinders matching the right structural support.
      */
     protected List<Intersectable> getRightLegs() {
         return List.of(
-                new Cylinder(95, new Ray(new Point(105, -5, 65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat),
-                new Cylinder(95, new Ray(new Point(105, -5, -65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat)
+                createSquareLeg(new Point(105, -5, 65), 12, 95),
+                createSquareLeg(new Point(105, -5, -65), 12, 95)
         );
     }
 
@@ -233,8 +256,8 @@ public class ManualBVHTest {
      */
     protected List<Intersectable> getLeftLegs() {
         return List.of(
-                new Cylinder(95, new Ray(new Point(-105, -5, 65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat),
-                new Cylinder(95, new Ray(new Point(-105, -5, -65), new Vector(0, -1, 0)), 6).setEmission(woodColor).setMaterial(woodMat)
+                createSquareLeg(new Point(-105, -5, 65), 12, 95),
+                createSquareLeg(new Point(-105, -5, -65), 12, 95)
         );
     }
 
@@ -277,44 +300,8 @@ public class ManualBVHTest {
     }
 
     /**
-     * Constructs a unified flower cluster including individual stems and surrounding pedal globes.
-     *
-     * @param center     The baseline central cluster anchor point.
-     * @param petalColor The emission color factor allocated to outer spheres.
-     * @return An asset collection representing the fully populated flower structure.
-     */
-    protected Geometries createFlower(Point center, Color petalColor) {
-        Geometries flowerGroup = new Geometries();
-
-        Color stemColor = new Color(34, 139, 34); // ירוק כהה
-        Material stemMat = new Material().setKD(0.6).setKS(0.1).setShininess(10);
-
-        double startY = 0.0;
-        double endY = center.getY();
-        int steps = 6;
-        for (int j = 0; j <= steps; j++) {
-            double currentY = startY + (endY - startY) * j / steps;
-            flowerGroup.add(new Sphere(new Point(center.getX(), currentY, center.getZ()), 0.8)
-                    .setEmission(stemColor)
-                    .setMaterial(stemMat));
-        }
-
-        Material plantMat = new Material().setKD(0.5).setKS(0.5).setShininess(20);
-        int petalsCount = 8;
-        for (int i = 0; i < petalsCount; i++) {
-            double angle = 2 * Math.PI * i / petalsCount;
-            double px = center.getX() + 3.5 * Math.cos(angle);
-            double py = center.getY() + 1.0;
-            double pz = center.getZ() + 3.5 * Math.sin(angle);
-            flowerGroup.add(new Sphere(new Point(px, py, pz), 2.2).setEmission(petalColor).setMaterial(plantMat));
-        }
-
-        flowerGroup.createBoundingBox();
-        return flowerGroup;
-    }
-
-    /**
-     * Builds and downscales the classic Utah Teapot mesh item to fit precisely on the desk surface boundaries.
+     * Helper function constructing the classic Utah Teapot mesh item.
+     * This function is placeholder, Teapot mesh creation logic is externally sourced.
      *
      * @return A spatial network representing a simplified teapot object.
      */
@@ -326,20 +313,28 @@ public class ManualBVHTest {
 
     /**
      * Generates a fully contained tight individual flower group bounding space wrapper.
+     * The logic is updated to create thicker, brighter, vase-aligned stems.
      *
-     * @param center     Anchor target coordinate.
+     * @param center     The baseline central cluster anchor point (where the flower is).
      * @param petalColor Base color for surrounding petal components.
      * @return A standalone encapsulated structural geometry tree node.
      */
     protected Geometries createSingleFlowerGroup(Point center, Color petalColor) {
         Geometries flowerGroup = new Geometries();
-        Point vaseTop = new Point(60, 12, -20); // יורד לתוך פתח האגרטל, לא נעצר בשפה העליונה
+        Point vaseTop = new Point(60, 12, -20);
 
-        Vector stemDir = vaseTop.subtract(center).normalize();
-        double stemLength = center.distance(vaseTop);
-        flowerGroup.add(new Cylinder(stemLength, new Ray(center, stemDir), 1.2).setEmission(new Color(20, 100, 30)).setMaterial(plantMat));
+        int segments = 15;
+        Vector step = vaseTop.subtract(center).scale(1.0 / segments);
+        Point current = center;
+
+        for (int i = 0; i <= segments; i++) {
+            flowerGroup.add(new Sphere(current, 1.8).setEmission(new Color(30, 150, 40)).setMaterial(plantMat));
+            if (i < segments) {
+                current = current.add(step);
+            }
+        }
+
         flowerGroup.add(new Sphere(center, 2.5).setEmission(new Color(200, 180, 0)).setMaterial(plantMat));
-
         for (int i = 0; i < 5; i++) {
             double angle = i * (2 * Math.PI / 5);
             double px = center.getX() + 3.5 * Math.cos(angle);
@@ -373,7 +368,7 @@ public class ManualBVHTest {
         System.out.println("Starting AUTOMATIC BVH Render...");
         long start = System.currentTimeMillis();
         camera.renderImage();
-        camera.writeToImage("Table_Dark_AutomaticBVH");
+        camera.writeToImage("Table_Dark_AutomaticBVH_3");
         long end = System.currentTimeMillis();
         System.out.println("AUTOMATIC Render Time: " + (end - start) / 1000.0 + " seconds");
     }

@@ -42,6 +42,10 @@ public class BoundingBox {
      */
     public final double maxZ;
 
+    /**
+     * a static delta
+     */
+
     private static final double DELTA = 0.1;
 
     /**
