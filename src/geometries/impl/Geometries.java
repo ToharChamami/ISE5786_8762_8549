@@ -4,6 +4,7 @@ import geometries.api.BoundingBox;
 import geometries.api.Intersectable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import primitives.Ray;
 
@@ -14,7 +15,7 @@ public class Geometries extends Intersectable {
     /**
      * List of intersect geometric objects
      */
-    private final List<Intersectable> geometries = new ArrayList<>();
+    private final List<Intersectable> _geometries = new ArrayList<>();
 
     /**
      * Empty constructor
@@ -37,13 +38,13 @@ public class Geometries extends Intersectable {
      * @param geometries objects to add
      */
     public void add(Intersectable... geometries) {
-        Collections.addAll(this.geometries, geometries);
+        Collections.addAll(_geometries, geometries);
     }
 
     @Override
     protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         List<Intersection> result = null;
-        for (Intersectable item : geometries) {
+        for (Intersectable item : _geometries) {
             var itemIntersections = item.calcIntersections(ray);
             if (itemIntersections != null) {
 
@@ -58,7 +59,7 @@ public class Geometries extends Intersectable {
 
     @Override
     protected void createBoundingBoxHelper() {
-        if (geometries.isEmpty()) return;
+        if (_geometries.isEmpty()) return;
 
         double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
@@ -67,9 +68,8 @@ public class Geometries extends Intersectable {
         boolean hasBoxes = false;
         boolean hasInfinites = false;
 
-        for (Intersectable item : geometries) {
+        for (Intersectable item : _geometries) {
             item.createBoundingBox();
-
             BoundingBox itemBox = item.getBoundingBox();
 
             if (itemBox != null) {
@@ -98,19 +98,17 @@ public class Geometries extends Intersectable {
      * using bounding boxes to construct the acceleration structure.
      */
     public void buildBVH() {
-        for (Intersectable item : this.geometries) {
-            if (item instanceof Geometries) {
-                ((Geometries) item).buildBVH();
+        createBoundingBox();
+        for (Intersectable item : this._geometries) {
+            if (item instanceof Geometries geometries) {
+                geometries.buildBVH();
             }
         }
 
-        if (this.geometries.size() <= 1) return;
-
-        createBoundingBox();
-
-        List<Intersectable> finites = new ArrayList<>();
-        List<Intersectable> infinites = new ArrayList<>();
-        for (Intersectable item : this.geometries) {
+        if (this._geometries.size() <= 1) return;
+        Geometries finites = new Geometries();
+        Geometries infinites = new Geometries();
+        for (Intersectable item : this._geometries) {
             if (item.getBoundingBox() != null) {
                 finites.add(item);
             } else {
@@ -118,69 +116,80 @@ public class Geometries extends Intersectable {
             }
         }
 
-        if (finites.size() <= 1) return;
+        if (finites._geometries.size() <= 2) return;
+        finites.buildBVHTree();
 
-        Intersectable root = buildBVHTree(finites);
-
-        this.geometries.clear();
-        this.geometries.addAll(infinites);
-        this.geometries.add(root);
+        _geometries.clear();
+        if (box == null) {
+            _geometries.add(infinites);
+            _geometries.add(finites);
+        } else {
+            _geometries.addAll(finites._geometries);
+        }
     }
 
     /**
      * Recursively builds a Bounding Volume Hierarchy tree from a list of finite geometries.
      * The method finds the longest axis of the overall bounding box, sorts the items by their centers
      * along that axis, and splits them into two halves to form a balanced binary tree structure.
-     *
-     * @param list The list of intersectable geometries to be organized into the BVH tree.
-     * @return representing the root node (parent) of the generated tree structure.
      */
-    private Intersectable buildBVHTree(List<Intersectable> list) {
-        if (list.isEmpty()) return new Geometries();
-        if (list.size() == 1) return list.get(0);
-        if (list.size() == 2) {
-            Geometries pair = new Geometries(list.get(0), list.get(1));
-            pair.createBoundingBox();
-            return pair;
-        }
+    private void buildBVHTree() {
+        createBoundingBox();
+        if (_geometries.size() <= 2) return;
 
-        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
-
-        for (Intersectable item : list) {
-            var box = item.getBoundingBox();
-            if (box != null) {
-                if (box.minX < minX) minX = box.minX;
-                if (box.maxX > maxX) maxX = box.maxX;
-                if (box.minY < minY) minY = box.minY;
-                if (box.maxY > maxY) maxY = box.maxY;
-                if (box.minZ < minZ) minZ = box.minZ;
-                if (box.maxZ > maxZ) maxZ = box.maxZ;
-            }
-        }
-
+        double minX = box.minX, maxX = box.maxX;
+        double minY = box.minY, maxY = box.maxY;
+        double minZ = box.minZ, maxZ = box.maxZ;
         double sizeX = maxX - minX;
         double sizeY = maxY - minY;
         double sizeZ = maxZ - minZ;
 
         if (sizeX > sizeY && sizeX > sizeZ) {
-            list.sort(java.util.Comparator.comparingDouble(g -> (g.getBoundingBox().minX + g.getBoundingBox().maxX) / 2));
+            _geometries.sort(Comparator.comparingDouble(g -> (g.getBoundingBox().minX + g.getBoundingBox().maxX) / 2));
         } else if (sizeY > sizeX && sizeY > sizeZ) {
-            list.sort(java.util.Comparator.comparingDouble(g -> (g.getBoundingBox().minY + g.getBoundingBox().maxY) / 2));
+            _geometries.sort(Comparator.comparingDouble(g -> (g.getBoundingBox().minY + g.getBoundingBox().maxY) / 2));
         } else {
-            list.sort(java.util.Comparator.comparingDouble(g -> (g.getBoundingBox().minZ + g.getBoundingBox().maxZ) / 2));
+            _geometries.sort(Comparator.comparingDouble(g -> (g.getBoundingBox().minZ + g.getBoundingBox().maxZ) / 2));
         }
 
-        int mid = list.size() / 2;
-        List<Intersectable> leftList = new ArrayList<>(list.subList(0, mid));
-        List<Intersectable> rightList = new ArrayList<>(list.subList(mid, list.size()));
+        int mid = _geometries.size() / 2;
+        Geometries leftList = new Geometries();
+        leftList._geometries.addAll(_geometries.subList(0, mid));
+        Geometries rightList = new Geometries();
+        leftList._geometries.addAll(_geometries.subList(mid, _geometries.size()));
 
-        Intersectable left = buildBVHTree(leftList);
-        Intersectable right = buildBVHTree(rightList);
+        leftList.buildBVH();
+        rightList.buildBVH();
 
-        Geometries parent = new Geometries(left, right);
-        parent.createBoundingBox();
-        return parent;
+        _geometries.clear();
+        _geometries.add(leftList);
+        _geometries.add(rightList);
     }
+
+    /**
+     * Recursive helper method to replicate and completely flatten a hierarchical geometry structure.
+     * Unpacks all composite node containers down to a single dimensional array list of leaf structures.
+     */
+    public void flatten() {
+        List<Intersectable> flatList = flattenHelper();
+        _geometries.clear();
+        _geometries.addAll(flatList);
+    }
+
+    /**
+     * Recursive helper.
+     *
+     * @return accumulated list containing all the basic geometries.
+     */
+    private List<Intersectable> flattenHelper() {
+        List<Intersectable> flatList = new ArrayList<>();
+        for (var geo : _geometries) {
+            if (geo instanceof Geometries geos)
+                flatList.addAll(geos.flattenHelper());
+            else
+                flatList.add(geo);
+        }
+        return flatList;
+    }
+
 }

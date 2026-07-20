@@ -119,8 +119,6 @@ public class Polygon extends Geometry {
 
     @Override
     protected void createBoundingBoxHelper() {
-        if (_vertices == null || _vertices.isEmpty()) return;
-
         double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
         double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;

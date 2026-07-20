@@ -1,6 +1,7 @@
 package renderer;
 
 import java.util.MissingResourceException;
+import java.util.stream.IntStream;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
@@ -168,8 +169,8 @@ public class Camera implements Cloneable {
      * @return The current {@code Camera} instance reference.
      */
     private Camera renderImageStream() {
-        java.util.stream.IntStream.range(0, _nY).parallel()
-                .forEach(i -> java.util.stream.IntStream.range(0, _nX).parallel()
+        IntStream.range(0, _nY).parallel()
+                .forEach(i -> IntStream.range(0, _nX).parallel()
                         .forEach(j -> castRay(j, i)));
         return this;
     }

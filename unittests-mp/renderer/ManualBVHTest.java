@@ -118,10 +118,6 @@ public class ManualBVHTest {
                 .setShadowSamplingPattern(SamplingPattern.JITTERED_GRID);
     }
 
-    // ============ Equivalence Partitions Tests ==============
-    // EP01: Adding all components explicitly as a flattened sequence without structured nests
-    // =====================================================================
-
     /**
      * Test method analyzing unaccelerated, flat unorganized rendering loops.
      */
